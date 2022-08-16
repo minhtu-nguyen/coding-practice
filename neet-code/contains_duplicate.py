@@ -1,5 +1,5 @@
 class Solution:
-  def containsDuplicaet(self, nums: List[int]) --> bool:
+  def containsDuplicaet(self, nums: List[int]) -> bool:
     hashset = set()
 
     for n in nums:
