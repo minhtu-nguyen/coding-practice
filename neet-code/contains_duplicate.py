@@ -1,5 +1,5 @@
 class Solution:
-  def containsDuplicaet(self, nums: List[int]) -> bool:
+  def containsDuplicate(self, nums: List[int]) -> bool:
     hashset = set()
 
     for n in nums:
@@ -10,6 +10,6 @@ class Solution:
 
 """
 Brute force: 2 loops - O(n^2) and O(1)
-Sort first: O(nlogn) and O(1)
-Extra mem: hashset - O(n) and O(n)
+Sort first: duplicate adjacent - O(nlogn) [n but sort take nlogn] and O(1)
+Extra mem: hashset check and hash - O(n) and O(n)
 """

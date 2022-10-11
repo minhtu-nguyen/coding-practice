@@ -10,6 +10,11 @@ class Solution:
         countT[t[i]] = 1 + countT.get(t[i], 0)
 
       return countS == countT # the same number of characters even duplicate --> same number of keys in dict
+      """
+      if c in countS:
+        if countS[c] != countT.get(c, 0):
+          return False //return ASA miss found
+      """
 
 """
 Brute force: 
