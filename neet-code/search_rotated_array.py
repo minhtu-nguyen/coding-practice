@@ -22,5 +22,5 @@ class Solution:
         return -1
 
 """
-
+Binary search, use order to check 
 """
