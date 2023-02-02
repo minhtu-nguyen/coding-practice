@@ -28,7 +28,7 @@ def isPalindrome(s):
     if c.isalnum():
       nenewStr += c.lower()
   return nenewStr == nenewStr[::-1]
-Better no extra space:
+Better no extra space: use 2 pointers
 """
 
 
