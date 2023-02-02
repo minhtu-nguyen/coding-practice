@@ -8,3 +8,8 @@ class Solution:
           count[ord(c) - ord("a")] += 1
         ans[tuple(count)].append(s)
       return ans.values()
+
+"""
+Overall O: m*nlogn using sort
+Better: using 26-letter count array O(m*n)
+"""
