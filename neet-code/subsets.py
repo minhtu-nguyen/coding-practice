@@ -20,5 +20,5 @@ class Solution:
 
 """
 Brute force: each element 2 choices 2*2*..*n = 2^n, length n ==> n*2^n
-Backtracking - build tree: 
+Backtracking - build tree
 """
