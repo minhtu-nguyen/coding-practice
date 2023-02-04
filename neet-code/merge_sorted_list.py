@@ -22,3 +22,8 @@ class Solution:
         tail.next = list2
 
       return dummy.next
+
+"""
+Brute force: O(k*n)
+Use like merge sort O(nlogk)
+"""
