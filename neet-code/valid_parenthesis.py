@@ -14,5 +14,6 @@ class Solution:
       return not stack
 
 """
+Use a hashmap 
 O(n) go through every element | O(n) use a stack
 """
