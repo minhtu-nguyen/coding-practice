@@ -16,3 +16,8 @@ class Solution:
       self.invertTree(root.left)
       self.invertTree(root.right)
       return root
+  
+
+"""
+Recursive DFS: visit every node and invert its children
+"""

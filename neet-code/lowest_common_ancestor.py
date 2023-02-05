@@ -17,3 +17,6 @@ class Solution:
         else:
           return cur
           
+"""
+DFS and find the split
+"""
