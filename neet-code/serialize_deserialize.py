@@ -40,4 +40,5 @@ class Codec:
 """
 BFS
 DFS: preorder
+O(n)
 """
