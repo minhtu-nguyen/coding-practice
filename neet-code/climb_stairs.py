@@ -9,3 +9,9 @@ class Solution:
         n1 = n2
         n2 = temp
       return n2
+
+"""
+Decision Tree DFS O(2^n) --> Repetitions
+Memoization: O(n)
+DP Bottom Up: 
+"""
