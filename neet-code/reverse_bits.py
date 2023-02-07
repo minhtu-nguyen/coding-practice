@@ -5,3 +5,7 @@ class Solution:
         bit = (n >> i) & 1
         res += (bit << (31 - 1))
       return res
+
+"""
+AND OR <<
+"""

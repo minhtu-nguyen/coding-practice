@@ -4,3 +4,7 @@ class Solution:
       for n in nums:
         res = n ^ res
       return res
+
+"""
+XOR
+"""
