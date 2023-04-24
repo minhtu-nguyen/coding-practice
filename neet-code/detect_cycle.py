@@ -14,5 +14,6 @@ class Solution:
           return True
       return False 
 """
-Using a hashmap + 2 pointers O(n) fast and slow 
+Using a hashmap O(n) - O(n)
+2 pointers O(n) fast and slow 
 """

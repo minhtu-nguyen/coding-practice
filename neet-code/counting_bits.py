@@ -11,5 +11,5 @@ class Solution:
 
 """
 O(nlogn) %2 /2
-DP n-4 O(n)
+DP n-[most significant bit] O(n)
 """

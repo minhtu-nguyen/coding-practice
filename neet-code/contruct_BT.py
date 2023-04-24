@@ -11,5 +11,7 @@ class Solution:
 
 
 """
-1st of preorder = root --> find in inorder, length of l, r subarray to partition preorder
+1st of preorder = root 
+position of root in inorder --> partition left and right subtree
+--> find in inorder, length of l, r subarray to partition preorder
 """

@@ -67,4 +67,5 @@ class SolutionBFS:
 
 """
 BFS
+DFS
 """

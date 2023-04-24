@@ -7,5 +7,6 @@ class Solution:
       return res
 
 """
+Get the last bit and place it at the right place using shift
 AND OR <<
 """

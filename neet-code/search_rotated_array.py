@@ -9,7 +9,7 @@ class Solution:
 
             # left sorted portion
             if nums[l] <= nums[mid]:
-                if target > nums[mid] or target < nums[l]:
+                if target > nums[mid] or target < nums[l]: #Careful 
                     l = mid + 1
                 else:
                     r = mid - 1

@@ -27,6 +27,5 @@ class Solution:
         return res
 
 """
-O(m*n) - O(1), set boundaries 4 vars
-
+O(m*n) - O(1), set boundaries 4 vars, shrink them
 """

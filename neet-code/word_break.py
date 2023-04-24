@@ -16,4 +16,5 @@ class Solution:
 """
 Compare the dict to word is better? O(n*m*n)
 Decision Tree | Cache | DP
+Bottom up: Check word
 """

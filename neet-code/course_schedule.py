@@ -30,5 +30,6 @@ class Solution:
 
 """
 DFS
-Adjacency map
+Adjacency List
+VisitSet --> Loop --> Impossible
 """

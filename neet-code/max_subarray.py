@@ -13,5 +13,5 @@ class Solution:
 """
 O(n^3): 2 loop traverse, 1 loop to sum
 O(n^2): curSum in 2nd loop
-O(n): check prefix < 0, reset curSum
+O(n): check prefix < 0, reset curSum, remove negative prefix
 """

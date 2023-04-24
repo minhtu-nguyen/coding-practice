@@ -29,3 +29,19 @@ class Solution:
 
       return newHead
 """
+#Grokking
+def reverse(head):
+    if not head or not head.next:
+        return head
+        
+    list_to_do = head.next
+    reversed_list = head
+    reversed_list.next = None
+    
+    while list_to_do:
+        temp = list_to_do
+        list_to_do = list_to_do.next
+        temp.next = reversed_list
+        reversed_list = temp
+
+    return reversed_list
