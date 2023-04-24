@@ -256,7 +256,94 @@ def get_middle_node(head):
     # Return the slow pointer
     return slow
 
+## Circular Array Loop
+'''
+An input array, nums containing non-zero integers, is given, where the value at each index represents the number of places to skip forward (if the value is positive) or backward (if the value is negative). When skipping forward or backward, wrap around if you reach either end of the array. For this reason, we are calling it a circular array. Determine if this circular array has a cycle. A cycle is a sequence of indices in the circular array characterized by the following:
 
+The same set of indices is repeated when the sequence is traversed in accordance with the aforementioned rules.
+The length of the sequence is at least two.
+The loop must be in a single direction, forward or backward.
+Flow: 
+- Traverse the entire nums array using slow and fast pointers, starting from index 0.
+- Move the slow pointer one time forward/backward and the fast pointer two times forward/backward.
+- If loop direction changes at any point, continue to the next element.
+- If the direction does not change, check whether both pointers meet at the same node, if yes, then the loop is detected and return TRUE.
+- Return FALSE if don’t encounter a loop after traversing the whole array.
+Naive approach: The naive approach is to traverse the whole array and check for each element whether we can form a cycle starting from each element or not. We’ll run a loop on every array element and keep track of the visited element using an additional array. We’ll check the condition for both the forward and backward cycles. If the direction of the cycle changes at any point, we’ll come out of that loop and continue verifying the loop condition for the remaining elements. O(n^2) - O(n)
+Optimized approach: 
+- Move the slow pointer x steps forward/backward, where x is the value at the ith index of the array.
+- Move the fast pointer x steps forward/backward and do this again for the value at the (i + 1)th index of the array.
+- Return TRUE when both pointers meet at the same point.
+- If the direction changes at any point or taking a step returns to the same location, then follow the steps above for the next element of the array.
+- Return FALSE if we have traversed every element of the array without finding a loop.
+O(n) - O(1)
+    input = (
+            [-2, -3, -9],
+            [-5, -4, -3, -2, -1],
+            [-1, -2, -3, -4, -5],
+            [2, 1, -1, -2],
+            [-1, -2, -3, -4, -5, 6],
+            [1, 2, -3, 3, 4, 7, 1]
+            )
+'''
+def circular_array_loop(nums):
+  # Set slow and fast pointer at first element.
+  slow = fast = 0
+  size = len(nums)
+  for i in range(1, size + 1):
+    # Save slow pointer's value before moving.
+    prev = slow
+    # Move slow pointer to one step.
+    slow = next_step(slow, nums[slow], size)
+    # Check if cycle is impossible, then set both pointers to next value
+    # and move to the next iteration.
+    if is_not_cycle(nums, prev, slow):
+      fast, slow = i, i
+      continue
+
+    # This flag indicates whether we need to move to the next iteration.
+    next_iter = False
+    # Number of moves of fast pointer
+    moves = 2
+    for _ in range(moves):
+      # Save fast pointer's value before moving.
+      prev = fast
+      # Move fast pointer check cycle after every move.
+      fast = next_step(fast, nums[fast], size)
+      # If cycle is not possible, set slow and fast to next element
+      # set 'next_iter' to true and break this loop.
+      if is_not_cycle(nums, prev, fast):
+        fast, slow = i, i
+        next_iter = True
+        break
+    
+    # Move to the next iteration
+    if next_iter:
+      continue
+    
+    # If both pointers are at same position after moving both, a cycle is detected.
+    if slow == fast:
+      return True
+      
+  return False
+
+# A function to calculate the next step
+def next_step(pointer, value, size):
+    result = (pointer + value) % size
+    if result < 0:
+        result += size
+    return result
+
+# A function to detect a cycle doesn't exist
+def is_not_cycle(nums, prev, pointer):
+    # If signs of both pointers are different or moving a pointer takes back to the same value,
+    # then the cycle is not possible, we return True, otherwise return False.
+    if (nums[prev] >= 0 and nums[pointer] < 0) or (abs(nums[pointer] % len(nums)) == 0):
+        return True
+    else:
+        return False
+
+##
 ### *** Practice
 ## 2 pointers - Valid Palindrome II
 '''
