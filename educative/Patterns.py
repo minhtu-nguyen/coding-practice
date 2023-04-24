@@ -343,7 +343,97 @@ def is_not_cycle(nums, prev, pointer):
     else:
         return False
 
-##
+##Palindrome Linked List
+'''
+For the given head of the linked list, find out if the linked list is a palindrome or not. Return TRUE if the linked list is a palindrome. Otherwise, return FALSE.
+Flow: 
+- Initialize both the slow and fast pointers as head.
+- Traverse linked list using both pointers at different speeds. At each iteration, the slow pointer increments by one node, and the fast pointer increments by two nodes.
+- Continue doing so until the fast pointer reaches the end of the linked list. At this instance, the slow pointer will be pointing at the middle of the linked list.
+- Reverse the second half of the linked list and compare it with the first half.
+- If both halves are the same then the given linked list is a palindrome.
+O(n) - O(1)
+    input = (
+                [2, 4, 6, 4, 2],
+                [0, 3, 5, 5, 0],
+                [9, 7, 4, 4, 7, 9],
+                [5, 4, 7, 9, 4, 5],
+                [5, 9, 8, 3, 8, 9, 5],
+            )
+'''
+# Check palindrome in linked_list
+def palindrome(head):
+    # Initialize variables with head
+    slow = head
+    fast = head
+    revert_data = None
+    mid_node = head
+
+    # Traverse linked_list through fast and slow
+    # pointers to get the middle node
+    while fast and fast.next:
+        mid_node = slow
+        slow = slow.next
+        fast = fast.next.next
+
+    # Fast pointer of odd linked list will point to last node
+    # of linked list but it will point to NULL for even linked list
+    saved_odd_mid_node = None
+    if fast:
+        saved_odd_mid_node = slow
+        slow = slow.next
+
+    # It will skip the first half
+    mid_node.next = None
+    # Pass middle node as a head to reverse function
+    # to revert the next half of linked_list
+    revert_data = reverse_linked_list(slow)
+    # Pass second half reverted data to compare_two_halves
+    # function to check the palindrome property
+    check = False
+    check = compare_two_halves(head, revert_data)
+    # Revert second half back to the original linked list
+    revert_data = reverse_linked_list(revert_data)
+
+    # Connect both halves
+    # If linked list was of odd sized, connect the middle node
+    # first which was skipped while reverting the second half
+    if saved_odd_mid_node:
+        mid_node.next = saved_odd_mid_node
+        saved_odd_mid_node.next = revert_data
+    else:
+        mid_node.next = revert_data
+
+    # Return true if there's only one node
+    # or both are pointing to NULL
+    if head is None or revert_data is None:
+        return True
+    if check:
+        return True
+    return False
+
+
+def compare_two_halves(first_half, second_half):
+    while first_half is not None and second_half is not None:
+        if first_half.data != second_half.data:
+            return False
+        else:
+            first_half = first_half.next
+            second_half = second_half.next
+    return True 
+
+# Template to reverse the linked list
+
+def reverse_linked_list(slow_ptr):
+    reverse = None
+    while slow_ptr is not None:
+        next = slow_ptr.next
+        slow_ptr.next = reverse
+        reverse = slow_ptr
+        slow_ptr = next
+    return reverse
+
+
 ### *** Practice
 ## 2 pointers - Valid Palindrome II
 '''
