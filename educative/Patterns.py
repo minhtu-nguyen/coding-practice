@@ -598,6 +598,91 @@ def min_window(str1, str2):
                 index_s2 = 0
         index_s1 += 1
     return min_subsequence
+## Minimum Window Substring
+'''
+We are given two strings, s and t. The minimum window substring of t in s is defined as follows:
+It is the shortest substring of s that includes all of the characters present in t.
+The frequency of each character in this substring that belongs to t should be equal to or greater than its frequency in t.
+The order of the characters does not matter here.
+We have to find the minimum window substring of t in s.
+Flow: 
+- Set up a sliding, adjustable window to move across the string s.
+- Initialize two collections: one to store the frequency of characters in t and the other to track the frequency of characters in the current window.
+- Iterate over s, expanding the current window until the frequencies of characters of t in the window are at least equal to their respective frequencies in t.
+- Trim the window by removing all the unnecessary characters. If the current window size is less than the length of the minimum window substring found so far, update the minimum window substring.
+- Continue iterating over s and perform the previous two steps in each iteration.
+- Return the minimum window substring.
+Naive approach: The naive approach would be to find all possible substrings of s and then identify the shortest substring that contains all characters of t with corresponding frequencies equal to or greater than those in t. O(n^2) - O(n)
+Optimized approach: 
+-We validate the inputs. If t is an empty string, we return an empty string.
+-Next, we initialize two hash maps: req_count, to save the frequency of characters in t, and window, to keep track of the frequency of characters of t in the current window. We also initialize a variable, required, to hold the number of unique characters in t. Lastly, we initialize current which keeps track of the characters that occur in t whose frequency in the current window is equal to or greater than their corresponding frequency in t.
+-Then, we iterate over s and in each iteration we perform the following steps:
+If the current character occurs in t, we update its frequency in the window hash map.
+If the frequency of the new character is equal to its frequency in req_count, we increment current.
+If current is equal to required, we decrease the size of the window from the start. As long as current and required are equal, we decrease the window size one character at a time, while also updating the minimum window substring. Once current falls below required, we slide the right edge of the window forward and move on to the next iteration.
+- Finally, when s has been traversed completely, we return the minimum window substring.
+O(m+(N*m)) - O(m)
+    s = ["PATTERN", "LIFE", "ABRACADABRA", "STRIKER", "DFFDFDFVD"]
+    t = ["TN", "I", "ABC", "RK", "VDD"]
+'''
+def min_window(s, t):
+    # empty string scenario
+    if t == "":
+        return ""
+    
+    # creating the two hash maps
+    req_count = {}
+    window = {}
+
+    # populating req_count hash map
+    for c in t:
+        req_count[c] = 1 + req_count.get(c, 0)
+
+    # populating window hash map
+    for c in t:
+        window[c] = 0
+
+    # setting up the conditional variables
+    current, required = 0, len(req_count)
+    
+    # setting up a variable containing the result's starting and ending point
+    # with default values and a length variable
+    res, res_len = [-1, -1], float("infinity")
+    
+    # setting up the sliding window pointers
+    left = 0
+    for right in range(len(s)):
+        c = s[right]
+
+        # if the current character also occurs in t, update its frequency in window hash map
+        if c in t:
+            window[c] = 1 + window.get(c, 0)
+
+        # updating the current variable
+        if c in req_count and window[c] == req_count[c]:
+            current += 1
+
+        # adjusting the sliding window
+        while current == required:
+            # update our result
+            if (right - left + 1) < res_len:
+                res = [left, right]
+                res_len = (right - left + 1)
+            
+            # pop from the left of our window
+            if s[left] in t:
+                window[s[left]] -= 1
+
+            # if the popped character was among the required characters and
+            # removing it has reduced its frequency below its frequency in t, decrement current
+            if s[left] in req_count and window[s[left]] < req_count[s[left]]:
+                current -= 1
+            left += 1
+    left, right = res
+
+    # return the minimum window substring
+    return s[left:right+1] if res_len != float("infinity") else ""
+
 
 ### *** Practice
 ## 2 pointers - Valid Palindrome II
