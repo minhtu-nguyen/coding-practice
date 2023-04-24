@@ -489,6 +489,67 @@ def find_repeated_sequences(s, k):
         substring_hashes.add(hashing)
     return output
 
+## Find Maximum in Sliding Window
+'''
+Given an integer list, nums, find the maximum values in all the contiguous subarrays (windows) of size w.
+Flow:
+- Create a collection (of your own choice) to process the elements of the input list.
+- Process the first window such that, at the end of the iteration, the elements of the first window are present in your collection in descending order.
+- When the first window has been processed, add the first element from your collection to the output list, since this will be the maximum in the first window.
+- Process the remaining windows using the same logic used to process the first window.
+- In each iteration, add the first element from your collection to the output list and slide the window one step forward.
+- Return the output list.
+Naive approach: The naive approach is to slide the window over the input list and find the maximum in each window separately. O(n(2w+wlogw))=O(n(wlogw)) - O(w)
+Optimized approach: 
+- First, we validate the inputs. If the input list is empty, we return an empty list and if the window size is greater than the list length, we set the window to be the same size as the input list.
+- Then, we process the first w elements of the input list. We will use a deque to store the indexes of the candidate maximums of each window.
+- For each element, we perform the clean-up step, removing the indexes of the elements from the deque whose values are smaller than or equal to the value of the element we are about to add to the deque. Then, we append the index of the new element to the back of the deque.
+- After the first w elements have been processed, we append the element whose index is present at the front of the deque to the output list as it is the maximum in the first window.
+- After finding the maximum in the first window, we iterate over the remaining input list. For each element, we repeat Step 3 as we did for the first w elements.
+- Additionally, in each iteration, before appending the index of the current element to the deque, we check if the first index in the deque has fallen out of the current window. If so, we remove it from the deque.
+- Finally, we return the list containing the maximum elements of each window.
+O(n) - O(w)
+    window_sizes = [3, 3, 3, 3, 2, 4, 3, 2, 3, 18]
+    nums_list = [
+        [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+        [10, 9, 8, 7, 6, 5, 4, 3, 2, 1],
+        [10, 10, 10, 10, 10, 10, 10, 10, 10, 10],
+        [1, 5, 8, 10, 10, 10, 12, 14, 15, 19, 19, 19, 17, 14, 13, 12, 12, 12, 14, 18, 22, 26, 26, 26, 28, 29, 30],
+        [10, 6, 9, -3, 23, -1, 34, 56, 67, -1, -4, -8, -2, 9, 10, 34, 67],
+        [4, 5, 6, 1, 2, 3],
+        [9, 5, 3, 1, 6, 3],
+        [2, 4, 6, 8, 10, 12, 14, 16],
+        [-1, -1, -2, -4, -6, -7],
+        [4, 4, 4, 4, 4, 4]
+    ]
+'''
+from collections import deque
+
+# function to clean up the deque
+def clean_up(i, current_window, nums):
+    while current_window and nums[i] >= nums[current_window[-1]]:
+        current_window.pop()
+
+# function to find the maximum in all possible windows
+def find_max_sliding_window(nums, w):
+    if len(nums) == 0:
+        return []
+    output = []
+    current_window = deque()
+    if w > len(nums):
+        w = len(nums)
+    for i in range(w):
+        clean_up(i, current_window, nums)
+        current_window.append(i)
+    output.append(nums[current_window[0]])
+    for i in range(w, len(nums)):
+        clean_up(i, current_window, nums)
+        if current_window and current_window[0] <= (i - w):
+            current_window.popleft()
+        current_window.append(i)
+        output.append(nums[current_window[0]])
+    return output
+
 ### *** Practice
 ## 2 pointers - Valid Palindrome II
 '''
