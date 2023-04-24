@@ -1,4 +1,7 @@
 ### *** Two Pointer ***
+'''
+As the name suggests, the two pointers pattern uses two pointers to iterate over an array or list until the conditions of the problem are satisfied. This is useful because it allows us to keep track of the values of two different indexes in a single iteration. Whenever there’s a requirement to find two data elements in an array that satisfy a certain condition, the two pointers pattern should be the first strategy to come to mind.
+'''
 ##Valid Palindrome
 '''
 Write a function that takes a string s as input and checks whether it’s a palindrome or not.
@@ -74,3 +77,61 @@ def find_sum_of_three(nums, target):
                 high -= 1    
     # No such triplet found whose sum equals the given target
     return False
+##Reverse Words in a String
+'''
+Given a sentence, reverse the order of its words without affecting the order of letters within a given word.
+Flow: 
+- Reverse the entire string.
+- Start iterating over the reversed string using two pointers, start and end, initially set at 0.
+- While iterating over the string, reverse a word pointed by start and end pointers, when a space is found.
+- Once the word has been reversed, update the start and end pointer to the index of the space + 1.
+- Repeat the process until the entire string is iterated and return the string.
+O(n+n)=O(n) | O(n) - copy it into a list of characters to overcome the issue of strings being immutable in Python
+    string_to_reverse = ["Hello Friend", "    We love Python",
+                         "The quick brown fox jumped over the lazy dog   ",
+                         "Hey", "To be or not to be",
+                         "AAAAA","Hello     World"]
+'''
+import re
+def reverse_words(sentence):
+   # remove leading, trailing and multiple spaces
+   sentence = re.sub(' +',' ',sentence.strip())
+   # We need to convert the updated string
+   # to lists of characters as strings are immutable in Python
+   sentence = list(sentence)
+   str_len = len(sentence)
+   
+   #  We will first reverse the entire string.
+   str_rev(sentence, 0, str_len - 1)
+   #  Now all the words are in the desired location, but
+   #  in reverse order: "Hello World" -> "dlroW olleH".
+ 
+   start = 0
+   end = 0
+
+   # Now, let's iterate the reversed string and reverse each word in place.
+   # "dlroW olleH" -> "World Hello"
+
+   while (start < str_len):
+      # Find the end index of the word. 
+    while end < str_len and sentence[end] != ' ':
+        end += 1
+     # Let's call our helper function to reverse the word in-place.
+    str_rev(sentence, start, end - 1)
+    start = end + 1;
+    end += 1
+  
+   return ''.join(sentence)
+
+# A function that reverses a whole sentence character by character
+def str_rev(_str, start_rev, end_rev):
+   # Starting from the two ends of the list, and moving
+   # in towards the centre of the string, swap the characters
+   while start_rev < end_rev:
+       temp = _str[start_rev]          # temp store for swapping
+       _str[start_rev] = _str[end_rev]  # swap step 1
+       _str[end_rev] = temp            # swap step 2
+
+
+       start_rev += 1                  # Move forwards towards the middle
+       end_rev -= 1                    # Move backwards towards the middle
