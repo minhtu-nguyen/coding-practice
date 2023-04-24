@@ -550,6 +550,55 @@ def find_max_sliding_window(nums, w):
         output.append(nums[current_window[0]])
     return output
 
+## Minimum Window Subsequence
+'''
+Given strings str1 and str2, find the minimum (contiguous) substring sub_str of str1, such that every character of str2 appears in sub_str in the same order as it is present in str2. If there is no window in str1 that covers all characters in str2, return an empty string. If there are multiple minimum-length windows, return the one with the leftmost starting index.
+Flow:
+- Initialize two pointers index_s1 and index_s2 to 0 to iterate both the strings.
+- If the character pointed by index_s1 in s1 is the same as the character pointed by index_s2 in s2, increment both pointers.
+- Create two new pointers (start and end) once index_s2 reaches the end of s2.
+- Set the start to the value of index_s1 and end to start + 1.
+- Decrement the start pointer until index_s2 becomes less than 0.
+- Decrement index_s2 only if the character pointed by the start pointer in s1 is equal to the character pointed to by index_s2 in s2.
+- Calculate the length of a substring by subtracting values of the end and start variables.
+- If this length is less than the current minimum length, update the length variable and min_subsequence string.
+- Repeat until index_s1 reaches the end of s1.
+Naive approach: The naive approach would be considering all possible windows of str1 and checking which windows contain str2. Out of all the windows in str1, we’ll choose the window with the shortest length. O(n^3) - O(1)
+Optimized approach: 
+- Initialize two pointers, index_s1 and index_s2, to zero for iterating both strings.
+- If the character pointed by index_s1 in str1 is the same as the character pointed by index_s2 in str2, increment both pointers. Otherwise, only increment index_s1.
+- Create two new pointers (start and end) once index_s2 reaches the end of str2. With these two pointers, we’ll slide the window in the opposite direction.
+- Set the start to the value of index_s1 and end to start + 1.
+- Decrement index_s2 if the character pointed by the start pointer in str1 is equal to the character pointed to by index_s2 in str2 and decrement the start pointer until index_s2 becomes less than zero.
+- Calculate the length of a substring by subtracting values of the end and start variables.
+- If this length is less than the current minimum length, update the length variable and min_subsequence string.
+- Repeat until index_s1 reaches the end of str1.
+O(m×n) - O(1)
+'''
+def min_window(str1, str2):
+    size_str1, size_str2 = len(str1), len(str2)
+    length = float('inf')
+    index_s1, index_s2 = 0, 0
+    min_subsequence = ""
+    while index_s1 < size_str1:
+        if str1[index_s1] == str2[index_s2]:
+            index_s2 += 1
+            if index_s2 == size_str2:
+                start, end = index_s1, index_s1+1
+                index_s2 -= 1
+                while index_s2 >= 0:
+                    if str1[start] == str2[index_s2]:
+                        index_s2 -= 1
+                    start -= 1
+                start += 1
+                if end - start < length:
+                    length = end - start
+                    min_subsequence = str1[start:end]
+                index_s1 = start
+                index_s2 = 0
+        index_s1 += 1
+    return min_subsequence
+
 ### *** Practice
 ## 2 pointers - Valid Palindrome II
 '''
