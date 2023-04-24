@@ -177,6 +177,86 @@ def is_happy_number(n):
         return True
     return False
 
+## Linked List Cycle
+'''
+Check whether or not a linked list contains a cycle. If a cycle exists, return TRUE. Otherwise, return FALSE. The cycle means that at least one node can be reached again by traversing the next pointer.
+Flow: 
+- Initialize both fast and slow pointers to the head of the linked list.
+- Move the slow pointer one node ahead and the fast pointer two nodes ahead.
+- Check if both pointers point to the same node at any point. If yes, then return TRUE.
+- Else, if the fast pointer reaches the end of the linked list, return FALSE.
+Naive approach: The naive approach is to traverse the linked list and store the current node in a set. At each iteration, we check if the current node is already present in the set. If it is, we’ve found a cycle and return TRUE. Otherwise, we add the node to the set. If the traversal has been completed, return FALSE, since we’ve reached the end of the linked list without encountering a cycle. O(n) - O(n)
+Optimized approach: To recap, the solution to this problem can be divided into the following three parts:
+- Initialize both the slow and fast pointers to the head node.
+- Move both pointers at different rates, i.e. the slow pointer will move one step ahead whereas the fast pointer will move two steps.
+- If both pointers are equal at some point, we know that a cycle exists.
+O(n) - O(1)
+    input = (
+             [2, 4, 6, 8, 10, 12],
+             [1, 3, 5, 7, 9, 11],
+             [0, 1, 2, 3, 4, 6],
+             [3, 4, 7, 9, 11, 17],
+             [5, 1, 4, 9, 2, 3],
+            )
+    pos = [0, -1, 1, -1, 2]
+'''
+def detect_cycle(head):
+    if head is None:
+        return False
+
+    # Initialize two pointers, slow and fast, to the head of the linked list
+    slow, fast = head, head
+    
+    # Run the loop until we reach the end of the
+    # linked list or find a cycle
+    while fast and fast.next:
+        # Move the slow pointer one step at a time
+        slow = slow.next
+        # Move the fast pointer two steps at a time
+        fast = fast.next.next
+        
+        # If there is a cycle, the slow and fast pointers will meet
+        if slow == fast:
+            return True
+    # If we reach the end of the linked list and haven't found a cycle, return False          
+    return False
+
+## Middle of the Linked List
+'''
+Given a singly linked list, return the middle node of the linked list. If the number of nodes in the linked list is even, return the second middle node.
+Flow: 
+- Initialize two pointers slow and fast at the head of the linked list.
+- Traverse the linked list, moving the slow pointer one step forward and fast pointer two steps forward.
+- When the fast pointer reaches the last node or NULL, then the slow pointer will point to the middle node of the linked list.
+- Return the slow pointer.
+Naive approach: The naive approach is to count the number of nodes in the linked list first, and then find the middle node in the next iteration.
+Optimized approach: 
+- Initialize two pointers named slow and fast at the head of the linked list.
+- While traversing, move the slow pointer one step forward and the fast pointer two steps forward.
+- When the fast pointer reaches the last node or NULL, then the slow pointer will point to the middle node of the linked list.
+O(n) - O(1)
+    input = (
+        [1, 2, 3, 4, 5],
+        [1, 2, 3, 4, 5, 6],
+        [3, 2, 1],
+        [10],
+        [1, 2],
+    )
+'''
+def get_middle_node(head):
+    # Initially slow and fast pointers point to head
+    slow = head
+    fast = head
+    # Traverse the linked list until fast reaches at the last node or NULL
+    while fast and fast.next:
+        # Move slow pointer one step ahead
+        slow = slow.next
+        # Move fast pointer two step ahead
+        fast = fast.next.next
+    # Return the slow pointer
+    return slow
+
+
 ### *** Practice
 ## 2 pointers - Valid Palindrome II
 '''
