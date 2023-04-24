@@ -433,6 +433,61 @@ def reverse_linked_list(slow_ptr):
         slow_ptr = next
     return reverse
 
+### *** Sliding Window
+'''
+A window is a sublist formed over a part of an iterable data structure. It can be used to slide over the data in chunks corresponding to the window size. The sliding window pattern allows us to process the data in segments instead of the entire list. The segment or window size can be set according to the problem’s requirements.
+'''
+## Repeated DNA Sequences
+'''
+Given a string, s, that represents a DNA sequence, and a number, k, return all the contiguous sequences (substrings) of length k that occur more than once in the string. The order of the returned subsequences does not matter. If no repeated subsequence is found, the function should return an empty set.
+Flow: 
+- Iterate over the input string.
+- Create a window of length k  to extract a substring.
+- Add the computed content of the window (the hash or the substring itself) to the set that keeps track of all the unique substrings of length k.
+- Move the window one step forward and add the computed content of the new window to a set.
+- If the computed content of a window is already present in the set, the substring is repeated. Append it to an output list.
+- Continue the iteration over the string until all possible substrings have been processed, and return the output list.
+Naive approach: A naive approach would be to iterate through the input DNA sequence and add all the unique sequences of length k into a set. If a sequence is already in a set, it is a repeated sequence. To achieve this, we can use two nested loops. The outer loop will iterate over each position in the DNA sequence, and the inner loop will create all possible substrings of length k starting at that position. O((n−k+1)×k).
+Optimized approach: We use the ***Rabin-Karp algorithm, which utilizes a sliding window with ***rolling hash for pattern matching. Instead of recomputing the hash for each window slide, we can use the rolling hash technique, where we can simply subtract the hash value of the character being removed from the window and add the hash value of the character being added. There are multiple approaches for computing hash values, and the choice of the hash function can impact the algorithm’s time complexity.
+- Hashing and comparison in linear time: sums the ASCII code of characters present
+- Hashing and comparison in constant time: Polynomial rolling hash technique
+
+- Iterate the string.
+- Compute the hash value for the contents of the window.
+- Add this hash value to the set that keeps track of the hashes of all substrings of the given length.
+- Move the window one step forward and compute a new hash value.
+- If the hash value of a window has already been seen, the sequence in this window is repeated, so we add it to our output set.
+- Once all characters of the string have been traversed, we return the output set.
+O(n−k+1) - O(n−k+1)
+
+    inputs_string = ["ACGT", "AGACCTAGAC", "AAAAACCCCCAAAAACCCCCC", "GGGGGGGGGGGGGGGGGGGGGGGGG",
+                     "TTTTTCCCCCCCTTTTTTCCCCCCCTTTTTTT", "TTTTTGGGTTTTCCA",
+                     "AAAAAACCCCCCCAAAAAAAACCCCCCCTG", "ATATATATATATATAT"]
+    inputs_k = [3, 3, 8, 10, 13, 30, 30, 21]
+'''
+def find_repeated_sequences(s, k):
+    window_size = k
+    if len(s) <= window_size:
+        return set()
+    base = 4
+    hi_place_value = pow(base, window_size - 1)
+    mapping = {'A': 1, 'C': 2, 'G': 3, 'T': 4}
+    numbers = []
+    for i in range(len(s)):
+        numbers.append(mapping.get(s[i]))
+    hashing = 0
+    substring_hashes, output = set(), set()
+    for start in range(len(s) - window_size + 1):
+        if start != 0:
+            hashing = (hashing - numbers[start - 1] * hi_place_value) * base \
+                + numbers[start + window_size - 1]
+        else:
+            for end in range(window_size):
+                hashing = hashing * base + numbers[end]
+        if hashing in substring_hashes:
+            output.add(s[start:start + window_size])
+        substring_hashes.add(hashing)
+    return output
 
 ### *** Practice
 ## 2 pointers - Valid Palindrome II
