@@ -750,7 +750,46 @@ def find_longest_substring(str):
 
     return longest
 
-##
+## Minimum Size Subarray Sum
+'''
+Given an array of positive integers nums and a positive integer target, find the window size of the shortest contiguous subarray whose sum is greater than or equal to the target value. If no subarray is found, 0 is returned.
+Flow:
+- Initialize a variable to store the size of the minimum subarray.
+- Iterate the input array.
+- In each iteration, add up an element of an array.
+- If the sum of the current subarray ≥ the target value, compare the previous window size with the current one and store the smaller value.
+- Find a smaller subarray that is greater than or equal to the target value by sliding the window.
+- Repeat the process until the entire array is iterated.
+O(n) - O(1)
+    target = [7, 4, 11, 10, 5, 15]
+    input_arr = [[2, 3, 1, 2, 4, 3],
+                      [1, 4, 4], [1, 1, 1, 1, 1, 1, 1, 1],
+                      [1, 2, 3, 4], [1, 2, 1, 3],
+                      [5, 4, 9, 8, 11, 3, 7, 12, 15, 44]]
+'''
+def min_sub_array_len(target, nums):
+    # Initializing window_size to a max number
+    window_size = float('inf')
+    # Initialize start pointer to 0 and sum to 0
+    start = 0
+    total_sum = 0
+    # Iterate over the input array
+    for end in range(len(nums)):
+        total_sum += nums[end]
+        # check if we can remove elements from the start of the subarray
+        # while still satisfying the target condition
+        while total_sum >= target:
+            # Finding size of current subarray
+            curr_sub_arr_size = (end + 1) - start
+            window_size = min(window_size, curr_sub_arr_size)
+            total_sum -= nums[start]
+            start += 1
+
+    if window_size != float('inf'):
+        return window_size
+    else:
+        return 0
+
 ### *** Practice
 ## 2 pointers - Valid Palindrome II
 '''
