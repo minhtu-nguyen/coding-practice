@@ -683,7 +683,74 @@ def min_window(s, t):
     # return the minimum window substring
     return s[left:right+1] if res_len != float("infinity") else ""
 
+## Longest Substring without Repeating Characters
+'''
+Given a string, str, return the length of the longest substring without repeating characters.
+Flow:
+- Initialize an empty hash map and a variable to track character indexes and the start of the window, respectively.
+- Traverse the string character by character. For each character, if the hash map does not contain the current character, store it with its index as the value.
+- If the hash map contains the current character and its index falls within the current window, a repeating character is found. Otherwise, store it in the hash map with its index as the value.
+- When a repeating character is found, update the start of window to the previous location of the current element and increment it. Also, calculate the length of the current window.
+- Update the longest substring seen so far if the length of the current window is greater than its current value.
+- Return the length of the longest substring.
+Naive approach: For each substring, we check whether any character in it is repeated. After checking all the possible substrings, the substring with the longest length that satisfies the specified condition is returned. O(n^3) - O(min(m,n))
+Optimized approach: 
+-Traverse the input string.
+-Use a hash map to store elements along with their respective indexes.
+-If the current element is present in the hash map, check whether it’s already present in the current window. If it is, we have found the end of the current window and the start of the next. We check if it’s longer than the longest window seen so far and update it accordingly.
+-Store the current element in the hash map with the key as the element and the value as the current index.
+-At the end of the traversal, we have the length of the longest substring with all distinct characters.
+O(n) - O(n)
+    str = [
+        "abcabcbb",
+        "pwwkew",
+        "bbbbb",
+        "ababababa",
+        "",
+        "ABCDEFGHI",
+        "ABCDEDCBA",
+        "AAAABBBBCCCCDDDD",
+    ]
+'''
+def find_longest_substring(str):
+    # Check the length of str
+    if len(str) == 0:
+        return 0
 
+    window_start, longest, window_length = 0, 0, 0
+
+    last_seen_at = {}
+
+    # Traverse str to find the longest substring
+    # without repeating characters.
+    for index, val in enumerate(str):
+        # If the current element is not present in the hash map,
+        # then store it in the hash map with the current index as the value.
+        if val not in last_seen_at:
+            last_seen_at[val] = index
+        else:
+            # If the current element is present in the hash map,
+            # it means that this element may have appeared before.
+            # Check if the current element occurs before or after `window_start`.
+            if last_seen_at[val] >= window_start:
+                window_length = index - window_start
+                if longest < window_length:
+                    longest = window_length
+                window_start = last_seen_at[val] + 1
+
+            # Update the last occurrence of
+            # the element in the hash map
+            last_seen_at[val] = index
+
+    index += 1
+    # Update the longest substring's
+    # length and starting index.
+    if longest < index - window_start:
+        longest = index - window_start
+
+    return longest
+
+##
 ### *** Practice
 ## 2 pointers - Valid Palindrome II
 '''
