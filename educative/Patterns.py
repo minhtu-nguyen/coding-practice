@@ -135,3 +135,77 @@ def str_rev(_str, start_rev, end_rev):
 
        start_rev += 1                  # Move forwards towards the middle
        end_rev -= 1                    # Move backwards towards the middle
+
+### *** Fast and Slow
+'''
+Unlike the two pointers approach, which is concerned with data values, the fast and slow pointers approach is used to determine data structure traits using indices in arrays or node pointers in linked lists. The approach is commonly used to detect cycles in the given data structure, so it’s also known as Floyd’s cycle detection algorithm.
+'''
+##Happy Number
+'''
+Write an algorithm to determine if a number n is happy.
+
+- A happy number is a number defined by the following process:
+- Starting with any positive integer, replace the number by the sum of the squares of its digits.
+- Repeat the process until the number equals 1 (where it will stay), or it loops endlessly in a cycle which does not include 1. Those numbers for which this process ends in 1 are happy.
+- Return TRUE if n is a happy number, and FALSE if not.
+Flow: 
+- Initialise a variable slow with the input number and fast with the squared sum of the input number’s digits.
+- If fast is not 1 and also not equal to slow, increment slow by one iteration and fast by two iterations. Essentially, set slow to Sum of Digits(slow) and fast to Sum of Digits(Sum of Digits(fast)).
+- If fast converges to 1, return TRUE, otherwise return FALSE.
+Naive approach: The brute force approach is to repeatedly calculate the squared sum of digits of the input number and store the computed sum in a hash set. For every calculation, we check if the sum is already present in the set. If yes, we've detected a cycle and should return FALSE. Otherwise, we add it to our hash set and continue further. If our sum converges to, we've found a happy number. O(logn) | O(n)
+Optimized approach: We maintain track of two values using a slow pointer and a fast pointer. The slow runner advances one number at each step, while the fast runner advances two numbers. We detect if there is any cycle by comparing the two values and checking if the fast runner has indeed reached the number one. We return True or False depending on if those conditions are met. 2 pointers = O(logn+logn) = O(logn) | O(1)
+    inputs = [1, 5, 19, 25, 7]
+'''
+def is_happy_number(n):
+
+    # Helper function that calculates the sum of squared digits.
+    def sum_of_squared_digits(number):
+        total_sum = 0
+        while number > 0:
+            number, digit = divmod(number, 10)
+            total_sum += digit ** 2
+        return total_sum
+
+    slow_pointer = n 
+    fast_pointer = sum_of_squared_digits(n)  
+
+    while fast_pointer != 1 and slow_pointer != fast_pointer: 
+        slow_pointer = sum_of_squared_digits(slow_pointer)
+        fast_pointer = sum_of_squared_digits(sum_of_squared_digits(fast_pointer))
+
+    if(fast_pointer == 1):
+        return True
+    return False
+
+### *** Practice
+## 2 pointers - Valid Palindrome II
+'''
+Write a function that takes a string as input and checks whether it can be a valid palindrome by removing at most one character from it.
+Flow: 
+- Initialize two pointers at opposite ends of the string.
+- If the values at the left and right indexes match, move both toward the middle until they meet.
+- If a mismatch occurs, skip one of the elements and check the rest of the string for a palindrome.
+- Skip the other element, and check for the palindrome.
+- If no palindrome is obtained, return False, else if no more than one mismatch occurs throughout the traversal, return True.
+'''
+def helper(s):
+    left, right = 0, len(s) - 1
+    while left < right:
+        if s[left] != s[right]:
+            return False
+        left += 1
+        right -= 1
+
+    return True
+
+
+def is_palindrome(s):
+    left, right = 0, len(s) - 1
+    while left < right:
+        if s[left] != s[right]:
+            return helper(s[left + 1:right + 1]) or helper(s[left:right])
+
+        left += 1
+        right -= 1
+
+    return True
