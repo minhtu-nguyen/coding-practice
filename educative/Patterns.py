@@ -1216,6 +1216,64 @@ def reorder_list(head):
     
     return head
 
+## Swapping Nodes in a Linked List
+'''
+Given the linked list and an integer k, return the head of the linked list after swapping the values of the kth node from the beginning and the kth node from the end of the linked list. We’ll number the nodes of the linked list starting from 1 to n.
+Flow: 
+- Traverse the linked list.
+- Find the kth node from the start of the linked list.
+- Count the total number of nodes in the linked list.
+- Find the position of the kth node from the end by subtracting k from the total number of nodes.
+- Move to the kth node from the end.
+- Swap the values of both nodes.
+Three-pass approach | Two-pass approach
+One pass approach
+- Traverse the linked list using the current pointer and count the length of the linked list simultaneously.
+- Find the first kth node.
+- After finding the first kth node, use another pointer, end, to traverse in a linked list.
+- Move the end pointer until the current pointer doesn’t reach the end of the linked list
+- The end pointer now points to the end node.
+O(n) - O(1)
+'''
+# Template for swapping two nodes of the linked list
+
+def swap(node1, node2):
+    temp = node1.data
+    node1.data = node2.data
+    node2.data = temp
+# swap_nodes is used to implement the complete solution
+def swap_nodes(head, k):
+    # count will be used to count the number of nodes in a linked list
+    count = 0
+    # front will be used to point the kth node at the beginning of the
+    # linked list end will be used to point the kth node at the end of
+    # the linked list
+    front, end = None, None
+    # curr will be used to traverse in a linked list
+    curr = head
+    # Traverse in a linked list until the null node
+    while curr:
+        # Increment the length for each node
+        count += 1
+        # If end is not null it means the kth node from the beginning has
+        # found now, we can move the end pointer in the linked list to
+        # find the kth node from the end of the linked list
+        if end is not None:
+            end = end.next
+        # if the count has become equal to k, it means the curr is
+        # pointing the kth node at the beginning of the linked list
+        if count == k:
+            # Set front to the curr node
+            front = curr
+            # Set end to the head node
+            end = head
+        # move curr to the next node
+        curr = curr.next
+    # swap the values of two nodes: front and end
+    swap(front, end)
+
+    return head
+
 
 ### *** Practice
 ## 2 pointers - Valid Palindrome II
