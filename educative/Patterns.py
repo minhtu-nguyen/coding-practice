@@ -952,6 +952,151 @@ def employee_free_time(schedule):
         prev_end = max(prev_end, interval.end)
     return ans
 
+### *** In-place Reversal of a Linked List
+'''
+We iterate in a linked list and keep track of the current node, the next node, and the previous node simultaneously. Keeping track of the nodes allows us to easily change the links between them and make them point to a different node than before.
+'''
+## Reverse Linked List
+'''
+Given the head of a singly linked list, reverse the linked list and return its updated head.
+Flow:
+- Traverse the linked list.
+- Append the last node before the head node.
+- Point head to the new added node.
+- Repeat until the linked list is not NULL.
+Naive approach: The naive approach to this problem is to clone the linked list into another data structure like an array or push the nodes of the list to the stack, and then create a new linked list. After pushing all the nodes to the stack, starting from the first node, the stack will return the nodes in reverse order when we pop all the nodes. We can use the popped node to create the new linked list with reversed nodes. O(n) - O(n)
+Optimized approach: 
+- Initialize two pointers. The first pointer points to the head of the linked list, and the second to the node following the head node.
+-Traverse through the linked list. At each step, we are essentially dealing with a pair of consecutive linked list nodes, and we are just doing two things:
+  a. Reverse the order of the current pair of nodes by changing the next pointer of the second node to point to the first node.
+
+  b. Move to the next pair of nodes by updating both pointers.
+- Continue the traversal until the first pointer reaches the last node in the linked list.
+O(n) - O(1)
+'''
+# Template for linked list node class
+
+class LinkedListNode:
+    # __init__ will be used to make a LinkedListNode type object.
+    def __init__(self, data, next=None):
+        self.data = data
+        self.next = next
+
+# Template for the linked list
+class LinkedList:
+    # __init__ will be used to make a LinkedList type object.
+    def __init__(self):
+        self.head = None
+
+    # insert_node_at_head method will insert a LinkedListNode at head
+    # of a linked list.
+    def insert_node_at_head(self, node):
+        if self.head:
+            node.next = self.head
+            self.head = node
+        else:
+            self.head = node
+
+    # create_linked_list method will create the linked list using the
+    # given integer array with the help of InsertAthead method.
+    def create_linked_list(self, lst):
+        for x in reversed(lst):
+            new_node = LinkedListNode(x)
+            self.insert_node_at_head(new_node)
+    
+    # __str__(self) method will display the elements of linked list.
+    def __str__(self):
+        result = ""
+        temp = self.head
+        while temp:
+            result += str(temp.data)
+            temp = temp.next
+            if temp:
+                result += ", "
+        result += ""
+        return result
+    
+def reverse(head):
+    if not head or not head.next:
+        return head
+        
+    list_to_do = head.next
+    reversed_list = head
+    reversed_list.next = None
+    
+    while list_to_do:
+        temp = list_to_do
+        list_to_do = list_to_do.next
+        temp.next = reversed_list
+        reversed_list = temp
+
+    return reversed_list
+
+## Reverse Nodes in k-Group
+'''
+Given a linked list, reverse the nodes of the linked list k at a time and return the modified list. Here, k is a positive integer and is less than or equal to the length of the linked list. If the number of nodes is not a multiple of k, the nodes left in the end will remain in their original order.
+- Count and check if there are k number of nodes in a linked list.
+- Reverse the set of k nodes.
+- Reconnect the reversed set of k nodes with the rest of the linked list.
+- Repeat the process till less than k or no nodes are left in the linked list.
+Naive approach: A naive approach would be to use another data structure—like a stack—to reverse the nodes of the linked list and then create a new linked list with reversed nodes. O(n) - O(n + k)
+Optimized approach: 
+- Count and check if there are k number of nodes in a linked list.
+- Reverse the set of k nodes.
+- Reconnect the reversed set of k nodes with the rest of the linked list.
+- Repeat the process till less than k or no nodes are left in the linked list.
+O(n) - O(1)
+'''
+# reverse will reverse the k number of nodes in the linked list
+def reverse(head, k):
+    previous, current, next = None, head, None
+    index = 0
+    while current and index < k:
+        next = current.next
+        current.next = previous
+        previous = current
+        current = next
+        index += 1
+    return previous, current, next
+
+
+# find_length will find the total length of the linked list
+def find_length(start):
+    current = start
+    count = 0
+    while current:
+        current = current.next
+        count += 1
+    return count
+
+# reverse_linked_list is our challenge function that will reverse
+# the group of k nodes in the linked list
+def reverse_linked_list(head, k):
+    if k <= 1 or not head:
+        return head
+    i, count = 0, 0
+    current, previous = head, None
+    total_length = find_length(head)
+    while True:
+        i += 1
+        last_node_of_previous_part = previous
+        last_node_of_current_part = current
+        next = None  
+        previous, current, next = reverse(last_node_of_current_part, k)
+        count += k
+        if last_node_of_previous_part:
+            last_node_of_previous_part.next = previous
+        else:
+            head = previous
+        last_node_of_current_part.next = current
+
+        if current is None or (total_length - count) < k:
+            break
+        previous = last_node_of_current_part
+    return head
+
+## Reverse Linked List II
+
 ### *** Practice
 ## 2 pointers - Valid Palindrome II
 '''
@@ -993,4 +1138,16 @@ Flow:
 - Iterate sell pointer over the prices, computing the current profit by subtracting the prices[buy] from the prices[sell].
 - If prices[buy] is less than prices[sell], choose the maximum value from current profit or maximum profit and store it in the maximum profit. Otherwise, update buy to be equal to sell.
 - Once the sell pointer reaches the end, return the maximum profit.
+'''
+## Merge Intervals - Meeting Rooms II
+'''
+We are given an input array of meeting time intervals, intervals, where each interval has a start time and an end time. Your task is to find the minimum number of meeting rooms required to hold these meetings.
+Flow:
+- Sort the given input intervals with respect to their start times.
+- Initialize a min-heap and push the end time of the first interval onto it.
+- Loop over the remaining intervals.
+- In each iteration, compare the start time of the current interval with all the end times present in the heap.
+- If the earliest end time of all intervals seen so far (the root of the heap) occurs before the start time of the current interval, remove the earliest interval from the heap and push the current interval onto the heap.
+- Otherwise, allot a new meeting room, that is, add the current interval in the heap without removing any existing interval.
+- After processing all the intervals, the size of the heap is the count of meeting rooms needed to hold the meetings.
 '''
