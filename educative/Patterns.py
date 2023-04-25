@@ -872,6 +872,49 @@ def insert_interval(existing_intervals, new_interval):
         i += 1
     return output
 
+## Interval List Intersections
+'''
+For two lists of closed intervals given as input, interval_list_a and interval_list_b, where each interval has its own start and end time, write a function that returns the intersection of the two interval lists.
+Flow:
+- Compare the starting and ending times of a given interval from A and B.
+- If the start time of the current interval in A is less than or equal to the end time of the current interval in B, or vice versa, we have found an intersection. Add it to a resultant list.
+- Move forward in the list whose current interval ends earlier.
+- Repeat comparison and move forward steps to find all intersecting intervals.
+- Return the resultant list of intersecting intervals.
+Naive approach: use a nested loop for finding intersecting intervals.The outer loop will iterate for every interval in interval_list_a and the inner loop will search for any intersecting interval in the interval_list_b.If such an interval exists, we add it to the intersections list. O(n^2)
+Optimized approach: 
+- Compare the starting and ending times of a given interval from A and B.
+- If the start time of the current interval in A is less than or equal to the end time of the current interval in B, or vice versa, we have found an intersection. Add it to a resultant list.
+- Move forward in the list whose current interval ends earlier and repeat comparison and moving forward steps to find all intersecting intervals.
+- Return the resultant list of intersecting intervals.
+O(n + m) - O(1)
+'''
+# Function to find the intersecting points between two intervals
+def intervals_intersection(interval_list_a, interval_list_b):
+    intersections = []  # to store all intersecting intervals
+    # index "i" to iterate over the length of list a and index "j"
+    # to iterate over the length of list b
+    i = j = 0
+
+    # while loop will break whenever either of the lists ends
+    while i < len(interval_list_a) and j < len(interval_list_b):
+        # Let's check if interval_list_a[i] intersects interval_list_b[j]
+        #  1. start - the potential startpoint of the intersection
+        #  2. end - the potential endpoint of the intersection
+        start = max(interval_list_a[i].start, interval_list_b[j].start)
+        end = min(interval_list_a[i].end, interval_list_b[j].end)
+
+        if start <= end:    # if this is an actual intersection
+            intersections.append(Interval(start, end))   # add it to the list
+
+        # Move forward in the list whose interval ends earlier
+        if interval_list_a[i].end < interval_list_b[j].end:
+            i += 1
+        else:
+            j += 1
+
+    return intersections
+
 ### *** Practice
 ## 2 pointers - Valid Palindrome II
 '''
