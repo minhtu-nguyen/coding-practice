@@ -1096,6 +1096,85 @@ def reverse_linked_list(head, k):
     return head
 
 ## Reverse Linked List II
+'''
+You’re given the head of a singly linked list with n nodes and two positive integers, left and right. Our task is to reverse the list’s nodes from position left to position right and return the reversed list.
+Flow: 
+- Find the left position node.
+- Reverse the linked list from left to right position node.
+- Merge the reversed list with the rest of the linked list.
+Naive approach: The naive approach to this problem is to clone the given linked list into another data structure, like an array or stack, and then create a new linked list. When we do this, the group of nodes from left to right will be reversed, and the new head of the reversed group of nodes will be stored in an array. In the end, we can complete the linked list using the new head by pointing the previous node from the original linked list to the new head and pointing the tail of the reversed group to the remaining original linked list. O(n) - O(n)
+Optimized approach: above. O(n) - O(1)
+'''
+# Assume that the linked list has left to right nodes.
+# Reverse left to right nodes of the given linked list.
+def reverse(head, left, right):
+    rev_head = None
+    ptr = head  # a pointer to traverse the original list.
+    while right >= left:
+        # Track the next node to traverse in the original list
+        next = ptr.next
+
+        # At the beginning of the reversed list,
+        # insert the node pointed to by `ptr`
+        ptr.next = rev_head
+        rev_head = ptr
+
+        # Move on to the next node
+        ptr = next
+
+        # Decrement the count of nodes to be reversed by 1
+        right -= 1
+    # Return reversed list's head
+    return rev_head
+def reverse_between(head, left, right):
+    ptr = head  # a pointer to traverse the original list.
+    # a pointer to keep the track of previous node
+    previous = None
+    reverse_head = None
+    right_node = None
+    # Keep traversing until left and right node number
+    count = 1
+    # Move the ptr to the left number node
+    while count < left and ptr:
+        previous = ptr  # keep track of the previous node
+        ptr = ptr.next
+        count += 1
+    if ptr:
+        # keep track of the next node outside the [left - right] 
+        # interval
+        next_node = ptr
+        while count <= right and next_node:
+            # keep track of the right number node
+            right_node = next_node  
+            next_node = next_node.next
+            count += 1
+        # If we have found the left till right nodes, then we 
+        # reverse them.
+        if right_node:
+            # Reverse these [left-right] nodes and get the new head
+            #  of the reversed list
+            reverse_head = reverse(ptr, left, right)
+        if previous:
+            # point previous.next to the reversed linked list
+            previous.next = reverse_head
+        if next_node:
+            # traverse in the reversed linked list until the last node
+            tmp = reverse_head
+            while tmp.next:
+                tmp = tmp.next
+            # add the next node to the reversed linked list
+            tmp.next = next_node
+
+    # We will reverse head if there are node before the [left-right]
+    # position interval
+    if previous:
+        return head
+    # We will simply return the reverse head if there is no node
+    # before the [left-right] position interval
+    else:
+        return reverse_head
+
+
 
 ### *** Practice
 ## 2 pointers - Valid Palindrome II
