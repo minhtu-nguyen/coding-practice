@@ -840,6 +840,37 @@ def merge_intervals(intervals):
         else:
             result.append(Interval(cur_start, cur_end))
     return result
+## Insert Interval
+'''
+You’re given a list of non-overlapping intervals, and you need to insert another interval into the list. Each interval is a pair of non-negative numbers, the first being the start time and the second being the end time of the interval. The input list of intervals is sorted in ascending order of start time. The intervals in the output must also be sorted by the start time, and none of them should overlap. This may require merging those intervals that now overlap as a result of the addition of the new interval.
+Flow: 
+- Create a new list to store the output and add the intervals that start before the new interval.
+- Add the new interval to the output and merge it with the previously added interval.
+- Add the other intervals to the output and merge with the previously added intervals when they overlap with each other.
+Naive approach: The naive approach is that we mark each interval in the list as non-visited. Now, for each interval that is marked as non-visited, we search if another interval exists in the list which overlaps in any form with the current interval. If that interval exists, we merge both of these intervals and mark them visited. If it doesn't overlap with anyone, we mark that interval as visited as well. O(n^2)
+Optimized approach: We create a new list where we store all the existing intervals that occur before the start of the interval to be inserted. When we finally run into an overlapping interval, we merge the two together and append the remaining intervals into our output array. O(n) - O(1)
+'''
+def insert_interval(existing_intervals, new_interval):
+    new_start, new_end = new_interval.start, new_interval.end
+    i = 0
+    n = len(existing_intervals)
+    output = []
+    while i < n and existing_intervals[i].start < new_start:
+        output.append(existing_intervals[i])
+        i = i + 1
+    if not output or output[-1].end < new_start:
+        output.append(new_interval)
+    else:
+        output[-1].end = max(output[-1].end, new_end)
+    while i < n:
+        ei = existing_intervals[i]
+        start, end = ei.start, ei.end
+        if output[-1].end < start:
+            output.append(ei)
+        else:
+            output[-1].end = max(output[-1].end, end)
+        i += 1
+    return output
 
 ### *** Practice
 ## 2 pointers - Valid Palindrome II
