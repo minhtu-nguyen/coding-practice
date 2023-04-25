@@ -1174,6 +1174,47 @@ def reverse_between(head, left, right):
     else:
         return reverse_head
 
+## Reorder List
+'''
+Given the head of a singly linked list, reorder the list as if it were folded on itself.
+Flow:
+- Find the middle node.
+- If there are two middle nodes, choose the second node.
+- Reverse the second half of the linked list.
+- Merge the first and second half of the linked list.
+Naive approach: First, we need to start from the first node using the current pointer. To find the last node, we traverse the complete linked list and add the last node in front of the current node. After adding the last node, the current node will move to the next node. Each time the last node is added, the current node will move ahead in the list. For this reason we need to find the last node. We’ll end the program when both current and last nodes become equal. O(n^2) - O(1)
+Optimized approach: 
+- Find the middle node. If there are two middle nodes, then choose the second node.
+- Reverse the second half of the linked list.
+- Merge both halves of the linked lists alternatively.
+O(n) - O(1)
+'''
+def reorder_list(head):
+    if not head:
+        return head
+    
+    # find the middle of linked list
+    # in 1->2->3->4->5->6 find 4 
+    slow = fast = head
+    while fast and fast.next:
+        slow = slow.next
+        fast = fast.next.next 
+        
+    # reverse the second part of the list
+    # convert 1->2->3->4->5->6 into 1->2->3 and 6->5->4
+    # reverse the second half in-place
+    prev, curr = None, slow
+    while curr:
+        curr.next, prev, curr = prev, curr, curr.next       
+
+    # merge two sorted linked lists
+    # merge 1->2->3 and 6->5->4 into 1->6->2->5->3->4
+    first, second = head, prev
+    while second.next:
+        first.next, first = second, first.next
+        second.next, second = first, second.next
+    
+    return head
 
 
 ### *** Practice
