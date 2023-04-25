@@ -790,6 +790,57 @@ def min_sub_array_len(target, nums):
     else:
         return 0
 
+### *** Merge Intervals
+'''
+Each interval is represented by a start and an end time. The most common problems solved using this pattern are scheduling problems. The key to understanding this pattern and exploiting its power lies in understanding how any two intervals may overlap.
+'''
+## Merge Intervals
+'''
+We are given an array of closed intervals, intervals, where each interval has a start time and an end time. The input array is sorted with respect to the start times of each interval. Your task is to merge the overlapping intervals and return a new output array consisting of only the non-overlapping intervals.
+Flow:
+- Insert the first interval from the input list into the output list.
+- Start a loop to iterate over each interval of the input list, except for the first.
+- If the input interval is overlapping with the last interval in the output list, merge these two intervals and replace the last interval of the output list with this merged interval.
+- Otherwise, if the input interval does not overlap with the last interval in the output list, add the input interval to the output list.
+Naive approach: The naive approach is to start from the first interval in the input list and check for any other interval in the list that overlaps it. If there is an overlap, merge the other interval into the first interval and then remove the other interval from the list. Repeat this for all the remaining intervals in the list. O(n^2) - O(1)
+Optimized approach: 
+- Insert the first interval from the input list into the output list.
+- Traverse the input list of intervals. For each interval in the input list, we do the following:
+  * If the input interval is overlapping with the last interval in the output list, merge these two intervals and replace the last interval of the output list with this merged interval.
+  * Otherwise, add the input interval to the output list.
+O(n) - O(1)
+'''
+class Interval:
+    def __init__(self, start, end):
+        self.start = start
+        self.end = end
+        self.closed = True  # by default, the interval is closed
+    # set the flag for closed/open
+
+    def set_closed(self, closed):
+        self.closed = closed
+
+    def __str__(self):
+        return "[" + str(self.start) + ", " + str(self.end) + "]" \
+            if self.closed else \
+                "(" + str(self.start) + ", " + str(self.end) + ")"
+    
+def merge_intervals(intervals):
+    if not intervals:
+        return None
+    result = []
+    result.append(Interval(intervals[0].start, intervals[0].end))
+    for i in range(1, len(intervals)):
+        last_added_interval = result[len(result) - 1]
+        cur_start = intervals[i].start
+        cur_end = intervals[i].end
+        prev_end = last_added_interval.end
+        if cur_start <= prev_end:
+            last_added_interval.end = max(cur_end, prev_end)
+        else:
+            result.append(Interval(cur_start, cur_end))
+    return result
+
 ### *** Practice
 ## 2 pointers - Valid Palindrome II
 '''
@@ -822,3 +873,13 @@ def is_palindrome(s):
         right -= 1
 
     return True
+
+## SLiding Window - Best Time to Buy and Sell Stock
+'''
+Given an array where the element at the index i represents the price of a stock on day i, find the maximum profit that you can gain by buying the stock once and then selling it.
+Flow: 
+- Initialize buy and sell pointers to 0 and 1, respectively, and set maximum profit variable to 0.
+- Iterate sell pointer over the prices, computing the current profit by subtracting the prices[buy] from the prices[sell].
+- If prices[buy] is less than prices[sell], choose the maximum value from current profit or maximum profit and store it in the maximum profit. Otherwise, update buy to be equal to sell.
+- Once the sell pointer reaches the end, return the maximum profit.
+'''
