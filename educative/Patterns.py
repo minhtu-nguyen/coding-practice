@@ -915,6 +915,43 @@ def intervals_intersection(interval_list_a, interval_list_b):
 
     return intersections
 
+## Employee Free Time
+'''
+You’re given a list containing the schedules of multiple people. Each person’s schedule is a list of non-overlapping intervals in sorted order. An interval is specified with the start time and the end time, both being positive integers. Your task is to find the list of intervals representing the free time for all the people. We’re not interested in the interval from negative infinity to zero or from the end of the last scheduled interval in the input to positive infinity.
+Flow: 
+- Add all the employee schedules to a list.
+- Sort each schedule in the list by starting time.
+- Iterate over the intervals, keeping track of the previous latest ending time.
+- If the starting time for any period occurs after the previous latest ending time, then this is a free time interval for all employees and we can add it to the result list.
+- Repeat the steps to track the latest ending time and compare with the new starting time to collect all common free intervals in the result list.
+- Return the result list.
+We find all common free time intervals by merging all of the intervals and finding out whether there are any gaps or intervals available in between the timeslots.
+- We add all the employee schedules to one list and then sort that list by starting time, in ascending order.
+- The intervals are then iterated while keeping track of the previous latest ending time.
+- If the starting time for any period is later than the previous latest ending time, we have discovered a free time interval for all employees, which we add to the result.
+O(nlogn) - O(n)
+'''
+def employee_free_time(schedule):
+    # Initializing two lists
+    ans = []
+    intervals = []
+
+    # Merging all the employee schedules into one list of intervals
+    for s in schedule:
+        intervals.extend(s)
+
+    # Sorting all intervals
+    intervals.sort(key=lambda x: x.start)
+    # Initializing prev_end as the endpoint of the first interval
+    prev_end = intervals[0].end
+    # iterating through the intervals and adding the gaps we find to the answer list
+    for interval in intervals:
+        if interval.start > prev_end:
+            ans.append(Interval(prev_end, interval.start))
+        # if the current interval's ending time is later than the current prev_end, update it
+        prev_end = max(prev_end, interval.end)
+    return ans
+
 ### *** Practice
 ## 2 pointers - Valid Palindrome II
 '''
