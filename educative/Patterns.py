@@ -1274,6 +1274,48 @@ def swap_nodes(head, k):
 
     return head
 
+## Reverse Nodes In Even Length Groups
+'''
+You’re given a linked list. Your task is to reverse all of the nodes that are present in the groups with an even number of nodes in them. The nodes in the linked list are sequentially assigned to non-empty groups whose lengths form the sequence of the natural numbers (1,2,3,4...). The length of a group is the number of nodes assigned to it. In other words:
+The 1st node is assigned to the first group.
+The 2nd and 3rd nodes are assigned to the second group.
+The 4th, 5th, and 6th nodes are assigned to the third group and so on.
+Flow:
+- Start traversing the second node of the list if it exists, since the first node does not need to be reversed as it is part of an odd numbered group of 1 node.
+- Keep traversing the linked list till l nodes have been traversed, where l is the length of the current group of nodes (which starts from 2).
+- During this traversal, keep a count n of the nodes being traversed. This is to ensure that if the linked list ends before l nodes have been traversed, we still have a track of the n nodes that have been traversed.
+- If the value of n is odd, do not reverse this group. Otherwise, if the value of n is even, reverse the n nodes in this group.
+- Increment l by 1 and repeat this process until the linked list has been traversed completely.
+Approach:
+We need to reverse each group that has an even number of nodes in it. We can think of each of these groups of nodes as separate linked lists. So, for each of these groups applying an in-place linked list reversal solves the original problem. We need to invoke the in-place reversal of linked list code for every group with an even number of nodes present. However, we’ll need to modify the terminating condition of the loop that is used in the in-place reversal of a linked list pattern. We constantly need to check if the current group even requires any sort of reversal or not and if it is the last group do we even need to modify it or not.
+'''
+def reverse_even_length_groups(head):
+    prev = head  # Node immediately before the current group
+    l = 2  # The head doesn't need to be reversed since it's a group of one node, so starts with length 2
+    while prev.next:
+        node = prev
+        n = 0
+        for i in range(l):
+            if not node.next:
+                break
+            n += 1
+            node = node.next
+        if n % 2:  # odd length
+            prev = node
+        else:      # even length
+            reverse = node.next
+            curr = prev.next
+            for j in range(n):
+                curr_next = curr.next
+                curr.next = reverse
+                reverse = curr
+                curr = curr_next
+            prev_next = prev.next
+            prev.next = node
+            prev = prev_next
+        l += 1
+    return head
+
 
 ### *** Practice
 ## 2 pointers - Valid Palindrome II
