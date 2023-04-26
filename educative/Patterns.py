@@ -1407,6 +1407,115 @@ class MedianOfStream:
         # because max-heap will have one more element than the min-heap
         return -self.max_heap_for_smallnum[0] / 1.0
 
+## Sliding Window Median
+'''
+Given an integer array, nums, and an integer, k, there is a sliding window of size k, which is moving from the very left to the very right of the array. We can only see the k numbers in the window. Each time the sliding window moves right by one position. Given this scenario, return the median of the each window. 
+Flow:
+- Declare a min-heap and a max-heap to store the elements of the sliding window.
+- Push k elements onto the max-heap and transfer 2/k numbers (the higher numbers) to the min-heap.
+- Compute the median of the window elements. If the window size is even, it’s the mean of the top of the two heaps. If it’s odd, it’s the top of the max-heap.
+- Move the window forward and rebalance the heaps.
+- If the incoming number is less than the top of the max-heap, push it on to the max-heap, else, push it onto the min-heap.
+- If the outgoing number is at the top of either of the heaps, remove it from that heap.
+- Repeat the steps to calculate the median, add the incoming number, rebalance the heaps, and remove the outgoing number from the heaps.
+Naive approach: use nested loops to traverse over the array. The outer loop ranges over the entire array, and the nested loop is used to iterate over windows of k elements. For each window, we’ll first sort the elements and then compute the median. We’ll append this value to the median list and move the window one step forward. Using quicksort O((n - k)logk) - O((n - k)logk).
+Optimized approach: 
+- Populate max-heap with k elements.
+- Transfer k/2elements from the max-heap to the min-heap.
+- If the window size is odd, the median is the top of the max-heap. Otherwise, it’s the mean of the top elements of the two heaps.
+- Move the window forward and add the outgoing number in the hash map, which is used to track the outgoing numbers.
+- Rebalance the heaps if they have more elements.
+- If the top element of the max-heap or the min-heap is present in the hash map with a frequency greater than 0, this element is irrelevant. We remove it from the respective heap and the hash map.
+- Repeat the process until all elements are processed.
+O(nlogn) - O(n)
+'''
+def median_sliding_window(nums, k):
+    # To store the medians
+    medians = []
+
+    # To keep track of the numbers that need to be removed from the heaps
+    outgoing_num = {}
+
+    # Max heap
+    small_list = []
+
+    # Min heap
+    large_list = []
+
+    # Initialize the max heap by multiplying each element by -1
+    for i in range(0, k):
+        heappush(small_list, -1 * nums[i])
+
+    # Transfer the top 50% of the numbers from max heap to min heap
+    # while restoring the sign of each number
+    for i in range(0, k//2):
+        element = heappop(small_list)
+        heappush(large_list, -1 * element)
+
+    i = k
+    while True:
+        # If the window size is odd
+        if (k & 1) == 1:
+            medians.append(float(small_list[0] * -1))
+        else:
+            medians.append((float(small_list[0] * -1) + float(large_list[0])) * 0.5)
+
+        # Break the loop if all elements have been processed
+        if i >= len(nums):
+            break
+
+        # Outgoing number
+        out_num = nums[i - k]
+
+        # Incoming number
+        in_num = nums[i]
+        i += 1
+
+        # Variable to keep the heaps balanced
+        balance = 0
+
+        # If the outgoing number is from max heap
+        if out_num <= (small_list[0] * -1):
+            balance -= 1
+        else:
+            balance += 1
+
+        # Add/Update the outgoing number in the hash map
+        if out_num in outgoing_num:
+            outgoing_num[out_num] = outgoing_num[out_num] + 1
+        else:
+            outgoing_num[out_num] = 1
+
+        # If the incoming number is less than the top of the max heap, add it in that heap
+        # Otherwise, add it in the min heap
+        if small_list and in_num <= (small_list[0] * -1):
+            balance += 1
+            heappush(small_list, in_num * -1)
+        else:
+            balance -= 1
+            heappush(large_list, in_num)
+
+        # Re-balance the heaps
+        if balance < 0:
+            heappush(small_list, (-1 * large_list[0]))
+            heappop(large_list)
+        elif balance > 0:
+            heappush(large_list, (-1 * small_list[0]))
+            heappop(small_list)
+
+        # Remove invalid numbers present in the hash map from top of max heap
+        while (small_list[0] * -1) in outgoing_num and (outgoing_num[(small_list[0] * -1)] > 0):
+            outgoing_num[small_list[0] * -1] = outgoing_num[small_list[0] * -1] - 1
+            heappop(small_list)
+
+        # Remove invalid numbers present in the hash map from top of min heap
+        while large_list and large_list[0] in outgoing_num and (outgoing_num[large_list[0]] > 0):
+            outgoing_num[large_list[0]] = outgoing_num[large_list[0]] - 1
+            heappop(large_list)
+
+    return medians
+
+##
 
 ### *** Practice
 ## 2 pointers - Valid Palindrome II
