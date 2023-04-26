@@ -1366,6 +1366,46 @@ def maximum_capital(c, k, capitals, profits):
 
     return current_capital
 
+## Find Median from a Data Stream
+'''
+Implement a data structure that’ll store a dynamically growing list of integers and provide access to their median in O(1).
+Flow: 
+- Split up incoming numbers into two lists—small and large. Those that are smaller than the current middle element are small, and those that are larger than it are large.
+- Maintain these lists as heaps so that the root of the small heap is the largest element in it and the root of large heap is the smallest element in it.
+- If the size of the large heap is greater than the size of small heap or, if size of small heap is greater than the size of the large heap + 1, rebalance the heaps.
+- If the number of elements is even, the median is the mean of the root of the two heaps. Else, it’s the root of the small heap.
+Naive approach: The naive solution is to first sort the data and then find the median. Insertion sort is an algorithm that can be used to sort the data as it appears. O(n^2) - O(1)
+Optimized approach: 
+- Use a min-heap to store the larger 50% of the numbers seen so far and a max-heap for the smaller 50% of the numbers.
+- Add the incoming elements to the appropriate heaps.
+- Calculate the median using the top elements of the two heaps.
+O(logn) - O(1)
+'''
+class MedianOfStream:
+
+    max_heap_for_smallnum = []
+    min_heap_for_largenum = []
+
+    def insert_num(self, num):
+        if not self.max_heap_for_smallnum or -self.max_heap_for_smallnum[0] >= num:
+            heappush(self.max_heap_for_smallnum, -num)
+        else:
+            heappush(self.min_heap_for_largenum, num)
+
+        if len(self.max_heap_for_smallnum) > len(self.min_heap_for_largenum) + 1:
+            heappush(self.min_heap_for_largenum, -heappop(self.max_heap_for_smallnum))
+        elif len(self.max_heap_for_smallnum) < len(self.min_heap_for_largenum):
+            heappush(self.max_heap_for_smallnum, -heappop(self.min_heap_for_largenum))
+
+    def find_median(self):
+        if len(self.max_heap_for_smallnum) == len(self.min_heap_for_largenum):
+
+            # we have even number of elements, take the average of middle two elements
+            # we divide both numbers by 2.0 to ensure we add two floating point numbers
+            return -self.max_heap_for_smallnum[0] / 2.0 + self.min_heap_for_largenum[0] / 2.0
+
+        # because max-heap will have one more element than the min-heap
+        return -self.max_heap_for_smallnum[0] / 1.0
 
 
 ### *** Practice
