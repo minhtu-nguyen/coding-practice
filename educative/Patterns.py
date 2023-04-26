@@ -1316,6 +1316,57 @@ def reverse_even_length_groups(head):
         l += 1
     return head
 
+### *** Two Heaps
+'''
+In some problems, we’re given a set of data such that it can be divided into two parts. We can either use the first part to find the smallest element using the min-heap and the second part to find the largest element using the max-heap or vice versa. There might be cases where we need to find the two largest numbers from two different data sets. We’ll use two max-heaps to store two different data sets in that case.
+'''
+## Maximize Capital
+'''
+You need to develop a program for making automatic investment decisions for a busy investor. The investor has some start-up capital, c, to invest and a portfolio of projects in which they would like to invest in. The investor wants to maximize their cumulative capital as a result of this investment.
+To help them with their decision, they have information on the capital requirement for each project and the profit it’s expected to yield. For example, if project A has a capital requirement of 3, and the investor’s current capital is 1 then the investor can invest in this project. Now, supposing that the project yields a profit of 2, the investor’s capital at the end of the project will be 1+2=3. The investor can now choose to invest in project A as well since their current capital has increased.
+As a basic risk-mitigation measure, the investor would like to set a limit on the number of projects, k, they invest in. For example, if the value of k is 2, then we need to identify the two projects that the investor can afford to invest in, given their capital requirements, and that yield the maximum profits.
+Further, these are one-time investment opportunities, that is, the investor can only invest once in a given project.
+Flow:
+- Create a min-heap for capitals.
+- Identify the projects that can be invested in that fall within the range of the current capital.
+- Select the project that yields the highest profit.
+- Add the profit earned to the current capital.
+- Repeat until k projects have been selected.
+Naive approach: traverse every value of the capitals array based on the available capital. If the current capital is less than or equal to the capital value in the array, then store the profit value in a new array that corresponds to the capital index. Whenever the current capital becomes less than the capital value in the array, we’ll call the max function to get the largest profit value. The selected profit value will be added to the previous capital. Repeat this process until we get the required number of projects containing maximum profit. O(n^2) - O(n)
+Optimized approach: 
+- Push all required capital values onto a min-heap.
+- Select projects in the range of the current capital and push their profits onto a max-heap.
+- Select the project from the max-heap that yields the maximum profit.
+- Add the profit from the selected project to the current capital.
+- Repeat steps 2–4 until we have selected the required number of projects.
+O(nlogn + nlogn) = O(nlogn) - O(n)
+'''
+from heapq import heappush, heappop
+
+
+def maximum_capital(c, k, capitals, profits):
+    current_capital = c
+    capitals_min_heap = []
+    profits_max_heap = []
+
+    for x in range(0, len(capitals)):
+        heappush(capitals_min_heap, (capitals[x], x))
+
+    for _ in range(k):
+
+        while capitals_min_heap and capitals_min_heap[0][0] <= current_capital:
+            c, i = heappop(capitals_min_heap)
+            heappush(profits_max_heap, (-profits[i], i))
+        
+        if not profits_max_heap:
+            break
+
+        j = -heappop(profits_max_heap)[0]
+        current_capital = current_capital + j
+
+    return current_capital
+
+
 
 ### *** Practice
 ## 2 pointers - Valid Palindrome II
@@ -1370,4 +1421,13 @@ Flow:
 - If the earliest end time of all intervals seen so far (the root of the heap) occurs before the start time of the current interval, remove the earliest interval from the heap and push the current interval onto the heap.
 - Otherwise, allot a new meeting room, that is, add the current interval in the heap without removing any existing interval.
 - After processing all the intervals, the size of the heap is the count of meeting rooms needed to hold the meetings.
+'''
+
+## In-place Reversal of a Linked List - Swap Nodes in Pairs
+'''
+Given a singly linked list, swap every two adjacent nodes of the linked list. After the swap, return the head of the linked list.
+- Check to make sure that there are at least 2 nodes in the linked list.
+- Swap the two nodes.
+- Reconnect the swapped pair of nodes with the rest of the linked list.
+- Repeat the process until only one node is left or we reach the end of the linked list.
 '''
