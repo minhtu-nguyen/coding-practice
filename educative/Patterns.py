@@ -1559,7 +1559,50 @@ def tasks(tasks_list):
     # return the total number of machines used by "tasks_list" tasks
     return optimal_machines
 
+### *** K-way Merge
+'''
+The k-way merge pattern helps to solve problems involving a list of sorted arrays.
+Here is what the pattern looks like:
+- Insert the first element of each array in a min-heap.
+- Next, remove the smallest element from the heap and add it to the merged array.
+- Keep track of which array each element comes from.
+- Then, insert the next element of the same array into the heap.
+- Repeat steps 2 to 4 to fill the merged array in sorted order.
+'''
 
+## Merge Sorted Array
+'''
+Given two sorted integer arrays, nums1 and nums2, and the number of data elements in each array, m and n, implement a function that merges the second array into the first one. You have to modify nums1 in place.
+Flow:
+Initialize two pointers, p1 and p2, that point to the last data elements in nums1 and nums2, respectively.
+Initialize a pointer p, that points to the last element of nums1.
+If the value at p1 is greater than the value at p2, set the value at p equal to p1 and decrement p1 and p by 1.
+Else, if the value at p2 is greater than the value at p1, set the value at p equal to p2 and decrement p2 and p by 1.
+Continue the traversal until nums2 is merged with nums1.
+Naive approach: append the second list to the first—at a cost of  O(n) and then sort it using quick sort O((m + n)log(m + n))
+Optimized approach: 
+- Initialize two pointers that point to the last data elements in both arrays.
+- Initialize a third pointer that points to the last index of nums1.
+- Traverse nums1 from the end using the third pointer and compare the values corresponding to the first two pointers.
+- Place the larger of the two values at the third pointer’s index.
+- Repeat the process until the two arrays are merged.
+O(m + n) - O(1)
+'''
+def merge_sorted(nums1, m, nums2, n):
+    p1 = m - 1  
+    p2 = n - 1 
+    x = 0
+    for p in range(n + m - 1, -1, -1):
+        if p2 < 0:
+            break
+        x += 1
+        if p1 >= 0 and nums1[p1] > nums2[p2]:
+            nums1[p] = nums1[p1]
+            p1 -= 1
+        else:
+            nums1[p] = nums2[p2]
+            p2 -= 1
+    return nums1
 
 ### *** Practice
 ## 2 pointers - Valid Palindrome II
