@@ -1604,6 +1604,60 @@ def merge_sorted(nums1, m, nums2, n):
             p2 -= 1
     return nums1
 
+## Kth Smallest Number in M Sorted Lists
+'''
+Given m number of sorted lists in ascending order and an integer k, find the kth smallest number among all the given lists.
+Flow:
+- Push the first element of each list onto the min-heap.
+- Pop the smallest number from the min-heap along with the list whose element is popped.
+- If there are more elements in the list, increment the counter and push its next element onto the min-heap.
+- Repeat the pop and push steps while there are elements in the min-heap, and only stop once you’ve removed k numbers from the heap.
+- The last number popped from the heap during this process is the required kth smallest number.
+Naive approach: A naive approach to this problem can be to merge all the arrays into a single array and then iterate over it to find the kth smallest number from it. O(nlogn)
+Optimized approach: The key idea in this approach is to use a min-heap to allow us to efficiently find the smallest of a changing set of numbers.
+- We first populate the min-heap with the smallest number from each of the m lists.
+- Then, proceed to pop from the heap k times to reach the kth smallest number.
+- Within a list, there may be numbers smaller than even the smallest number of another list. Because of this, every time we pop a number, we insert the next number from the same list. That way, we’re always considering the right candidates in the search for the kthsmallest number.
+O((m+l)logm) - O(n)
+'''
+def k_smallest_number(lists, k):
+    # storing the length of lists to use it in a loop later
+    list_length = len(lists)
+    # declaring a min-heap to keep track of smallest elements
+    kth_smallest = []
+    # to check if input lists are empty
+    empty_list = []
+
+    for index in range(list_length):
+        # if there are no elements in the input lists, return []
+        if lists[index] == empty_list:
+            continue;
+        else:
+            # placing the first element of each list in the min-heap
+            heappush(kth_smallest, (lists[index][0], 0, lists[index]))
+
+    # set a counter to match if our kth element
+    # equals to that counter, return that number
+    numbers_checked, smallest_number = 0, 0
+    while kth_smallest:  # iterating over the elements pushed in our min-heap
+        # get the smallest number from top of heap and its corresponding list
+        smallest_number, index, top_num_list = heappop(kth_smallest)
+        numbers_checked += 1
+
+        if numbers_checked == k:
+            break
+
+        # if there are more elements in list of the top element,
+        # add the next element of that list to the min-heap
+        if index + 1 < len(top_num_list):
+            heappush(
+                kth_smallest, (top_num_list[index + 1], index + 1, top_num_list))
+
+    # return the Kth number found in input lists
+    return smallest_number
+
+
+
 ### *** Practice
 ## 2 pointers - Valid Palindrome II
 '''
