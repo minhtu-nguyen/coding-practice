@@ -2204,8 +2204,33 @@ def find_closest_elements(nums, k, num):
     # Return the window
     return nums[left + 1:right]
 
-##
-
+## Single Element in a Sorted Array
+'''
+In this problem, you’re given an array of sorted integers in which all of the integers, except one, appears twice. Your task is to find the single integer that appears only once.
+The solution should have a time complexity of O(logn) or better and a space complexity of O(1).
+Flow:
+- Initialize the left, mid and right variables.
+- Calculate mid. Decrement it by one if it’s an odd index.
+- If mid and mid+1 are not the same number, then change right to point to mid and calculate mid again.
+- If mid and mid+1 are the same, then change left to mid+2.
+- Repeat the steps until the left pointer becomes greater than the right pointer and calculate the midpoint in each step.
+- Return the element at the left index.
+O(logn) - O(1)
+'''
+def single_non_duplicate(nums): 
+    l = 0
+    r = len(nums) - 1
+    while l < r: # Calculating mid point
+        mid = l + (r - l) // 2
+        if mid % 2 == 1: # If mid is odd, decrement it
+            mid -= 1     # to  the preceding even index
+            # If the element at mid and mid + 1 are the same then
+            # the single element must appear after the mid point
+        if nums[mid] == nums[mid + 1]: 
+            l = mid + 2
+        else :# Otherwise we must search before the mid point
+            r = mid
+    return nums[l]
 
 ### *** Practice
 ## 2 pointers - Valid Palindrome II
