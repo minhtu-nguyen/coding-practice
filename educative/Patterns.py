@@ -1987,6 +1987,31 @@ def top_k_frequent(arr, k):
 
     return top_numbers
 
+## Kth Largest Element in an Array
+'''
+Find the kth largest element in an unsorted array.
+Flow: 
+- Insert the first k numbers into the min-heap.
+- Iterate the complete array.
+- If any number is greater than the root, take the root out and insert the greater number.
+- After iterating all of the numbers, return the root number as the kth largest element.
+O((n-k)logk) - O(k)
+'''
+def find_kth_largest(array, k):
+    k_numbers_min_heap = []
+    # Put first k elements in the min heap
+    for i in range(k):
+        k_numbers_min_heap.append(array[i])
+        # heappush(min_heap, array[i])
+    heapq.heapify(k_numbers_min_heap)
+    # Go through the remaining elements of the list, if the element from the list is greater than the
+    # top(smallest) element of the heap, remove the top element from heap and add the element from array
+    for i in range(k, len(array)):
+        if array[i] > k_numbers_min_heap[0]:
+            heapq.heappop(k_numbers_min_heap)
+            heapq.heappush(k_numbers_min_heap, array[i])
+    # The root of the heap has the Kth largest element
+    return k_numbers_min_heap[0]
 
 
 ### *** Practice
