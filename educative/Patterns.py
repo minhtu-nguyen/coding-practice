@@ -1802,6 +1802,51 @@ def kth_smallest_element(matrix, k):
 
     # return the Kth smallest element found in the matrix
     return smallest_element
+
+### *** Top K Elements
+'''
+The best data structure to keep track of the smallest or largest k elements is heap. With this pattern, we either use a max-heap or a min-heap to find the smallest or largest k elements, respectively.
+'''
+## Kth Largest Element in a Stream
+'''
+Given an infinite stream of integers, nums, design a class to find the kth largest element in a stream.
+Flow: 
+- Create a min heap from the elements in the input number stream
+- Pop from the heap until the its size=k
+- In the add function, push the incoming number to the stream
+- If the size exceeds k, pop from the heap
+- After iterating all of the numbers, return the top of the heap as the kth largest element
+Naive approach: The naive solution is first to sort the data and then find kth largest element. Insertion sort is an algorithm that can be used to sort the data as it appears. O(n^2) - O(1)
+Optimized approach: 
+- Use a min-heap to store the numbers in the input stream.
+- If the size of the heap > k,pop from the heap.
+- Return the top element of the min-heap.
+Construct: O(nlogn) - Add: O(logk) - O(1)
+O(n)
+'''
+import heapq
+class KthLargest:
+    # constructor to initialize heap and add values in it
+    def __init__(self, k, nums):
+        self.k = k
+        self.top_k_heap = nums
+        heapq.heapify(self.top_k_heap)
+        while len(self.top_k_heap) > k:
+            heapq.heappop(self.top_k_heap)
+            
+    # adds element in the heap
+    def add(self, val):
+        heapq.heappush(self.top_k_heap, val)
+        if len(self.top_k_heap) > self.k:
+            heapq.heappop(self.top_k_heap)
+        return self.return_Kth_largest()
+        
+    # returns kth largest element from heap
+    def return_Kth_largest(self):
+        return self.top_k_heap[0]
+
+
+
 ### *** Practice
 ## 2 pointers - Valid Palindrome II
 '''
@@ -1864,4 +1909,16 @@ Given a singly linked list, swap every two adjacent nodes of the linked list. Af
 - Swap the two nodes.
 - Reconnect the swapped pair of nodes with the rest of the linked list.
 - Repeat the process until only one node is left or we reach the end of the linked list.
+'''
+
+## K-way merge - Median of Two Sorted Arrays
+'''
+You’re given two sorted integer arrays, nums1 and nums2, of size m and n, respectively. Your task is to return the median of the two sorted arrays.
+Flow:
+- Pick the middle element of the longer array as the partition location. Let’s call this element left long. Let’s call the very next element right long.
+- Figure out how many elements of the shorter array need to be in the first half. Let’s call this element left short. Let’s call the next element right short.
+- Check Partition: If left long is less than right short and left short is less than right long, we can calculate the median of the two sorted arrays as the mean of Max(left long, left short) and Min(right long, right short).
+- Otherwise, if left long is greater than right short, move left long to halfway between its current position and the start of the longer array, and update right long, left short and right short accordingly.
+- Otherwise, if left short is greater than right long, move left short to halfway between its current position and the start of the shorter array, then figure out left long and update right short and right long accordingly.
+- Repeat the Check Partition step and either return the median or move the partition.
 '''
