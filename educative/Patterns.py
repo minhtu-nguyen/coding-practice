@@ -1656,6 +1656,64 @@ def k_smallest_number(lists, k):
     # return the Kth number found in input lists
     return smallest_number
 
+## Find K Pairs with Smallest Sums
+'''
+Given two lists, and an integer k, find k pairs of numbers with the smallest sum so that in each pair, each list contributes one number to the pair.
+Flow:
+- Initialize a heap to store the sum of pairs and their respective indexes.
+- Initially, we start making pairs by pairing only the first element of the second list with each element of the first list. We push the pairs onto a min-heap, sorted by the sum of each pair.
+- Use another loop to pop the smallest pair from the min-heap, noting the sum of the pair and the list indexes of each element, and add the pair to a result list.
+- To make new pairs, we move forward in the second list and pair the next element in it with each element of the first list, pushing each pair on the min-heap.
+- We keep pushing and popping pairs from the min-heap until we have collected the required k smallest pairs in the result list.
+Naive approach: One way to solve this problem is by creating all possible pairs from the given lists. Once we’ve created all pairs, sort them according to their sums, and remove the first k pairs from the list. O(m*n*log(m*n))
+Optimized approach:
+- We start by pairing only the first element of the second list with each element of the first list. The sum of each pair and their respective indexes from the lists, i and j, are stored on a min-heap.
+- Next, we use a second loop in which at each step, we do the following:
+  * We pop the pair with the smallest element from the min-heap and collect it in a result list.
+  * We make a new pair in which the first element is the first element from the pair we just popped and the second element is the next element in the second list.
+  * We push this pair along with its sum onto the min-heap.
+  * We keep a count of the steps and stop when the min-heap becomes empty or when we have found k pairs.
+O((m+k)logm) - O(m)
+'''
+def k_smallest_pairs(list1, list2, k):
+    # storing the length of lists to use it in a loop later
+    list_length = len(list1)
+    # declaring a min-heap to keep track of the smallest sums
+    min_heap = []
+    # to store the pairs with smallest sums
+    pairs = []
+
+    # iterate over the length of list 1
+    for i in range(min(k, list_length)):
+        # computing sum of pairs all elements of list1 with first index
+        # of list2 and placing it in the min-heap
+        heappush(min_heap, (list1[i] + list2[0], i, 0))
+
+    counter = 1
+
+    # iterate over elements of min-heap and only go upto k
+    while min_heap and counter <= k:
+        # placing sum of the top element of min-heap
+        # and its corresponding pairs in i and j
+        sum_of_pairs, i, j = heappop(min_heap)
+
+        # add pairs with the smallest sum in the new list
+        pairs.append([list1[i], list2[j]])
+
+        # increment the index for 2nd list, as we've
+        # compared all possible pairs with the 1st index of list2
+        next_element = j + 1
+
+        # if next element is available for list2 then add it to the heap
+        if len(list2) > next_element:
+            heappush(min_heap,
+                     (list1[i] + list2[next_element], i, next_element))
+
+        counter += 1
+
+    # return the pairs with the smallest sums
+    return pairs
+
 
 
 ### *** Practice
