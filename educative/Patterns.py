@@ -2013,6 +2013,68 @@ def find_kth_largest(array, k):
     # The root of the heap has the Kth largest element
     return k_numbers_min_heap[0]
 
+### *** Modified Binary Search
+## Search in Rotated Sorted Array
+'''
+Given a sorted integer array, nums, and an integer value, target, the array is rotated by some arbitrary number. Search and return the index of target in this array. If the target does not exist, return -1.
+Flow:
+- Declare two low and high pointers that will initially point to the first and last indexes of the array, respectively.
+- Declare a middle pointer that will initially point to the middle index of the array. This divides the array into two halves.
+- Check if the target is present at the position of the middle pointer. If it is, return its index.
+- If the first half of the array is sorted and the target lies in this range, update the high pointer to mid in order to search in the first half.
+- Else, if the second half of the array is sorted and the target lies in this range, update the low pointer to mid in order to search in the second half.
+- If the high pointer becomes greater or equal to the low pointer and we still haven’t found the target, return -1.
+Naive approach: traverse the whole array while searching for our target. O(n) - O(1)
+Optimized approach: O(logn) - O(1) iter | O(logn) recur
+'''
+def binary_search_rotated(nums, target):
+    low = 0
+    high = len(nums) - 1
+
+    if low > high:
+        return -1
+
+    while low <= high:
+        mid = low + (high - low) // 2
+        if nums[mid] == target:
+            return mid
+
+        if nums[low] <= nums[mid]:
+            if nums[low] <= target and target < nums[mid]:
+                high = mid - 1 
+            else:
+                low = mid + 1 
+        else:
+            if nums[mid] < target and target <= nums[high]:
+                low = mid + 1
+            else:
+                high = mid - 1 
+    return -1
+
+def binary_search(nums, low, high, target):
+
+    if (low > high):
+        return -1
+    mid = low + (high - low) // 2
+
+    if nums[mid] == target:
+        return mid
+
+    if nums[low] <= nums[mid]:
+        if nums[low] <= target and target < nums[mid]:
+            return binary_search(nums, low, mid-1, target)
+        else:
+            return binary_search(nums, mid+1, high, target)
+    else:
+        if nums[mid] < target and target <= nums[high]:
+            return binary_search(nums, mid+1, high, target)
+        else:
+            return binary_search(nums, low, mid-1, target)
+
+
+def binary_search_rotated(nums, target):
+    return binary_search(nums, 0, len(nums)-1, target)
+
 
 ### *** Practice
 ## 2 pointers - Valid Palindrome II
@@ -2088,4 +2150,13 @@ Flow:
 - Otherwise, if left long is greater than right short, move left long to halfway between its current position and the start of the longer array, and update right long, left short and right short accordingly.
 - Otherwise, if left short is greater than right long, move left short to halfway between its current position and the start of the shorter array, then figure out left long and update right short and right long accordingly.
 - Repeat the Check Partition step and either return the median or move the partition.
+'''
+
+## Top K Elements - Kth Smallest Element in a BST
+'''
+Given the root node of a binary search tree and an integer value k, return the kth smallest value from all the nodes of the tree.
+Flow:
+- Traverse the BST in the inorder fashion.
+- At each node, save its value in an array, building up a list of values in a tree, sorted in ascending order.
+- Once the entire tree has been traversed, fetch the k−1th element from the list.
 '''
