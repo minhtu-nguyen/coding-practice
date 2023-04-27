@@ -1758,8 +1758,50 @@ def merge_k_lists(lists):  # Main function
         return lists[0].head
     return
 
+## Kth Smallest Element in a Sorted Matrix
+'''
+Find the kth smallest element in an (nxn), where each row and column of the matrix is sorted in ascending order.
+Although there can be repeating values in the matrix, each element is considered unique and, therefore, contributes to calculating the kth smallest element.
+Flow: 
+- Push the first element of each row of the matrix in a min-heap.
+- Remove the top (root) of the min-heap.
+- If the popped element has the next element in its row, push that element to the heap.
+- If k elements have been removed from the heap, return the last popped element.
+Approach: A key observation when tackling this problem is that the matrix is sorted along rows and columns. This means that whether we look at the matrix as a collection of rows or as a collection of columns, we see a collection of sorted lists.
+- We push the first element of each row of the matrix in the min-heap, storing each element along with its row and column index.
+- Remove the top (root) of the min-heap.
+- If the popped element has the next element in its row, push the next element in the heap.
+- Repeat steps 2 and 3 as long as there are elements in the min-heap, and stop as soon as we’ve popped k elements from it.
+- The last popped element in this process is the kth smallest element in the matrix.
+O((n+k)logn) - O(n)
+'''
+def kth_smallest_element(matrix, k):
+    # storing the number of rows in the matrix to use it in later
+    row_count = len(matrix)
+    # declaring a min-heap to keep track of smallest elements
+    min_numbers = []
+    
+    for index in range(row_count):
+        
+        # pushing the first element of each row in the min-heap
+        heappush(min_numbers, (matrix[index][0], index, 0))
 
+    numbers_checked, smallest_element = 0, 0
+    # iterating over the elements pushed in our min-heap
+    while min_numbers:
+        # get the smallest number from top of heap and its corresponding row and column
+        smallest_element, row_index, col_index = heappop(min_numbers)
+        numbers_checked += 1
+        # when numbers_checked equals k, we'll return smallest_element
+        if numbers_checked == k:
+            break
+        # if the current popped element has a next element in its row,
+        # add the next element of that row to the min-heap
+        if col_index + 1 < len(matrix[row_index]):
+            heappush(min_numbers, (matrix[row_index][col_index + 1], row_index, col_index + 1))
 
+    # return the Kth smallest element found in the matrix
+    return smallest_element
 ### *** Practice
 ## 2 pointers - Valid Palindrome II
 '''
