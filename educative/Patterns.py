@@ -2146,6 +2146,67 @@ class RandomPickWithWeight:
                 high = mid
         return low
 
+## Find K Closest Elements
+'''
+Given a sorted integer array nums and two integers—k and num—return the k closest integers to num in this array. Ensure that the result is sorted in ascending order.
+Flow: 
+- Use binary search to find the closest elements to num and assign a left pointer to the closest number that’s less than num and right to left + 1.
+- If the right value is closer to num than the left value, move the right pointer one step forward.
+- Else, move the left pointer one step backwards.
+- When the window size becomes equal to k, return the closest elements starting from the left pointer towards the right pointer.
+Naive approach: The naive approach is to compute the distance of every element from the given num. Then, we'll sort the elements in ascending order based on the computed distances and store them in a new array. O(nlogn) - O(n)
+Optimized approach: We use binary search to locate either num in the array or the number nearest to it. We'll then set left to point to the number closest to and less than num, and right to num itself (or, if num does not exist in the array, then the number in the array closest to it). We'll then move left backward and right forward until the elements between them are the k elements closest to num.
+O(logn + k) - O(1)
+'''
+def binary_search(array, target):
+    left = 0
+    right = len(array) - 1
+    while left <= right:
+        mid = (left + right) // 2
+        if array[mid] == target:
+            return mid
+        if array[mid] < target:
+            left = mid + 1
+        else:
+            right = mid - 1
+    return left
+
+def find_closest_elements(nums, k, num):
+
+    # If the length of the array is same as k,
+    # return the original array
+    if len(nums) == k:
+        return nums
+
+    # Do a binary search to find the element closest to num
+    # and initialize two pointers for the sliding window
+
+    left = binary_search(nums, num) - 1
+    right = left + 1
+
+    # While the sliding window's size is less than k
+    while right - left - 1 < k:
+        # check for out of bounds
+        if left == -1:
+            right += 1
+            continue
+
+        # Expand the window towards the side with the closer number
+        # Be careful to not go out of bounds with the pointers
+        # |a - num| < |b - num|,
+        # |a - num| == |b - num|
+        if right == len(nums) or \
+                abs(nums[left] - num) <= abs(nums[right] - num):
+            left -= 1
+        else:
+            right += 1
+
+    # Return the window
+    return nums[left + 1:right]
+
+##
+
+
 ### *** Practice
 ## 2 pointers - Valid Palindrome II
 '''
