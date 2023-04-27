@@ -2075,6 +2075,35 @@ def binary_search(nums, low, high, target):
 def binary_search_rotated(nums, target):
     return binary_search(nums, 0, len(nums)-1, target)
 
+## First Bad Version
+'''
+The latest version of a software product fails the quality check. Since each version is developed upon the previous one, all the versions created after a bad version are also considered bad.
+Suppose you have n versions with the IDs [1,2,...,n], and you have access to an API function that returns TRUE if the argument is the ID of a bad version.
+Your task is to find the first bad version, which is causing all the later ones to be bad. You have to implement a solution with the minimum number of API calls.
+Flow: 
+- Initialize first to 1 and last to n.
+- Calculate mid as the mean of 1 and n, and call the API function with mid. Increment the counter for the number of API calls.
+- If the API function returns TRUE, set last to mid.
+- Else, if the API function returns FALSE, set first to mid+1.
+- While first < last, repeat the steps to adjust first and last, to recalculate mid, and to call the API function.
+- Return the tuple containing the first bad version and the number of API calls.
+Naive approach: The naive approach is to find the first bad version in the versions list by linear search. We traverse the whole version list one element at a time until we find the target version. O(n)
+Optimized approach: O(logn) - O(1)
+'''
+def is_bad_version(n):
+    pass
+def first_bad_version(n):
+    first = 1
+    last = n
+    calls = 0
+    while first < last:  
+        mid = first + (last - first) // 2
+        if is_bad_version(mid):  #API call
+            last = mid
+        else:
+            first = mid + 1
+        calls += 1
+    return first, calls
 
 ### *** Practice
 ## 2 pointers - Valid Palindrome II
