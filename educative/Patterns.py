@@ -1845,6 +1845,57 @@ class KthLargest:
     def return_Kth_largest(self):
         return self.top_k_heap[0]
 
+## Reorganize String
+'''
+Given a string, rearrange it so that any two adjacent characters are not the same. If such a reorganization of the characters is possible, output any possible valid arrangement. Otherwise, return an empty string.
+Flow:
+- Store each character and its frequency in a hash map.
+- Construct a max-heap using the character frequency data, so that the most frequently occurring character is at the root of the heap.
+- Iterate over the heap and in each iteration, pop the most frequently occurring character and append it to the result string.
+- Decrement the frequency of the popped character (as we have consumed one occurrence of it) and push it back onto the heap if the updated frequency is greater than 0.
+- Return the result string when the heap becomes empty.
+Naive approach: The naive approach is to generate all possible permutations of the given string and check if the generated string is a valid arrangement or not. O(n^2) - O(1)
+Optimized solution: 
+- Store each character and its frequency in a hash map.
+- Construct a max-heap using the character frequency data so that the most frequently occurring character is at the root of the heap.
+- Iterate over the heap until all the characters have been considered.
+  * Pop the most frequently occurring character from the heap and append it to the result string.
+  * Decrement the count of the character (as we have used one occurrence of it), and push the character that was popped in the previous iteration back onto the heap.
+  * If the frequency count of the character that was just popped remains more than 0, save it for use in the next iteration.
+O(nlogc) (c alphabet constant) --> O(n) - O(1)
+'''
+from collections import Counter
+def reorganize_string(input_string):
+    
+    char_counter = Counter(input_string)
+    most_freq_chars = []
+
+    for char, count in char_counter.items():
+        most_freq_chars.append([-count, char])
+
+    heapq.heapify(most_freq_chars)
+
+    previous = None
+    result = ""
+
+    while len(most_freq_chars) > 0 or previous:
+
+        if previous and len(most_freq_chars) == 0:
+            return ""
+
+        count, char = heapq.heappop(most_freq_chars)
+        result = result + char
+        count = count + 1
+
+        if previous:
+            heapq.heappush(most_freq_chars, previous)
+            previous = None
+
+        if count != 0:
+            previous = [count, char]
+
+    return result + ""
+
 
 
 ### *** Practice
