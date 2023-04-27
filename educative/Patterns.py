@@ -1714,6 +1714,50 @@ def k_smallest_pairs(list1, list2, k):
     # return the pairs with the smallest sums
     return pairs
 
+## Merge K Sorted Lists
+'''
+Given an array of k sorted linked lists, your task is to merge them into a single sorted list.
+Flow:
+- Traverse the input lists in pairs using head pointers.
+- Compare the node values of lists in each pair and add the smaller one to a dummy list.
+- Repeat the above steps until all the values from the lists in a pair are added.
+- Compare this new list with the resultant list of the next pair.
+Approach: use the divide and conquer technique, starting with pairing the lists and then merging each pair. We repeat this until all the given lists are merged. O(nlogk) - O(1)
+'''
+def merge_2_lists(head1, head2):  # helper function
+    dummy = LinkedListNode(-1)
+    prev = dummy  # set prev pointer to dummy node
+
+    # traverse over the lists until both or one of them becomes null
+    while head1 and head2:
+        if head1.data <= head2.data:
+            # if l1 value is <=  l2 value, add l1 node to the list
+            prev.next = head1
+            head1 = head1.next
+        else:
+            # if l1 value is greater than l2 value, add l2 node to the list
+            prev.next = head2
+            head2 = head2.next
+        prev = prev.next
+
+    if head1 is not None:
+        prev.next = head1
+    else:
+        prev.next = head2
+
+    return dummy.next
+
+def merge_k_lists(lists):  # Main function
+    if len(lists) > 0:
+        step = 1
+        while step < len(lists):
+            # Traversing over the lists in pairs to merge with result
+            for i in range(0, len(lists) - step, step * 2):
+                lists[i].head = merge_2_lists(lists[i].head, lists[i + step].head)
+            step *= 2
+        return lists[0].head
+    return
+
 
 
 ### *** Practice
