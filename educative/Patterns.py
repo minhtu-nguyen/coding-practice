@@ -1896,7 +1896,58 @@ def reorganize_string(input_string):
 
     return result + ""
 
+## K Closest Points to Origin
+'''
+Given a list of points on a plane, where the plane is a 2-D array with (x, y) coordinates, find the k closest points to the origin (0,0).
+Flow: 
+- Push the first k points to the heap.
+- Compare the distance of the point with the distance of the top of the heap.
+- Push and pop the point from the heap.
+- Return the points from the heap.
+Naive approach: When thinking about how to solve this problem, it may help to solve a simpler problem—find the point closest to the origin. This would involve a linear scan through the unsorted list of points, with, at each step, a comparison between the closest point discovered so far and the current point from the list. O(nk)
+Optimized approach: O(nlogk) - O(k)
+'''
+class Point:
+    # __init__ will be used to make a Point type object
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
 
+    # __lt__ is used for max-heap
+    def __lt__(self, other):
+        return self.distance_from_origin() > other.distance_from_origin()
+
+    # __str__ is used to print the x and y values
+    def __str__(self):
+        return '[{self.x}, {self.y}]'.format(self=self)
+
+    # distance_from_origin calculates the distance using x, y coordinates
+    def distance_from_origin(self):
+        # ignoring sqrt to calculate the distance
+        return (self.x * self.x) + (self.y * self.y)
+
+    __repr__ = __str__
+
+def k_closest(points, k):
+    points_max_heap = []
+
+    # put first 'k' points in the max heap
+    for i in range(k):
+        heapq.heappush(points_max_heap, points[i])
+
+    # go through the remaining points of the input array, if a 
+    # point is closer to the origin than the top point of the 
+    # max-heap, remove the top point from heap and add the point 
+    # from the input array
+    for i in range(k, len(points)):
+        if points[i].distance_from_origin() \
+         < points_max_heap[0].distance_from_origin():
+            heapq.heappop(points_max_heap)
+            heapq.heappush(points_max_heap, points[i])
+
+    # the heap has 'k' points closest to the origin, return 
+    # them in a list
+    return list(points_max_heap)
 
 ### *** Practice
 ## 2 pointers - Valid Palindrome II
