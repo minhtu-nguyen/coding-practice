@@ -2105,6 +2105,47 @@ def first_bad_version(n):
         calls += 1
     return first, calls
 
+## Random Pick with Weight
+'''
+You’re given an array of positive integers, w, where w[i] describes the weight of the ith index.
+You need to perform weighted random selection to return an index from the w array. The larger the value of w[i], the heavier the weight is. Hence, the higher the chances of its index being picked.
+Flow:
+- Generate a list of running sums from the given list of weights.
+- Generate a random number, where the range for the random number will be from 0 to the maximum number in the list of running sums.
+- Use binary search to find the index of the first running sum that is greater than the random value.
+- Return the index found.
+Naive approach: In order to correctly add bias to the randomized pick, we need to generate a probability line where the length of each segment is determined by the corresponding weight in the input array. Positions with greater weights have longer segments on the probability line, and positions with smaller weights have smaller segments. We can represent this probability line as a list of running sums of weights. 
+O(n) - O(n) contruct - O(logn) - O(1) search
+'''
+import random
+class RandomPickWithWeight:
+    # Constructor
+
+    def __init__(self, w):
+        self.cum_sums = []
+        cum_sum = 0
+        # Calculating the weights running sums list
+        for weight in w:
+            cum_sum += weight
+            self.cum_sums.append(cum_sum)
+        self.total_sum = cum_sum
+
+    def pick_index(self):
+        target = random.randint(0, self.cum_sums[-1])
+
+        # Assigning low pointer at the start of the array
+        low = 0
+        # Assigning high pointer at the end of the array
+        high = len(self.cum_sums)
+        # Binary search to find the target
+        while low < high:
+            mid = low + (high - low) // 2
+            if target > self.cum_sums[mid]:
+                low = mid + 1
+            else:
+                high = mid
+        return low
+
 ### *** Practice
 ## 2 pointers - Valid Palindrome II
 '''
