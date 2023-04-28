@@ -2232,6 +2232,50 @@ def single_non_duplicate(nums):
             r = mid
     return nums[l]
 
+### *** Subsets
+'''
+The subsets pattern is useful in finding the permutations and combinations of elements in a data structure.
+The idea is to consider the data structure as a set and make a series of subsets from this set. The subsets generated are based on certain conditions that the problem provides us.
+'''
+
+## Subsets
+'''
+Given a set of integers, find all possible subsets within the set.
+Flow:
+- Compute the number of possible subsets of the given set using 2^n, where n is the number of elements.
+- Start a loop from 0 to the count of subsets and add an empty list to the results list in the first iteration.
+- In each iteration, create a bit mask of length n for each element in the input set. If the ith bit is set, set[i] will be present in the current subset.
+- Add the current subset to the list of subsets.
+Naive approach: The naive approach is to use the cascading algorithm to find all subsets of a set. The idea of this approach is to iterate the set and append each element to the existing subsets as new subsets. Therefore, with each iteration, the size of the subsets doubles. O(n*2^n) - O(n*2^n)
+Optimized approach: O((2^n)*n) - O(n)
+'''
+def get_bit(num, bit):
+    temp = (1 << bit)
+    temp = temp & num
+    if temp == 0:
+        return 0
+    return 1
+
+def find_all_subsets(v):
+    sets = []
+    
+    if not v:
+        return [[]]
+    else:
+        subsets_count = 2 ** len(v)
+        for i in range(0, subsets_count):
+            st = set()
+            for j in range(0, len(v)):
+                if get_bit(i, j) == 1 and v[j] not in st:
+                    st.add(v[j])
+            
+            if i == 0:
+                sets.append([])
+            else:
+                sets.append(list(st))
+    return sets
+
+
 ### *** Practice
 ## 2 pointers - Valid Palindrome II
 '''
@@ -2315,4 +2359,16 @@ Flow:
 - Traverse the BST in the inorder fashion.
 - At each node, save its value in an array, building up a list of values in a tree, sorted in ascending order.
 - Once the entire tree has been traversed, fetch the k−1th element from the list.
+'''
+
+## Modified Binary Search - Search in Rotated Sorted Array II
+'''
+You are required to find an integer t in an array arr of non-distinct integers. Return TRUE if t exists in the rotated, sorted array arr, and FALSE otherwise, while minimizing the number of operations in the search.
+Flow:
+- Declare two low and high pointers that will initially point to the first and last indexes of the array, respectively.
+- Declare a middle pointer that will initially point to the middle index of the array. This divides the array into two halves.
+- Check if the target is present at the position of the middle pointer. If it is, return True.
+- If the first half of the array is sorted and the target lies in this range, update the high pointer to mid in order to search in the first half.
+- Else, if the second half of the array is sorted and the target lies in this range, update the low pointer to mid in order to search in the second half.
+- If the high pointer becomes greater or equal to the low pointer and we still haven’t found the target, return False.
 '''
