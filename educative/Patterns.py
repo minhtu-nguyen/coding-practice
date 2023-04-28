@@ -2275,6 +2275,107 @@ def find_all_subsets(v):
                 sets.append(list(st))
     return sets
 
+## Permutations
+'''
+Given an input string, return all possible permutations of the string.
+Flow:
+- Starting from the first index as the current index, recursively compute the permutations of the input string.
+- Compute the permutation by swapping the current index with every index in the remaining string.
+- Recurse the computation step by incrementing the current index by 1.
+- If we reach the end of the string, store the current string as a permutation.
+- Return the list of all permutations.
+O(n!) - O(n)
+'''
+# This function will swap characters for every permutation
+def swap_char(word, i, j):
+    swap_index = list(word)
+    swap_index[i], swap_index[j] = swap_index[j], swap_index[i]
+
+    return ''.join(swap_index)
+
+
+def permute_string_rec(word, current_index, result):
+    # Prevents adding duplicate permutations
+    if current_index == len(word) - 1:
+        result.append(word)
+
+        return
+
+    for i in range(current_index, len(word)):
+        # swaps character for each permutation
+        swapped_str = swap_char(word, current_index, i)
+
+        # recursively calls itslef to find each permuation
+        permute_string_rec(swapped_str, current_index + 1, result)
+
+def permute_word(word):
+    result = []
+
+    # Starts finding permuations from start of string
+    permute_string_rec(word, 0, result)
+
+    return result
+
+## Letter Combinations of a Phone Number
+'''
+Given a string having digits from 2-9 inclusive, return all the possible letter combinations that can be made from the numbers in the string. Return the answer in any order.
+Flow:
+- Initialize a dictionary that maps the digits to their characters.
+- Create a backtracking function that considers a digit as starting point and generates all possible combinations with that letter.
+- If the length of our combination is the same as the input, we have an answer. Add it to the list of results and backtrack.
+- Otherwise, find all the possible combinations of characters that correspond to the current digit.
+Approach:
+- We return an empty array if the input is an empty string.
+- We initialize a data structure (for example, a dictionary) that maps the digits to their characters. For example, we map 2 to a, b, and c.
+- The following parameters will be passed to our backtracking function: the path of the current combination of characters, the index of the given digit array, digits, letters, and combinations.
+- If our current combination of characters is the same length as the input, then we have an answer. Therefore, add it to our list of results and backtrack.
+- Otherwise, we get all the characters that correspond to the current digit we are looking at: digits[index].
+- We then loop through these characters. We add each character to our current path and call backtrack again but move on to the next digit by incrementing the index by 1. To avoid using the same character twice in a combination, we make sure to remove the character from the path once we’ve made its combinations.
+O(k^n*n) - O(n*k)
+'''
+# Use backtrack function to generate all possible combinations
+def backtrack(index, path, digits, letters, combinations):
+    # If the length of path and digits is same,
+    # we have a complete combination
+    if len(path) == len(digits):
+        s = ""
+        s = s.join(path)
+        combinations.append(s)
+        return  # Backtrack
+    # Get the list of letters using the index and digits[index]
+    possible_letters = letters[digits[index]]
+    if possible_letters:
+        for letter in possible_letters:
+            # Add the letter to our current path
+            path.append(letter)
+            # Move on to the next category
+            backtrack(index + 1, path, digits, letters, combinations)
+            # Backtrack by removing the letter before moving onto the next
+            path.pop()
+
+def letter_combinations(digits):
+    combinations = []
+    
+    # If the input is empty, immediately return an empty answer array
+    if len(digits) == 0:
+        return []
+
+    #  Mapping the digits to their corresponding letters
+    digits_mapping = {
+        "1": [""],
+        "2": ["a", "b", "c"],
+        "3": ["d", "e", "f"],
+        "4": ["g", "h", "i"],
+        "5": ["j", "k", "l"],
+        "6": ["m", "n", "o"],
+        "7": ["p", "q", "r", "s"],
+        "8": ["t", "u", "v"],
+        "9": ["w", "x", "y", "z"]}
+
+    # Initiate backtracking with an empty path and starting index of 0
+
+    backtrack(0, [], digits, digits_mapping, combinations)
+    return combinations
 
 ### *** Practice
 ## 2 pointers - Valid Palindrome II
