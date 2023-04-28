@@ -2377,6 +2377,51 @@ def letter_combinations(digits):
     backtrack(0, [], digits, digits_mapping, combinations)
     return combinations
 
+## Generate Parentheses
+'''
+For a given number, n, generate all combinations of balanced parentheses.
+Flow:
+- Create an output list to store all the valid combinations of parantheses.
+- Call the back_track function with initial parameters set to n, empty string and 0 for the count of both, opening and closing parantheses.
+- If the count of opening and closing parentheses equals n, then we have a valid combination of parentheses, so we will append the string to our final list.
+- Otherwise, we will check if the number of opening parentheses is less than n. If yes, we will add opening parentheses to our string and increment the count.
+- Lastly, we will check the count of closing parentheses. If the count is less than the count of opening parentheses, then we will add closing parentheses to our string and increment its count.
+O(4^n) - O(n)
+'''
+def back_track(n, left_count, right_count, output, result):
+    # Base case where count of left and right braces is "n"
+    if left_count >= n and right_count >= n:
+        output_str = str(output)
+
+        replace_str = "[],' "
+
+        for c in replace_str:
+            output_str = output_str.replace(c, "")
+        result.append(output_str)
+
+    # Case where we can still append left braces
+    if left_count < n:
+        output.append('(')
+        back_track(n, left_count + 1,
+                   right_count, output, result)
+        output.pop()
+
+    # Case where we append right braces if the current count
+    # of right braces is less than the count of left braces
+    if right_count < left_count:
+        output.append(')')
+        back_track(n, left_count,
+                   right_count + 1, output, result)
+        output.pop()
+
+def generate_combinations(n):
+    result = []
+    output = []
+    back_track(n, 0, 0, output, result)
+
+    return result
+
+
 ### *** Practice
 ## 2 pointers - Valid Palindrome II
 '''
@@ -2472,4 +2517,14 @@ Flow:
 - If the first half of the array is sorted and the target lies in this range, update the high pointer to mid in order to search in the first half.
 - Else, if the second half of the array is sorted and the target lies in this range, update the low pointer to mid in order to search in the second half.
 - If the high pointer becomes greater or equal to the low pointer and we still haven’t found the target, return False.
+'''
+
+## Subsets - Find K-Sum Subsets
+'''
+Given a set of n positive integers, find all the possible subsets of integers that sum up to a number k.
+Flow:
+- Find all possible subsets of the set.
+- Find the sum of the elements of each subset.
+- If the sum for any subset equals k, then add this subset into the result list.
+- Return the result list.
 '''
