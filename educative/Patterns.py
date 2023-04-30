@@ -2549,6 +2549,44 @@ def two_city_scheduling(costs):
             answer = answer + difference[i][2]
     return answer
 
+## Minimum Number of Refueling Stops
+'''
+You need to find the minimum number of refueling stops that a car needs to make to cover a distance, target. For simplicity, assume that the car has to travel from west to east in a straight line. There are various fuel stations on the way that are represented as a 2-D array of stations, i.e., stations[i] = =[d i ​ ,f i ​ ] , where � � d i ​ is the distance (in miles) of the ith gas station from the starting position, and fi is the amount of fuel (in liters) that it stores. Initially, the car starts with k liters of fuel. The car consumes one liter of fuel for every mile traveled. Upon reaching a gas station, the car can stop and refuel using all the petrol stored at the station. In case it cannot reach the target, the program simply returns −1.
+Flow:
+- If the start fuel is greater than or equal to the target, then the car doesn’t need to refuel, so return 0.
+- Iterate over the refueling stations until the maximum distance is less than the target and the car is not out of fuel.
+- If the car can reach the next station from the current position, then add its fuel capacity to the max-heap.
+- If the car cannot reach the next fuel station, pop the station with the highest fuel value from the max-heap, add its fuel to the car’s tank, and increment the stops.
+- Return the number of stops. If the car cannot reach the destination even after stopping at all the fuel stations, return −1.
+O(nlogn) - O(n)
+'''
+def min_refuel_stops(target, start_fuel, stations):
+    # If starting fuel is already greater or equal to target, no need to refuel
+    if start_fuel >= target:
+        return 0
+    # Create a max heap to store the fuel capacities of stations in
+    # such a way that maximum fuel capacity is at the top of the heap
+    max_heap = []
+    # Initialize variables for loop
+    i, n = 0, len(stations)
+    stops = 0
+    max_distance = start_fuel
+    # Loop until the car reach the target or the car is out of fuel
+    while max_distance < target:
+        # If there are still stations and the next one is within range, add its fuel capacity to the max heap
+        if i < n and stations[i][0] <= max_distance:
+            heapq.heappush(max_heap, -stations[i][1])
+            i += 1
+        # If there are no more stations and we can't reach the target, return -1
+        elif not max_heap:
+            return -1
+        # Otherwise, fill up at the station with the highest fuel capacity and increment stops
+        else:
+            max_distance += -heapq.heappop(max_heap)
+            stops += 1
+    # Return the number of stops taken
+    return stops
+
 ### *** Practice
 ## 2 pointers - Valid Palindrome II
 '''
