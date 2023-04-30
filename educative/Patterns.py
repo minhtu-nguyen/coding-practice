@@ -2421,6 +2421,66 @@ def generate_combinations(n):
 
     return result
 
+### *** Greedy Techniques
+'''
+Greedy is an algorithmic paradigm that builds up a solution piece by piece. This means it chooses the next piece that offers the most obvious and immediate benefit. A greedy algorithm, as the name implies, always makes the choice that seems to be the best at the time. It makes a locally-optimal choice in the hope that it will lead to a globally optimal solution. In other words, greedy algorithms are used to solve optimization problems.
+
+Greedy algorithms work by recursively constructing a solution from the smallest possible constituent parts. A recursion is an approach to problem-solving in which the solution to a particular problem depends on solutions to smaller instances of the same problem. While this technique might seem to result in the best solution, greedy algorithms have the downside of getting stuck in local optima and generally do not return the global best solution. There are a number of problems that use the greedy technique to find the solution, especially in the networking domain, where this approach is used to solve problems such as the traveling salesman problem and Prim’s minimum spanning tree algorithm.
+'''
+## Jump Game I
+'''
+In a single-player jump game, the player starts at one end of a series of squares, with the goal of reaching the last square.
+At each turn, the player can take up to s steps towards the last square, where s is the value of the current square.
+For example, if the value of the current square is 3, the player can take either 3 steps, or 2 steps, or 1 step in the direction of the last square. The player cannot move in the opposite direction, that is, away from the last square.
+You have been tasked with writing a function to validate whether a player can win a given game or not.
+Flow:
+- Set the last element in the array as your initial target.
+- Traverse the array from the end to the first element in the array.
+- If the current index is reachable from any preceding index, based on the value at that index, make that index the new target.
+- If you reach the first index of the array without finding any index from which the current target is reachable, return FALSE.
+- Else, if you are able to move each current target backwards all the way to the first index of the array, you’ve found a path from the start to the end of the array. Return TRUE.
+Naive approach: The naive approach would be to check if we can reach the end of the array from every single element until it returns TRUE or if we reach the end of the array itself. 
+Optimized approach: We set the target index as the last index of the array. We then traverse the array backwards and verify if we can reach the target index from any of the previous indexes. If we're able to reach it, we update the target index with the index that allows us to jump to the target index. We repeat this process until we've traversed the entire array. We return TRUE if, through this process, we are able to reach the first index of the array; otherwise, we return FALSE. O(n) - O(1).
+'''
+def jump_game(nums):
+    target_num_index = len(nums) - 1
+    for i in range(len(nums) - 2, -1, -1):
+        if target_num_index <= i + nums[i]:
+            target_num_index = i
+
+    if target_num_index == 0:
+        return True
+    return False
+
+## Boats to Save People
+'''
+You’re given an array, people, where people[i] is the weight of the ith person, and an infinite number of boats, where each boat can carry a maximum weight, limit. Each boat carries, at most, two people at the same time. This is provided that the sum of the weight of those people is under or equal to the weight limit.
+You need to return the minimum number of boats to carry every person in the array.
+Flow:
+- Sort the people array and initialize three variables to mark the heaviest and lightest person in the list and to calculate the number of boats needed.
+- Since the array is already sorted, point the lightest variable to the first element in our people array, and the heaviest variable to the last element in our array.
+- Check if the combined weight of the lightest and heaviest person is under the weight limit. If it is, then increment the lightest variable by one, decrement the heaviest variable by one, and increment the boats used by one. If it isn’t, then only decrement the heaviest pointer by one and increment the boat count by one.
+- Return the answer variable as our final output.
+Naive approach: The naive approach would first count the number of people whose weight is equal to the boat's limit. For the remaining people, we will pair each person with every other person in the array such that their combined weight is less than or equal to the boat's limit. Once we have all such pairs, we will select the pair with the maximum weight and increment the boat count by 1. We will do the same for all the remaining people until all of them have been placed in a boat. O(n^2)
+Optimized approach: We decided that if the person with the highest weight could share the boat with the person with the lowest weight, we would always make them share. If not, the person with the highest weight is not able to be paired with anyone and must instead get a boat of their own. By implementing the greedy pattern we traverse the array forward and backward at the same time with the help of two pointers, indicating the heaviest and lightest person currently on the ship. We calculated the sum of both their weights and adjusted our pointers accordingly until the pointers crossed each other. O(nlogn) - O(n) sorting
+'''
+def rescue_boats(people, limit):
+    # Sorting the peoples array.
+    people.sort()
+    # After the array is sorted, the person with the lightest weight will be at the start of the list.
+    lightest = 0
+    # The heaviest person will be at the end of the list
+    heaviest = len(people) - 1
+    answer = 0  # The number of boats used before we save anyone
+    while lightest <= heaviest:  # The condition to share boats.
+        answer += 1  # We increase the number of boats we used by one
+        # If there is still space for another person than we increment the light pointer by one too.
+        if people[lightest] + people[heaviest] <= limit:
+            lightest += 1  # Moving forward because we added the lightest person too
+        # The heaviest person will always get a boat, hence we would always shift to the 2nd person with most weight.
+        heaviest -= 1
+    return answer  # Returning the minimum number of boats
+
 
 ### *** Practice
 ## 2 pointers - Valid Palindrome II
