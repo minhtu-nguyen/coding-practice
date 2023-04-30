@@ -2513,7 +2513,41 @@ def gas_station_journey(gas, cost):
 
     return starting_index
 
+## Two City Scheduling
+'''
+A company is planning to interview 2n people. You're given the array costs where costs[i]=[aCost i ​ ,bCost i ​ ] . The cost of flying the ith person to city  A is aCost i ​ , and the cost of flying the ith person to city  B is bCosti ​ . Return the minimum cost to fly every person to a city such that exactly n n people arrive in each city.
+Flow:
+- Initialize an array to store the extra amount each person would take to travel to city A compared to city B.
+- In the same array, along with the difference, also append the cost each person takes to travel to city A and city B.
+- Sort the array in ascending order based on the difference between the cost of travelling to city A and city B.
+- Calculate the minimum possible cost to send people evenly among the two cities.
+O(nlogn) - O(m+n)
+'''
+# We will be using math.floor for floor division in this problem.
+import math
 
+
+def two_city_scheduling(costs):
+    # Array that we will use to divide the group in two equal parts.
+    difference = []
+    # Initiliazing a new variable to calculate the minimum cost required to send exactly n people to both cities.
+    answer = 0
+    # Initiliazing a loop, to calculate the difference to travel to City A or B.
+    for cost1, cost2 in costs:
+        # Calculating the differences, and adding costs for City A and B alongside in an array.
+        difference.append([cost1 - cost2, cost1, cost2])
+    # We sort the array based on the differences we calculated above.
+    difference.sort()
+    length_diff = len(difference)
+    # Initiliazing a loop, to add the relevent costs to our answer variable.
+    for i in range(length_diff):
+        if i < math.floor(length_diff / 2):
+            # We will send this half to City A
+            answer = answer + difference[i][1]
+        else:
+            # We will send this half to City B
+            answer = answer + difference[i][2]
+    return answer
 
 ### *** Practice
 ## 2 pointers - Valid Palindrome II
