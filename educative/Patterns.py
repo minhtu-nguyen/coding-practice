@@ -2481,6 +2481,39 @@ def rescue_boats(people, limit):
         heaviest -= 1
     return answer  # Returning the minimum number of boats
 
+## Gas Stations 
+'''
+There are n gas stations along a circular route, where the amount of gas at the ith station is gas[i].
+We have a car with an unlimited gas tank and it costs cost[i] of gas to travel from the ith station to its next (i+1)th station. We begin the journey with an empty tank at one of the gas stations.
+Given two integer arrays, gas and cost, return the starting gas station’s index if we can travel around the circuit once in the clockwise direction. Otherwise, return −1.
+Flow:
+- Calculate the total gas and total cost from the arrays. If the total gas is less than the total cost, return -1, since we can never complete a loop from any index.
+- Set the starting index and total gas available equal to 0.
+- Traverse the gas array. During this traversal, subtract the current element in the gas array with the cooresponding index in the cost array, and add this value to the total gas.
+- If at any point, the total gas becomes less than 0, that means, we can not complete a loop form this starting index, so we increment the starting index by 1.
+- Return the starting index at the end of the traversal.
+Naive approach: The naive approach to this would be to choose each station as a starting point and try to visit every other station while maintaining the fuel level. This will determine whether or not it is possible to visit the next station. If not, we choose another starting station and try to visit every other station in the array until we reach the starting station again. O(n^2)
+Optimized approach: O(n) - O(1)
+'''
+def gas_station_journey(gas, cost):
+    if sum(cost) > sum(gas):  # If the sum of the costs is greater than the gas
+        return -1             # available to us, then we can't ever reach the same point again.
+
+    # Setting the indexes that we will start our analysis from
+    total_gas, starting_index = 0, 0
+    for i in range(len(gas)):  # Traversing the array from start to finish
+        # Checking how much gas we have left in the tank after going to
+        # the next station.
+        total_gas = total_gas + (gas[i] - cost[i])
+        # the next station.
+
+        if total_gas < 0:
+            total_gas = 0
+            starting_index = i + 1
+
+    return starting_index
+
+
 
 ### *** Practice
 ## 2 pointers - Valid Palindrome II
