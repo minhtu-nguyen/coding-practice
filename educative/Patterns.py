@@ -2587,6 +2587,138 @@ def min_refuel_stops(target, start_fuel, stations):
     # Return the number of stops taken
     return stops
 
+### *** Backtracking
+'''
+Backtracking is different from recursion because, in recursion, the function calls itself until it reaches a base case whereas backtracking tries to explore all possible paths to a solution.
+The way backtracking works is that it first explores one possible option. If the required criteria have been met with that option, we choose a path that stems from that option and keep on exploring that path. If a solution is reached from this path, we return this solution. Otherwise, if a condition is violated from the required set of conditions, we backtrack and explore another path.
+'''
+## N-Queens
+'''
+Given a chessboard of size n×n, determine how many ways n queens can be placed on the board, such that no two queens attack each other.
+A queen can move horizontally, vertically, and diagonally on a chessboard. One queen can be attacked by another queen if both share the same row, column, or diagonal.
+Flow:
+- Start by placing a queen anywhere in the first row of a chess board.
+- Since no other queen may be placed in a row that already has a queen, search for a safe position for the next queen in the next row.
+- Iterate over the rows to find a safe placement for the queens. Store the column number where a queen is placed in a list.
+- If a safe position is not found, backtrack to the previous valid placement. Search for another solution.
+- If a complete solution is found, add it to the results array, and backtrack to find other valid solutions in the same way.
+Naive solution: we could find all configurations with all possible placements of n queens and then determine for every configuration if it is valid or not. O((n^2/n)) - O(n)
+Optimized solution: O(n^n) - O(n)
+'''
+# This method determines if a queen can be placed at proposed_row, proposed_col
+# with current solution i.e. this move is valid only if no queen in current
+# solution may attack the square at proposed_row and proposed_col
+def is_valid_move(proposed_row, proposed_col, solution):
+    for i in range(0, proposed_row):
+        old_row = i
+        old_col = solution[i]
+        diagonal_offset = proposed_row - old_row
+        if (old_col == proposed_col or
+            old_col == proposed_col - diagonal_offset or
+                old_col == proposed_col + diagonal_offset):
+            return False
+            
+    return True
+
+# Recursive worker function
+def solve_n_queens_rec(n, solution, row, results):
+    if row == n:
+        results.append(solution)
+        return
+
+    for i in range(0, n):
+        valid = is_valid_move(row, i, solution)
+        if valid:
+            solution[row] = i
+            solve_n_queens_rec(n, solution, row + 1, results)
+
+# Function to solve N-Queens problem
+def solve_n_queens(n):
+    results = []
+    solution = [-1] * n
+    solve_n_queens_rec(n, solution, 0, results)
+    return len(results)
+
+# This solution uses stack to store the solution.
+# Stack will hold only the column values and one solution
+# will be stored in the stack at a time.
+
+def is_valid_move(proposed_row, proposed_col, solution):
+  # we need to check with all queens
+  # in current solution
+  for i in range(0, proposed_row):
+    old_row = i
+    old_col = solution[i]
+
+    diagonal_offset = proposed_row - old_row
+    if (old_col == proposed_col or
+      old_col == proposed_col - diagonal_offset or
+        old_col == proposed_col + diagonal_offset):
+      return False
+
+  return True
+
+def solve_n_queens(n):
+  results = []
+  solution = [-1] * n
+  sol_stack = []
+
+  row = 0
+  col = 0
+
+  while row < n:
+    # For the current state of the solution, check if a queen can be placed in any
+    # column of this row
+    while col < n:
+      if is_valid_move(row, col, solution):
+        # If this is a safe position for a queen (a valid move), save 
+        # it to the current solution on the stack...
+        sol_stack.append(col)
+        solution[row] = col
+        row = row + 1
+        col = 0
+        # ... and move on to checking the next row (breaking out of the inner loop)
+        break
+      col = col + 1
+
+    # If we have checked all the columns
+    if col == n:
+      # If we are working on a solution
+      if sol_stack:
+        # Backtracking, as current row does not offer a safe spot given the previous move
+        # So, get set up to check the previous row with the next column
+        col = sol_stack[-1] + 1
+        sol_stack.pop()
+        row = row - 1
+      else:
+        # If we have backtracked all the way and found this to be a dead-end,
+        # break out of the inner loop
+        break  # no more solutions exist
+      
+    # If we have found a safe spot for a queen in each of the rows
+    if row == n:
+      # add the solution into results
+      results.append(solution)
+
+      # backtrack to find the next solution
+      row = row - 1
+      col = sol_stack[-1] + 1
+      sol_stack.pop()
+
+  return len(results)
+
+## Word Search 
+'''
+Given an m×n 2-D grid of characters, we have to find a specific word in the grid by combining the adjacent characters. Assume that only up, down, right, and left neighbors are considered adjacent.
+Flow:
+Start traversing the grid.
+Call depth-first-search to search for the next character of the search word in four possible directions for each cell of the grid.
+If a valid character is found, then call the depth-first-search function again for this cell.
+Keep traversing the cells until the grid is empty or the valid string is found.
+'''
+
+
+
 ### *** Practice
 ## 2 pointers - Valid Palindrome II
 '''
@@ -2692,4 +2824,15 @@ Flow:
 - Find the sum of the elements of each subset.
 - If the sum for any subset equals k, then add this subset into the result list.
 - Return the result list.
+'''
+
+## Greedy - Jump Game II
+'''
+In a single-player jump game, the player starts at one end of a series of squares, with the goal of reaching the last square. At each turn, the player can take up to s steps towards the last square, where s is the value of the current square. For example, if the value of the current square is 3 , the player can take either 3 steps, or 2 steps, or 1 step in the direction of the last square. The player cannot move in the opposite direction, that is, away from the last square. You’ve been provided with the nums integer array, representing the series of squares. You’re initially positioned at the first index of the array. Find the minimum number of jumps needed to reach the last index of the array. You may assume that you can always reach the last index.
+Flow:
+- Initialize three variables: farthest_jump, denoting the farthest index we can reach, current_jump, denoting the end index of our current jump, and jumps, to store the number of jumps. All three of these variables are set to 0.
+- Traverse the entire nums array. On each ith iteration, update farthest_jump to the max of the current value of farthest_jump, and i + nums[i].
+- If i is equal to current_jump, we have completed the current jump and can now prepare to take the next jump (if required). So we increment the jumps variable by 1 and set current_jump equal to farthest_jump.
+- Otherwise, do not update either the jumps variable or the current_jump variable, since we haven’t yet completed the current jump.
+- At the end of the traversal, the jumps variable will contain the minimum number of jumps required to reach the last index.
 '''
