@@ -2975,8 +2975,38 @@ def find_max_knapsack_profit(capacity, weights, values):
                 profits[c] = max(profits[c], new_profit)
     return profits[capacity]
 
+## Coin Change
+'''
+You're given an integer total and a list of integers called coins. The variable coins hold a list of coin denominations, and total is the total amount of money.
+You have to find the minimum number of coins that can make up the total amount by using any combination of the coins. If the amount can't be made up, return -1. If the total amount is 0, return 0.
+Flow:
+- Initialize a counter array that contains elements equal to our total. Furthermore, initialize a variable to store the minimum number of coins needed. The minimum variable can be initialized to infinity at the start of each path.
+- Traverse the coins array, and for each element, check the base cases. If the remaining sum is equal to 0, return 0. If it is less than 0, return -1 and if it is greater than 0, return the target value stored at the -ith index of the counter array. Store this value into a separate variable called result.
+- Increment the value in result variable by one and add it to the minimum variable. Repeat this process until the (rem-1)^{th} index of the counter is not infinity.
+Naive approach:  generates all possible combinations of given denominations such that in each combination, the sum of coins is equal to total. From these combinations, choose the one with the minimum number of coins and return the minimum number required. If the sum of any combinations is not equal to total then print -1. O(total^n) - O(n)
+Optimized solution: O(n*m) - O(n)
+'''
+def calculate_minimum_coins(coins, rem, counter):  
+    if rem < 0: 
+        return -1
+    if rem == 0:
+        return 0
+    if counter[rem - 1] != float('inf'):
+        return counter[rem - 1]
+    minimum = float('inf')
 
+    for s in coins: 
+        result = calculate_minimum_coins(coins, rem - s, counter)
+        if result >= 0 and result < minimum:
+            minimum = 1 + result
 
+    counter[rem - 1] =  minimum if minimum !=  float('inf') else  -1 
+    return counter[rem - 1]
+
+def coin_change(coins, total): 
+    if total < 1:
+        return 0
+    return calculate_minimum_coins(coins, total, [float('inf')] * total)
 
 ### *** Practice
 ## 2 pointers - Valid Palindrome II
