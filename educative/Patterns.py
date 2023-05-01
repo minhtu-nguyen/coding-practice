@@ -2857,6 +2857,72 @@ def heist(root):
 
     return [includeRoot, excludeRoot] 
 
+## Restore IP Addresses
+'''
+Given a string s containing digits, return a list of all possible valid IP addresses that can be obtained from the string. A valid IP address is made up of four numbers separated by dots ., for example 255.255.255.123. Each number falls between 0 and 255 (including 0 and 255), and none of them can have leading zeros.
+Flow:
+- Initially place all three dots each after 1 digit, e.g., 2.5.5.25511135
+- Recursively add the next digit from right to the last segment of the IP address, e.g., 2.5.52.5511135
+- If the number in any segment exceed 255, move this digit to the second segment.
+- Make a condition that checks whether each segment lies within the range 0<=x<=255
+- Once all dots are placed and each segment is valid, return the IP address.
+Naive approach: The brute-force approach would be to check all possible positions of the dots. To place these dots, initially, we’ve 11 places, then 10 places for the second dot, 9 places for the third dot, and so on. So, in the worst case we would need to perform 11×10×9=990 validations.
+Optimized approach: O(1) - O(1)
+'''
+def valid(segment):
+    segment_length = len(segment)  # storing the length of each segment
+    if segment_length > 3:  # each segment's length should be less than 3
+        return False
+
+    # Check if the current segment is valid
+    # for either one of following conditions:
+    # 1. Check if the current segment is less or equal to 255.
+    # 2. Check if the length of segment is 1. The first character of segment
+    #    can be `0` only if the length of segment is 1.
+    return int(segment) <= 255 if segment[0] != '0' else len(segment) == 1
+
+
+# this function will append the current list of segments to the list of result.
+def update_segment(s, curr_pos, segments, result):
+    segment = s[curr_pos + 1:len(s)]
+
+    if valid(segment):  # if the segment is acceptable
+        segments.append(segment)  # add it to the list of segments
+        result.append('.'.join(segments))
+        segments.pop()  # remove the top segment
+
+
+def backtrack(s, prev_pos, dots, segments, result):
+    # prev_pos : the position of the previously placed dot
+    # dots : number of dots to place
+
+    size = len(s)
+
+    # The current dot curr_pos could be placed in
+    # a range from prev_pos + 1 to prev_pos + 4.
+    # The dot couldn't be placed after the last character in the string.
+    for curr_pos in range(prev_pos + 1, min(size - 1, prev_pos + 4)):
+        segment = s[prev_pos + 1:curr_pos + 1]
+        if valid(segment):
+            segments.append(segment)
+
+            # if all 3 dots are placed add the solution to result
+            if dots - 1 == 0:
+                update_segment(s, curr_pos, segments, result)
+            else:
+                # continue to place dots
+                backtrack(s, curr_pos, dots - 1, segments, result)
+
+            segments.pop()  # remove the last placed dot
+
+
+def restore_ip_addresses(s):
+
+    # creating empty lists for storing valid IP addresses,
+    # and each segment of IP
+    result, segments = [], []
+    backtrack(s, -1, 3, segments, result)
+    return result
 
 
 ### *** Practice
