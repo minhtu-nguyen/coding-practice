@@ -2753,6 +2753,109 @@ def depth_first_search(row, col, word, grid):
 
     return result
 
+## House Robber III
+'''
+A thief has discovered a new neighborhood to target, where the houses can be represented as nodes in a binary tree. The money in the house is the data of the respective node. The thief can enter the neighborhood from a house represented as root of the binary tree. Each house has only one parent house. The thief knows that if he robs two houses that are directly connected, the police will be notified. The thief wants to know the maximum amount of money he can steal from the houses without getting caught by the police. The thief needs your help determining the maximum amount of money he can rob without alerting the police.
+Flow:
+- If the tree is empty, return 0.
+- Recursively calculate the maximum amount of money that can be robbed from the left and right subtrees of the root node.
+- Recursively compute the maximum amount of money that can be robbed with the parent node included and excluded both.
+- Return the maximum from both the amounts computed.
+Naive approach: calculating the sum of every possible valid combination of houses that can be robbed. 2^n
+Optimized solution: O(n) - O(n)
+'''
+class BinaryTreeNode:
+    def __init__(self, data):
+        self.data = data
+        self.left = None
+        self.right = None
+
+        # below data members used only for some of the problems
+        self.next = None
+        self.parent = None
+        self.count = 0
+
+class BinaryTree:
+    # constructor
+    def __init__(self, *args):
+        if len(args) < 1:
+            self.root = None
+        elif isinstance(args[0], int):
+            self.root = BinaryTreeNode(args[0])
+        else:
+            self.root = None
+            self.insertList(args[0])
+
+    # function to create the binary tree given a list of integers
+    def insertList(self, inputList):
+        if not inputList:
+            self.root = None
+        else:
+            self.root = BinaryTreeNode(inputList[0])
+            q = deque([self.root])
+            i = 1
+            while i < len(inputList):
+                currentNode = q.popleft()
+                if inputList[i] != None:
+                    currentNode.left = BinaryTreeNode(inputList[i])
+                    q.append(currentNode.left)
+                i += 1
+                if i < len(inputList) and inputList[i] != None:
+                    currentNode.right = BinaryTreeNode(inputList[i])
+                    q.append(currentNode.right)
+                i += 1
+
+    # function to find a node given the value stored in the node
+    def find(self, value):
+        q = deque([self.root])
+        while q:
+            currentNode = q.popleft()
+            if currentNode:
+                if currentNode.data == value:
+                    return currentNode
+                q.append(currentNode.left)
+                q.append(currentNode.right)
+            if all(val == None for val in q):
+                break
+        return None
+
+    # function to return level order traversal of the binary tree
+    def level_order_traversal(self):
+        if not self.root:
+            return []
+        result = []
+        q = deque([self.root])
+        while q:
+            currentNode = q.popleft()
+            if currentNode:
+                result.append(currentNode.data)
+                q.append(currentNode.left)
+                q.append(currentNode.right)
+            else:
+                result.append(None)
+            if all(val == None for val in q):
+                break
+        return result
+    
+def rob(root):
+   # Returns maximum value from the pair: [includeRoot, excludeRoot]
+   return max(heist(root))
+   
+def heist(root):
+    # Empty tree case
+    if root == None: 
+        return [0, 0]
+
+    # Recursively calculating the maximum amount that can be robbed from the left subtree of the root   
+    left_subtree = heist(root.left) 
+    # Recursively calculating the maximum amount that can be robbed from the right subtree of the root   
+    right_subtree  = heist(root.right)
+    # includeRoot contains the maximum amount of money that can be robbed with the parent node included
+    includeRoot = root.data + left_subtree[1] + right_subtree[1] 
+    # excludeRoot contains the maximum amount of money that can be robbed with the parent node excluded 
+    excludeRoot = max(left_subtree) + max(right_subtree)
+
+    return [includeRoot, excludeRoot] 
 
 
 
