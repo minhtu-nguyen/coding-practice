@@ -2924,6 +2924,59 @@ def restore_ip_addresses(s):
     backtrack(s, -1, 3, segments, result)
     return result
 
+### *** Dynamic Programming
+'''
+There are multiple ways to solve dynamic programming problems: top-down, bottom-up, and optimized bottom-up approaches.
+The bottom-up approach is optimized using the 1-D array instead of using the 2-D array.
+'''
+## 0/1 Knapsack
+'''
+Suppose you have the list of weights and corresponding values for n items. You have a knapsack that can carry a specific amount of weight at a time called capacity.
+You need to find the maximum profit of items using the sum of values of the items you can carry in a knapsack. The sum of the weights of the items should be less than or equal to the knapsack’s capacity.
+If any combination can’t make the given knapsack capacity of weights, then return 0.
+Flow:
+- Initialize the profits array of size capacity to save the profit for each capacity.
+- Initialize a loop that will range from 0 to the length of values array.
+- Initialize an inner loop that will range from capacity to 0.
+- Check if weights[i] < capacity. If true, calculate the profit and save it in a profit array.
+- Return profit[capacity].
+Naive approach: ry all combinations to calculate the profit of the given values. And then choose one maximum profit from all the combinations with the weight that doesn’t exceed the given capacity. O(2^n) - O(n)
+Optimized approach: O(nw) - O(w)
+'''
+def find_max_knapsack_profit(capacity, weights, values):
+    # Store values length to use it later in the code
+    values_length = len(values)
+    # Check if the constraints are fulfilled for the given problem
+    # Check if the given capacity is no smaller than or equal to zero
+    # Check if the length of values is not equal to zero, if zero we will
+    # return 0
+    # Check if the length of weights is not equal to the length of the values,
+    # if false we will return 0
+    if capacity <= 0 or values_length == 0 or len(weights) != values_length:
+        return 0
+    # Initialize array named profits of size (capacity + 1) and
+    # fill the array with 0    
+    profits = [0] * (capacity + 1)
+    # Iterate in values and weights list using i as an iterator where
+    # values and weights list have same lengths
+    for i in range(values_length):
+        # Find the profit for each capacity starting from Cn to C0
+        for c in range(capacity, -1, -1):
+            # Check if the weight[i] is smaller than or equal to capacity
+            # in range Cn - C0
+            if weights[i] <= c:
+                # Saving the profit for printing purposes
+                init_profit = profits[c]
+                # Calculate the new profit using the previous profit and
+                # values[i]
+                new_profit = profits[c - weights[i]] + values[i]
+                # Set profits[c] value equal to the maximum of profits[c]
+                # and new calculated profit
+                profits[c] = max(profits[c], new_profit)
+    return profits[capacity]
+
+
+
 
 ### *** Practice
 ## 2 pointers - Valid Palindrome II
@@ -3041,4 +3094,33 @@ Flow:
 - If i is equal to current_jump, we have completed the current jump and can now prepare to take the next jump (if required). So we increment the jumps variable by 1 and set current_jump equal to farthest_jump.
 - Otherwise, do not update either the jumps variable or the current_jump variable, since we haven’t yet completed the current jump.
 - At the end of the traversal, the jumps variable will contain the minimum number of jumps required to reach the last index.
+'''
+## Backtracking - Sudoku Solver
+'''
+Given a 9 x 9 sudoku board, solve the puzzle by completing the empty cells. The sudoku board is only considered valid if the rules below are satisfied:
+Each row must contain digits between 1–9, and there should be no repetition of digits within a row.
+Each column must contain digits between 1–9, and there should be no repetition of digits within a column.
+The board consists of 9 non-overlapping sub-boxes, each containing 3 rows and 3 columns. Each of these 3 x 3 sub-boxes must contain digits between 1–9, and there should be no repetition of digits within a sub-box.
+Flow:
+- Start iterating the board from the top left cell until we reach the first free cell.
+- One by one, place all numbers between 1 and 9 in the current cell, if that number isn’t already present in the current row, column and 3x3 sub-box.
+- Write down that number that is now present in the current row, column, and box.
+- If we reach the last cell, that means we’ve successfully solved the sudoku.
+- Else, we move to the next cell.
+- Backtrack if the solution is not yet present, and remove the last number from the cell.
+'''
+
+## Backtracking - Matchsticks to Square
+'''
+Given an integer array, matchsticks, where matchsticks[i] is the length of the ith matchstick. Use every single matchstick to create a square. No stick should be broken, although they can be connected, and each matchstick can only be used once.
+Return TRUE if we can make this square and FALSE otherwise.
+Flow:
+- If the number of matchsticks is less than 4, return FALSE.
+- If the sum of all values in matchsticks is less than 4, return FALSE.
+- If the sum of all values in matchsticks is not a multiple of 4, return FALSE.
+- Sort matchsticks in descending order and set the length of one side to 1/4th of the sum of the values of matchsticks.
+- Choose a matchstick for one of the sides and check if it’s equal to the required length of one side.
+- If it’s equal to the required length, try constructing another side using the remaining matchsticks.
+- If it’s less than the required length, try to complete the side.
+- If it’s greater than the required length, return FALSE.
 '''
