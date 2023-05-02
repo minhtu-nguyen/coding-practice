@@ -3034,6 +3034,55 @@ def find_tribonacci(n):
           first_num + second_num + third_num
     return third_num
 
+## Partition Equal Subset Sum
+'''
+Given a non-empty array of positive integers, determine if the array can be divided into two subsets so that the sum of both the subsets is equal.
+Flow:
+- Create a matrix of size n∗s, where n is the size of the array and s is the sum of the array.
+- Place TRUE in the first row of the matrix and FALSE in the first column of the matrix except the [0][0] location.
+- Fill up the matrix in a bottom up approach.
+- The last index of the matrix denotes whether the array can be partitioned or not.
+Naive approach: First, we calculate the sum of the array. If the sum of the array is odd, there can’t be two subsets with the equal sum, so we return FALSE. If the sum is even, we calculate sum/2 and find a subset of the array with a sum equal to sum/2. This solution tests two possibilities, whether to include or exclude it. O(2^n)
+Optimized approach: O(n*s)
+'''
+def can_partition_array(nums):
+    
+    # calculate sum of array
+    t_sum = sum(nums)
+    # if total sum is odd, it cannot be partitioned into equal sum subsets
+    if t_sum % 2 != 0:
+        return False
+    
+    s_sum = t_sum//2
+    # Create a 2d matrix and fill all entries with False
+    global matrix
+    matrix = [[0 for i in range(len(nums)+1)] for j in range(s_sum+1)]
+    # initialize the first row as true (1)
+    # because each array has a subset whose sum is zero
+    for i in range(0, len(nums) + 1):
+        matrix[0][i] = 1
+
+    # initialize the first column as false (0), except for [0][0] location
+    # because an empty array has no subset whose sum is greater than zero
+    for i in range(1, s_sum + 1):
+        matrix[i][0] = 0
+    # Fill up the 2d matrix in a bottom-up manner
+    for i in range(1, s_sum+1):
+        for j in range(1, len(nums)+1):
+            if nums[j - 1] > i:
+                matrix[i][j] = matrix[i][j - 1]
+            else:
+                matrix[i][j] = matrix[i - nums[j - 1]
+                                      ][j - 1] or matrix[i][j - 1]
+
+    # Print 2d array in matrix format
+    print('\n'.join([''.join(['{:4}'.format(item)
+              for item in row]) for row in matrix]))
+              
+    # Return the last index of the matrix, which is our answer
+    return bool(matrix[s_sum][len(nums)])
+
+
 ### *** Practice
 ## 2 pointers - Valid Palindrome II
 '''
