@@ -3008,6 +3008,32 @@ def coin_change(coins, total):
         return 0
     return calculate_minimum_coins(coins, total, [float('inf')] * total)
 
+## N-th Tribonacci Number
+'''
+Given a number n, calculate the corresponding Tribonacci number. 
+T0 = 0 , Y1 = 1 , T2 = 1 and T n+3 ​ =T n ​ +T n+1 ​ +T n+2 ​ , for n>=0
+Flow:
+- Initialize the first three numbers as 0, 1, and 1 respectively.
+- If n is less than 3, then the result will be determined by the base case.
+- Else continue computing the third and next numbers by adding the previous three numbers. Update them until the required number is obtained.
+Naive approach: We’ll first initialize three numbers as 0, 1, and 1. If our required Tribonacci number is 1 or 2, we’ll return 1 in the base case. Otherwise, we’ll call the function recursively three times to compute the next number’s sum, as the tribonacci number is the sum of the previous three numbers. We’ll repeat this process until we hit the base case. O(3^n) - O(n)
+Optimized approach: O(n) - O(1)
+'''
+def find_tribonacci(n):
+    # if n is less than 3, then it's the base case
+    if n < 3:
+        return 1 if n else 0
+
+    # initializing first three numbers
+    first_num, second_num, third_num = 0, 1, 1
+    # loop proceeds for n-2 times
+    for _ in range(n - 2):
+        # compute the sum of the last three Tribonacci numbers and update
+        # first_num, second_num and third_num for the next iteration
+        first_num, second_num, third_num = second_num, third_num, \
+          first_num + second_num + third_num
+    return third_num
+
 ### *** Practice
 ## 2 pointers - Valid Palindrome II
 '''
