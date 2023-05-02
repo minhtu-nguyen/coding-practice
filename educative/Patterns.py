@@ -3082,6 +3082,42 @@ def can_partition_array(nums):
     # Return the last index of the matrix, which is our answer
     return bool(matrix[s_sum][len(nums)])
 
+## Word Break II
+'''
+Given a string s and a dictionary of strings word_dict, add spaces in s to construct a sentence where each word is a valid dictionary word. Return all such possible sentences in any order.
+Flow:
+- Identify all valid words that are a prefix of the input word.
+- Split the word on all prefixes and the corresponding suffixes.
+- For each valid word prefix, solve a sub-problem on the suffix
+- If the suffix can be split into valid words, store the result in the output dictionary with each valid suffix as key and the list of words that compose the prefix as the value.
+- Return the value from the dictionary that corresponds to the query string as the key.
+Naive approach: use a basic recursive strategy in which we take each prefix of the string and compare it to the word in a dictionary. If it matches, we take the string’s suffix and repeat the process.
+Optimized approach: O(nk + 2^n) - O((n*2^n) + k)
+'''
+def word_break(s, word_dict):
+    return helper(s, word_dict, {}) #Calling the helper function
+    
+def helper(s, dictionary, result): #Helper Function that breaks down the string into words from subs
+    if not s: #If s is empty string
+        return []
+    
+    if s in result:
+        return result[s]
+    
+    res = []
+    for word in dictionary: #Verifying if s can be broken down further
+        if not s.startswith(word):
+            continue
+        if len(word) == len(s):
+            res.append(s)
+        else:
+            result_of_the_rest = helper(s[len(word):], dictionary, result)
+            for item in result_of_the_rest:
+                item = word + ' ' + item
+                res.append(item)
+    result[s] = res
+    return res
+
 
 ### *** Practice
 ## 2 pointers - Valid Palindrome II
