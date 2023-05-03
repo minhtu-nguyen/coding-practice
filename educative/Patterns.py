@@ -4137,6 +4137,12 @@ class MaxTreePathSum:
         self.max_contrib(root)
         return self.max_sum
 
+### *** Tree Breadth-first Search
+'''
+Tree breadth-first search is an important tree traversal algorithm for finding a node in a tree that satisfies the given constraints. It starts searching at the root node and moves down level by level, exploring adjacent nodes at level k+1.
+Essentially, it first visits nodes that are one edge away from the root, followed by nodes that are two edges away, and so on. This helps in efficiently finding neighbor nodes, particularly peer-to-peer networking systems.
+'''
+
 
 ### *** Practice
 ## 2 pointers - Valid Palindrome II
@@ -4294,4 +4300,18 @@ Flow:
 - Find the number of ways to climb 5 stairs.
 - Find the number of ways to climb (n-2) stairs.
 - Find the number of ways to climb n stairs.
+'''
+
+##
+
+## DFS - Maximum Depth of Binary Tree
+'''
+Given the root of a binary tree, return its maximum depth. A binary tree’s maximum depth is the number of nodes along the longest path from the root node down to the farthest leaf node.
+Flow:
+- Initialize a counter to track the maximum depth seen so far and a counter for the depth of the current branch.
+- If the current node is NULL, return the counter.
+- Else, if the current node exists, check the depth of the left subtree and the depth of the right subtree.
+- Compare the depths of the left and right subtrees, and select the greater of the two. Add 1 and update this as the depth of this branch.
+- If the depth of the current branch exceeds the maximum depth seen so far, update the maximum depth.
+- When all branches have been explored, return the maximum depth seen so far.
 '''
