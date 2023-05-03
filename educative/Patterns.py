@@ -4045,6 +4045,50 @@ def deserialize(stream):
     node = deserialize_helper(stream)
     return node
 
+## Invert Binary Tree
+'''
+Given the root node of a binary tree, convert the binary tree into its mirror image.
+Flow:
+- Perform post order traversal on the left child of the root node.
+- Perform post order traversal on the right child of the root node
+- Swap the left and right children of the root node.
+O(n) - O(logn) for balanced tree/ O(n) for degenerate tree
+'''
+# global variables to support step-by-step printing
+change = 0
+master_root = None
+
+
+# Function to mirror binary tree
+def mirror_binary_tree(root):
+    global change, master_root
+    # Base case: end recursive call if current node is null
+    if not root:
+        return
+
+    # We will do a post-order traversal of the binary tree.
+    if root.left:
+        mirror_binary_tree(root.left)
+
+    if root.right:
+        mirror_binary_tree(root.right)
+
+    # Let's swap the left and right nodes at current level.
+    root.left, root.right = root.right, root.left
+
+    # Only to demonstrate step-by-step operation of the solution
+    if master_root and (root.left or root.right):
+        change += 1
+        print("\n\tChange ", change, ", at node ", root.data, ":", sep="")
+        #display_tree(master_root)
+
+    return root
+
+
+## 
+
+
+
 ### *** Practice
 ## 2 pointers - Valid Palindrome II
 '''
