@@ -3606,7 +3606,41 @@ def calculator(expression):
             number = 0
     
     return result + number * sign_value
-    
+
+## Remove All Adjacent Duplicates In String
+'''
+Given a string consisting of lowercase English letters, repeatedly remove adjacent duplicate letters, one pair at a time. Both members of a pair of adjacent duplicate letters need to be removed.
+Flow:
+- Initialize a stack to store string characters and their frequencies.
+- Iterate over the string. If the current character and the character at the top of the stack are the same, increment its count. Otherwise, push it to the stack and set its count to 1.
+- Check if the count on the top of the stack reaches 2. If yes, we’ve found the adjacent duplicates. hence, we pop from the stack.
+- Once the traversal is complete, the characters stored in the stack are the required sequence of characters, with all adjacent duplicates removed.
+Naive approach: generate a set of all possible adjacent duplicates in the English language and traverse over the string to see if these duplicates are present. We’ll use nested loops to check this condition. If yes, we’ll replace the adjacent duplicates in the input string with an empty character. O(n^2)
+Optimized approach: O(n) - O(n)
+'''
+def remove_duplicates(to_clean_up):
+    frequency_stack = []
+    k = 2
+    i = 0
+    for char in to_clean_up:  
+        if frequency_stack and frequency_stack[-1][0] == char:
+            frequency_stack[-1][1] += 1
+
+            if frequency_stack[-1][1] == k:
+                frequency_stack.pop()
+        else:
+            frequency_stack.append([char, 1])
+        i += 1
+
+    result = ""
+    for elem in frequency_stack:
+        char = elem[0]
+        count = elem[1]
+        result = result + (char * count)
+    return result
+
+
+
 ### *** Practice
 ## 2 pointers - Valid Palindrome II
 '''
