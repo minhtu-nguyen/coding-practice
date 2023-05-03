@@ -3118,6 +3118,47 @@ def helper(s, dictionary, result): #Helper Function that breaks down the string 
     result[s] = res
     return res
 
+### *** Cyclic Sort
+'''
+Cyclic sort is an in-place comparison sort algorithm. It is based on the idea that the array can be divided into cycles, and each element is rotated to create a sorted array. This pattern deals with problems involving arrays that contain numbers in a given range. Mostly, cyclic sort problems involve unique unsorted elements. This pattern is mostly used where we need to find the missing number or duplicate number in a given range.
+'''
+## Missing Number
+'''
+Given an array, nums, containing n distinct numbers in the range [0,n], return the only number in the range that is missing from the array.
+Flow: 
+- Start the list traversal from the first element.
+- If the list element isn’t equal to its index, swap it with the number on the correct index.
+- Else, if the element is at the correct index or greater than the length of the array, skip it and move one step forward.
+- Once you’ve iterated over the entire array, compare each number with its index.
+- The first occurrence of an index that’s not equal to its list element is the missing number.
+Naive approach: A naive approach would be to first sort the array using quick sort and then traverse the array with two adjacent pointers. Since the integers are sorted, the difference between two adjacent array elements should be 1 if there is no missing integer. We can start by having the first pointer at index 0 and the second pointer at index 1, moving both 1 step forward each time. If the difference is greater than 1, our missing value would be the value of the first pointer + 1. O(nlogn) + O(n) - O(n)
+Optimized approach: O(n) - O(1)
+'''
+def find_missing_number(nums):
+  len_nums = len(nums)
+  index = 0
+  ind = 0
+
+  while index < len_nums:
+    ind+=1
+    value = nums[index]
+
+    if value < len_nums and value != nums[value]:
+      nums[index], nums[value] = nums[value], nums[index]
+
+    elif value >= len_nums:
+      index+=1
+
+    else:
+      index += 1
+
+  for x in range(len_nums):
+    if x != nums[x]:
+      return x
+  return len_nums
+
+
+
 
 ### *** Practice
 ## 2 pointers - Valid Palindrome II
@@ -3264,4 +3305,15 @@ Flow:
 - If it’s equal to the required length, try constructing another side using the remaining matchsticks.
 - If it’s less than the required length, try to complete the side.
 - If it’s greater than the required length, return FALSE.
+'''
+
+## Dynamic Programming - Climbing Stairs
+'''
+You are climbing a staircase. It takes n steps to reach the top. Each time, you can either climb 1 or 2 steps. In how many distinct ways can you climb to the top?
+Flow:
+- Find the number of ways to climb 2 stairs.
+- Find the number of ways to climb 3 stairs.
+- Find the number of ways to climb 5 stairs.
+- Find the number of ways to climb (n-2) stairs.
+- Find the number of ways to climb n stairs.
 '''
