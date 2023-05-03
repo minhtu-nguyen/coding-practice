@@ -3979,8 +3979,71 @@ def diameter_of_binaryTree(root):
     # return the diameter
     return diameter_res
 
-## 
+## Serialize and Deserialize Binary Tree
+'''
+Serialize a given binary tree to a file and deserialize it back to a tree. Make sure that the original and the deserialized trees are identical.
+Serialize: Write the tree to a file.
+Deserialize: Read from a file and reconstruct the tree in memory.
+Serialize the tree into a list of integers, and then, deserialize it back from the list to a tree. For simplicity’s sake, there’s no need to write the list to the files.
+Flow:
+- Perform a depth-first traversal and serialize individual nodes to the stream.
+- Also, serialize a marker to represent a NULL pointer that helps deserialize the tree.
+- Deserialize the tree using preorder traversal.
+- During deserialization, create a new node for every non-marker node using preorder traversal.
+Naive approach:  store one of the traversals of the tree into a file when serializing a tree and read that traversal back to create a tree when deserializing. However, any one of the traversals is not unique. That is, two different trees can have the same in-order traversal. The same goes for pre-order or post-order traversal as well. 
+For serialization, this approach will store both the inorder and preorder traversal and place a delimiter to separate them.
+For deserialization, pick each node from the preorder traversal, make it root, and find its index in the inorder traversal. The nodes to the left of that index will be the part of the left subtree, and the nodes to the right of that index will be the part of the right subtree.
+Optimized approach: O(n) - O(logn) for balanced tree/ O(n) for degenerate tree
+'''
+# Initializing our marker
+MARKER = "M"
+m = 1
 
+
+def serialize_rec(node, stream):
+    global m
+    # Adding marker to stream if the node is None
+    if node is None:
+        stream.append(MARKER + str(m))
+        m += 1
+        return
+
+    # Adding node to stream
+    stream.append(node.data)
+
+    # Doing a pre-order tree traversal for serialization
+    serialize_rec(node.left, stream)
+    serialize_rec(node.right, stream)
+
+# Function to serialize tree into list of integers.
+def serialize(root):
+    stream = []
+    serialize_rec(root, stream)
+    return stream
+
+def deserialize_helper(stream):
+    # pop last element from list
+    val = stream.pop()
+
+    # Return None when a marker is encountered
+    if type(val) is str and val[0] == MARKER:
+        return None
+
+    # Creating new Binary Tree Node from current value from stream
+    node = BinaryTreeNode(val)
+
+    # Doing a pre-order tree traversal for serialization
+    node.left = deserialize_helper(stream)
+    node.right = deserialize_helper(stream)
+
+    # Return node if it exists
+    return node
+
+# Function to deserialize integer list into a binary tree.
+def deserialize(stream):
+    stream.reverse()
+    node = deserialize_helper(stream)
+    return node
 
 ### *** Practice
 ## 2 pointers - Valid Palindrome II
