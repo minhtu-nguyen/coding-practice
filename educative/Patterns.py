@@ -3639,7 +3639,40 @@ def remove_duplicates(to_clean_up):
         result = result + (char * count)
     return result
 
+## Minimum Remove to Make Valid Parentheses
+'''
+Given a string with matched and unmatched parentheses, remove the minimum number of parentheses so that the resulting string is a valid parenthesization.
+Flow:
+- Traverse the string, while keeping track of the parenthesis alongside their indices in the stack.
+- If matched parenthesis is found, remove it from the stack.
+- Once the string has been traversed, we will be left only with the unmatched parentheses in the stack.
+- Create a new string without including the characters at indices still present in the stack.
+Naive approach: raverse the string twice. Each time we find a parenthesis in the string, we’ll traverse the string from the start to the end to find if this parenthesis is matched or not. O(n^2) - O(n)
+Optimized approach: O(n) - O(n)
+'''
+def min_remove_parentheses(s):
+    delimiters = []
+    builder = s
+    for i, val in enumerate(s):
+        if len(delimiters) > 0 and delimiters[-1][0] == '(' and val == ')':
+            # closing parenthesis found while top of delimiters stack
+            # is an opening parenthesis, so pop the
+            # opening parenthesis as it's part of a pair
+            delimiters.pop()
+        elif val == '(' or val == ')':
+            # parenthesis found, push to delimiters stack for checking
+            # against the rest of the string
+            delimiters.append([val, i])
 
+    # At this point, the delimiters stores the indices
+    # that need to be removed from the input string
+    while delimiters:
+        # compile the result string, skipping the
+        # indices that need to be removed from the input
+        popped_val = delimiters.pop()
+        index = popped_val[1]
+        builder = builder[0:index] + builder[index+1:len(builder)]
+    return builder
 
 ### *** Practice
 ## 2 pointers - Valid Palindrome II
