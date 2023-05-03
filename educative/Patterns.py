@@ -3821,6 +3821,144 @@ A tree is a graph that contains the following properties:
 - It consists of a single connected component.
 There are three main methods to solving a problem with the depth-first search pattern—Preorder, Inorder, and Postorder.
 '''
+## Flatten Binary Tree to Linked List
+'''
+Given the root of a binary tree, flatten the tree into a linked list using the same Tree class. The left child of the linked list is always NULL, and the right child points to the next node in the list. The nodes in the linked list should be in the same order as the preorder traversal of the given binary tree.
+Flow:
+- For every node, check whether it has a left child or not. If it does not have a left child, we move on to the right child.
+- Otherwise, find the node on the rightmost branch of the left subtree that does not have a right child.
+- Once we find this rightmost node, connect it with the right child of the current node. After connecting, set the right child of the current node to the left child of the current node.
+- Finally, set the left child of the current node to NULL.
+- Repeat the process until the given binary tree becomes flattened.
+Naive approach: perform level order traversal of binary tree using the Queue. During level order traversal, keep track of the previous node. We’d make the current node the right child of the last node and the left of the last node NULL. After this traversal, the binary tree will be flattened as a linked list. O(n) space for queue.
+Optimized approach: O(1) - O(1)
+'''
+class BinaryTreeNode:
+    def __init__(self, data):
+        self.data = data
+        self.left = None
+        self.right = None
+
+        # below data member is only used for printing
+        self.printData = str(data)
+
+        # below data members used only for some of the problems
+        self.next = None
+        self.parent = None
+        self.count = 0
+
+from binary_tree_node import *
+
+class BinaryTree:
+    def __init__(self, *args):
+        if len(args) < 1:
+            self.root = None
+        elif isinstance(args[0], int):
+            self.root = BinaryTreeNode(args[0])
+        else:
+            self.root = None
+            for x in args[0]:
+                self.insert(x)
+
+    # for BST insertion
+    def insert(self, node_data):
+        new_node = BinaryTreeNode(node_data)
+        if not self.root:
+            self.root = new_node
+        else:
+            parent = None
+            temp_pointer = self.root
+            while temp_pointer:
+                parent = temp_pointer
+                if node_data <= temp_pointer.data:
+                    temp_pointer = temp_pointer.left
+                else:
+                    temp_pointer = temp_pointer.right
+            if node_data <= parent.data:
+                parent.left = new_node
+            else:
+                parent.right = new_node
+
+    def find_in_bst_rec(self, node, node_data):
+        if not node:
+            return None
+        if node.data == node_data:
+            return node
+        elif node.data > node_data:
+            return self.find_in_bst_rec(node.left, node_data)
+        else:
+            return self.find_in_bst_rec(node.right, node_data)
+
+    def find_in_bst(self, node_data):
+        return self.find_in_bst_rec(self.root, node_data)
+
+    def get_sub_tree_node_count(self, node):
+        if not node:
+            return 0
+        else:
+            return 1 + self.get_sub_tree_node_count(node.left) + self.get_sub_tree_node_count(node.right)
+
+    def get_tree_deep_copy_rec(self, node):
+        if node:
+            new_node = BinaryTreeNode(node.data)
+            new_node.left = self.get_tree_deep_copy_rec(node.left)
+            new_node.right = self.get_tree_deep_copy_rec(node.right)
+            return new_node
+        else:
+            return None
+
+    def get_tree_deep_copy(self):
+        if not self.root:
+            return None
+        else:
+            tree_copy = BinaryTree()
+            tree_copy.root = self.get_tree_deep_copy_rec(self.root)
+            return tree_copy
+        
+def flatten_tree(root):
+    if not root:
+        return
+    # Assign current to root
+    current = root
+
+    # Traversing the whole tree
+    print("  Traversing the tree\n")
+    while current:
+
+        # printing the tree
+        display_tree(root, current)
+
+        if current.left:
+            print("  The current node has a left child\n")
+            last = current.left
+
+            # printing the tree
+            display_tree(root, last)
+
+            # If the last node has right child
+            while last.right:
+                print("  The current node has a right child\n")
+                # printing the tree
+                display_tree(root, last.right)
+
+                last = last.right
+            
+            # If the last node does not have right child
+            print("   The current node does not have a right child")
+            print("   We'll merge it with the right subtree")
+            last.right = current.right
+            current.right = current.left
+            current.left = None
+
+            # printing
+            print(".    Our tree now looks like this:\n", end = "")
+            display_tree(root, current)
+            
+        if current.right:
+            print("  Moving to the right child\n")
+        current = current.right
+    return root
+
 
 
 ### *** Practice
