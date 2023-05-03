@@ -3548,8 +3548,21 @@ def can_finish(num_courses, prerequisites):
 
     return True
 
-## 
-
+## Find All Possible Recipes from Given Supplies
+'''
+A list of recipes a chef can prepare from the supplied items is given. Ingredients required to prepare a recipe are mentioned in the ingredients list. The ith recipe has the name recipes i, and you can create it if you have all the needed ingredients from the ingredients i list. A recipe may be listed as an ingredient in a different recipe. For example, the input may specify that custard is an ingredient in a trifle recipe or that trifle is an ingredient in a custard recipe.
+Identify which recipes a chef can prepare from the given ingredients from the supplies list.
+Flow:
+- Calculate the count of the ingredients of each recipe. This is the count of the dependencies of each recipe.
+- Start the topological sort with the list of supplies as the starting point.
+- Use the topological sort to decrease the dependency count of each recipe.
+- Scan through the list of recipes and add those to the result list whose dependency count is 0, that is, those for which all ingredients (whether as supplies, or as the results of other recipes) are available.
+'''
+### *** Stacks
+'''
+A stack is a linear data structure that follows a last in, first out (LIFO) order to perform operations on its elements. This means that whenever we obtain an element from the stack, it will always return the last inserted element.
+Stacks in programming are used to store elements that are sequentially dependent on each other. When required, the elements can then be popped from the stack while maintaining a fixed order.
+'''
 
 
 ### *** Practice
