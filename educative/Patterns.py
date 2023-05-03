@@ -3805,7 +3805,14 @@ class NestedIterator:
             return self.nested_list_stack.pop().get_integer()
         return None
 
-
+## Valid Parentheses
+'''
+Given a string that may consist of opening and closing parentheses, your task is to check if the string contains valid parenthesization or not.
+Flow:
+- If the current character is an opening parenthesis, push it onto the stack.
+- Else, if the current character is a closing parenthesis and it corresponds to the opening parenthesis on the top of the stack, then pop from the stack.
+- After complete traversal, if the stack is empty then the parentheses are valid. If the stack is not empty, then the parentheses are not valid.
+'''
 
 ### *** Practice
 ## 2 pointers - Valid Palindrome II
