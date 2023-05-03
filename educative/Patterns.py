@@ -3813,6 +3813,15 @@ Flow:
 - Else, if the current character is a closing parenthesis and it corresponds to the opening parenthesis on the top of the stack, then pop from the stack.
 - After complete traversal, if the stack is empty then the parentheses are valid. If the stack is not empty, then the parentheses are not valid.
 '''
+### *** Tree Depth-first Search
+'''
+A tree is a graph that contains the following properties:
+- It is undirected.
+- It is acyclic (contains no cycles).
+- It consists of a single connected component.
+There are three main methods to solving a problem with the depth-first search pattern—Preorder, Inorder, and Postorder.
+'''
+
 
 ### *** Practice
 ## 2 pointers - Valid Palindrome II
