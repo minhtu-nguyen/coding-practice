@@ -3381,6 +3381,53 @@ def alien_order(words):
         return ""
     return "".join(result)
 
+## Verifying an Alien Dictionary
+'''
+You’re given a list of words with lowercase English letters in a different order, written in an alien language. The order of the alphabet is some permutation of lowercase letters of the English language.
+We have to return TRUE if the given list of words is sorted lexicographically in this alien language.
+Flow:
+- Store the ranking of each letter from the order string in the data structure.
+- Iterate over the two adjacent words in the words list.
+- If words[i + 1] ends before words[i], return FALSE.
+- Else, if the characters in both of the words are different and words are in correct order, exit and move to the next two adjacent words.
+- Else, return FALSE if the characters are different in both words and words are not in correct order.
+- At the end of the loop, all of the adjacent words have been examined, which ensures that all of the words are sorted. Therefore, return TRUE.
+Naive approach: The naive approach for this problem is to iterate over the order list and words simultaneously. Start from the first word, then compare the order with all other words present in the list. O(n^3)
+Optimized approach: O(m) - O(1) - m is the total number of letters in the list of words.
+'''
+def verify_alien_dictionary(words, order):
+    # If there is only one word to check, this is a trivial case with 
+    # not enough input (minimum two words) to run the algorithm. 
+    # So we return True
+    if len(words) == 1:
+        return True
+    # Declare a hash map to store the characters of the words
+    order_map = {}
+    # Traverse order and store the rank of each letter in order_map
+    for index, val in enumerate(order): 
+        order_map[val] = index
+    # Traverse in array words
+    for i in range(len(words) - 1):
+        # Traverse each character in a word
+        for j in range(len(words[i])):
+            # If all the letters have matched so far, but the current word
+            # is longer than the next one, the two are not in order and
+            # we return False
+            if j >= len(words[i + 1]):
+                return False
+            # Check if the letters in the same position in the two words 
+            # are different
+            if words[i][j] != words[i + 1][j]:
+                # Check if the rank of the letter in the current word is 
+                # greater than the rank in the same position in the next word
+                if order_map[words[i][j]] > order_map[words[i + 1][j]]:
+                    return False
+                # if we find the first different character and they are sorted,
+                # then there's no need to check remaining letters
+                break
+    return True
+
+
 
 
 ### *** Practice
