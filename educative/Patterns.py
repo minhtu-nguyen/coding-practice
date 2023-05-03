@@ -3847,8 +3847,6 @@ class BinaryTreeNode:
         self.parent = None
         self.count = 0
 
-from binary_tree_node import *
-
 class BinaryTree:
     def __init__(self, *args):
         if len(args) < 1:
@@ -3924,23 +3922,13 @@ def flatten_tree(root):
     # Traversing the whole tree
     print("  Traversing the tree\n")
     while current:
-
-        # printing the tree
-        display_tree(root, current)
-
         if current.left:
             print("  The current node has a left child\n")
             last = current.left
 
-            # printing the tree
-            display_tree(root, last)
-
             # If the last node has right child
             while last.right:
                 print("  The current node has a right child\n")
-                # printing the tree
-                display_tree(root, last.right)
-
                 last = last.right
             
             # If the last node does not have right child
@@ -3948,17 +3936,50 @@ def flatten_tree(root):
             print("   We'll merge it with the right subtree")
             last.right = current.right
             current.right = current.left
-            current.left = None
-
-            # printing
-            print(".    Our tree now looks like this:\n", end = "")
-            display_tree(root, current)
-            
+            current.left = None            
         if current.right:
             print("  Moving to the right child\n")
         current = current.right
     return root
 
+## Diameter of Binary Tree
+'''
+Given a binary tree, you need to compute the length of the tree’s diameter. The diameter of a binary tree is the length of the longest path between any two nodes in a tree. This path may or may not pass through the root.
+Flow:
+- Start traversing the tree from the root node.
+- For each node, calculate the height of the left and right subtree.
+- For each node, update the diameter using the following formula: max(diameter, left height + right height).
+- After traversing the whole tree, return the diameter value since it is the length of the tree’s diameter.
+Naive approach: pick one node, find the distance to every other node from the selected node, and keep track of the maximum value. Repeat this process with all the nodes of the tree. After this process, we’ll have the maximum possible distance between the two nodes. That will be the diameter of the tree. O(n^2)
+Optimized approach: O(n) - O(n)
+'''
+# function to recursively calculate the height of the tree
+# and update the diameter
+def diameter_helper(node, diameter_res):
+    if node is None:
+        return 0, diameter_res
+    else:
+        # Compute the height of each subtree
+        lh, diameter_res = diameter_helper(node.left, diameter_res)
+        rh, diameter_res = diameter_helper(node.right, diameter_res)
+
+        # update the result with the max of the previous and current diameter value
+        diameter_res = max(diameter_res, lh + rh)
+
+        # Use the larger one
+        return max(lh, rh) + 1, diameter_res
+    
+def diameter_of_binaryTree(root):
+    # variable for diameter
+    diameter_res = 0
+    if not root:
+        return 0
+    # compute the height of the tree and the max diameter
+    _, diameter_res = diameter_helper(root, diameter_res)
+    # return the diameter
+    return diameter_res
+
+## 
 
 
 ### *** Practice
