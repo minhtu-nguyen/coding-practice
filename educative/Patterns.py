@@ -3427,6 +3427,128 @@ def verify_alien_dictionary(words, order):
                 break
     return True
 
+## Course Schedule II
+'''
+Let’s assume that there are a total of n courses labeled from 0 to n−1. Some courses may have prerequisites. A list of prerequisites is specified such that if Prerequisitesi​ =a,b, you must take course b before course a.
+Given the total number of courses n and a list of the prerequisite pairs, return the course order a student should take to finish all of the courses. If there are multiple valid orderings of courses, then the return any one of them.
+Flow:
+- Create a graph with a node for each course and edges representing the dependencies. Store the in-degrees of each node in a separate data structure.
+- Pick a node with in-degree equal to zero and add it to the output list.
+- Decrement the in-degree of the node picked in the previous step.
+- Repeat for all nodes with in-degree equal to zero.
+Naive approach: use nested loops to iterate over the prerequisites list, find the dependency of one course on another, and store them in a separate array. O(n^2) - O(n)
+Optimized approach: 
+- Make a graph by initializing the hash map with the vertices and their children.
+- Keep the number of in-degrees of each of the vertex in the separate hash map.
+- Find the source vertex.
+- Add the source to the sorted list.
+- Retrieve all the source children and add them to the queue.
+- Decrement the in-degrees of the retrieved children.
+- If the in-degree of the child vertex becomes equal to zero, add it to the sorted list.
+- Repeat the process until the queue isn’t empty.
+O(V + E) - O(V + E)
+'''
+def find_order(n, prerequisites):
+    sorted_order = []
+    # if n is smaller than or equal to zero we will return the empty array
+    if n <= 0:
+        return sorted_order
+
+    # Store the count of incoming prerequisites in a hashmap
+    in_degree = {i: 0 for i in range(n)}  
+    # a. Initialize the graph
+    graph = {i: [] for i in range(n)}  # adjacency list graph
+
+    # b. Build the graph
+    for prerequisite in prerequisites:
+        parent, child = prerequisite[1], prerequisite[0]
+        graph[parent].append(child)  # add the child to its parent's list
+        in_degree[child] += 1  # increment child's in_degree
+
+    # c. Find all sources i.e., all nodes with 0 in-degrees
+    sources = deque()
+    # traverse in in_degree using key
+    for key in in_degree:
+        # if in_degree[key] is 0 append the key in the deque sources
+        if in_degree[key] == 0:
+            sources.append(key)
+
+    # d. For each source, add it to the sorted_order and subtract one from 
+    # all of its children's in-degrees. If a child's in-degree becomes zero, 
+    # add it to the sources queue
+    while sources:
+        # pop an element from the start of the sources and store 
+        # the element in vertex
+        vertex = sources.popleft()
+        # append the vertex at the end of the sorted_order
+        sorted_order.append(vertex)
+        # traverse in graph[vertex] using child
+        # get the node's children to decrement 
+        # their in-degrees
+        for child in graph[vertex]:  
+            in_degree[child] -= 1
+            # if in_degree[child] is 0 append the child in the deque sources
+            if in_degree[child] == 0:
+                sources.append(child)
+
+    # topological sort is not possible as the graph has a cycle
+    if len(sorted_order) != n:
+        return []
+
+    return sorted_order
+
+## Course Schedule
+'''
+There are a total of num_courses courses you have to take. The courses are labeled from 0 to num_courses - 1. You are also given a prerequisites array, where prerequisites[i] = [a[i], b[i]] indicates that you must take course b[i] first if you want to take the course a[i]. For example, the pair [1,0] indicates that to take course 1, you have to first take course 0.
+Return TRUE if all of the courses can be finished. Otherwise, return FALSE.
+Flow:
+- Initialize a graph containing the key as the parent and the value as its child’s vertices.
+- Find all sources with 0 in-degrees.
+- For each source, append it to a sorted list, retrieve all of its children, and decrement the in-degrees of the respective child by 1.
+- Repeat the process until the source queue becomes empty.
+O(V + E) - O(V + E)
+'''
+def can_finish(num_courses, prerequisites):
+    sorted_order = []
+    if num_courses <= 0:
+        return True
+
+    # a. Initialize the graph
+    # count of incoming prerequisites
+    inDegree = {i: 0 for i in range(num_courses)}
+    graph = {i: [] for i in range(num_courses)}  # adjacency list graph
+
+    # b. Build the graph
+    for edge in prerequisites:
+        parent, child = edge[1], edge[0]
+        graph[parent].append(child)  # put the child into it's parent's list
+        inDegree[child] += 1  # increment child's inDegree
+
+    # c. Find all sources i.e., all num_courses with 0 in-degrees
+    sources = deque()
+    for key in inDegree:
+        if inDegree[key] == 0:
+            sources.append(key)
+
+    # d. For each source, add it to the sorted_order and subtract one from
+    # all of its children's in-degrees
+    # if a child's in-degree becomes zero, add it to the sources queue
+    while sources:
+        course = sources.popleft()
+        sorted_order.append(course)
+        # get the node's children to decrement their in-degrees
+        for child in graph[course]:
+            inDegree[child] -= 1
+            if inDegree[child] == 0:
+                sources.append(child)
+
+    # topological sort is not possible as the graph has a cycle
+    if len(sorted_order) != num_courses:
+        return False
+
+    return True
+
+## 
 
 
 
