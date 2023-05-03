@@ -3157,6 +3157,37 @@ def find_missing_number(nums):
       return x
   return len_nums
 
+## First Missing Positive
+'''
+Given an unsorted integer array, nums, return the smallest missing positive integer. Create an algorithm that runs with an O(n) time complexity and utilizes a constant amount of space.
+Flow: 
+- Traverse the array and make sure the elements present at the index are one less than their respective values if possible.
+- Skip any negative numbers or the numbers that exceed that the length of our array.
+- Traverse the array and check if the indices hold the value that is one more than the index itself.
+- If no index contains any value other than one added to itself, add one to the largest number present in the array and return that as the output.
+Naive approach: 
+- The brute force approach would be to search for every positive integer in the array, starting from 1 and incrementing the number to be searched until we find the first missing positive number. O(n^2)
+- A solution that everyone thinks about is sorting the array and then searching for the smallest positive number. O(nlogn)
+- The final approach we would discuss is storing all the numbers in a hash table and returning the first positive value we don't encounter. 
+Optimized approach: O(n) - O(1)
+'''
+def smallest_missing_positive_integer(nums):
+  for i in range(len(nums)): #Traversing the array from the first index to the last index
+    correct_spot = nums[i] - 1 #Determining what position the specific element should be at
+    while 1 <= nums[i] <= len(nums) and nums[i] != nums[correct_spot]: 
+      # The first condition verifies if there is a position
+      # at which this specific number can be stored and the
+      # second condition checks if the number is indeed at
+      # the wrong position right now
+      nums [i], nums[correct_spot] = nums[correct_spot], nums[i] # Swapping the number to it's correct position
+      correct_spot = nums[i] - 1 # Making sure the new swapped number to the current index is verified in the
+                                 # next iteration
+
+  for i in range(len(nums)):
+     if i + 1 != nums[i]:
+       return i + 1
+  return len(nums) + 1
+
 
 
 
