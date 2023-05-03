@@ -3188,6 +3188,48 @@ def smallest_missing_positive_integer(nums):
        return i + 1
   return len(nums) + 1
 
+## Find The Duplicate Number
+'''
+Given an array of integers, find a duplicate number such that the array contains n+1 integers in the range [1,n] inclusive.
+There is only one repeated number in an array. You need to find that repeated number.
+Flow:
+- Traverse in an array using two pointers.
+- Move the first pointer one time and the second pointer two times.
+- Move until the pointers don’t meet.
+- Move the first pointer from the start and the second pointer from the intersection point until they don’t meet.
+Naive approach:The naive approach to this problem is sorting the given array. The duplicate numbers can be anywhere in an unsorted array, but they’ll be next to each other in a sorted array. After sorting the array, we can compare each index with index+1 to find any duplicate number. O(nlogn) - O(nlogn) or O(n)
+Optimized approach: O(n) - O(1)
+'''
+def find_duplicate(nums):
+    # Initialize the fast and slow pointers and make them point the first
+    # element of the array
+    fast = slow = nums[0]
+    # PART #1
+    # Traverse in array until the intersection point is not found
+    while True:
+        # Move the slow pointer using the nums[slow] flow
+        slow = nums[slow]
+        # Move the fast pointer two times fast as the slow pointer using the 
+        # nums[nums[fast]] flow 
+        fast = nums[nums[fast]]
+        # Break of the slow pointer becomes equal to the fast pointer, i.e., 
+        # if the intersection is found
+        if slow == fast:
+            break
+    # PART #2
+    # Make the slow pointer point the starting position of an array again, i.e.,
+    # start the slow pointer from starting position
+    slow = nums[0]
+    # Traverse in an array until the slow pointer does not become equal to the
+    # fast pointer
+    while slow != fast:
+        # Move the slow pointer using the nums[slow] flow
+        slow = nums[slow]
+        # Move the fast pointer slower than before, i.e., move the fast pointer
+        # using the nums[fast] flow
+        fast = nums[fast]
+    # Return the fast pointer as it points the duplicate number of the array
+    return fast
 
 
 
