@@ -4084,9 +4084,58 @@ def mirror_binary_tree(root):
 
     return root
 
+## Binary Tree Maximum Path Sum
+'''
+Given the root of a binary tree, return the maximum sum of any non-empty path.
+A path in a binary tree is defined as follows:
+- A sequence of nodes in which each pair of adjacent nodes must have an edge connecting them.
+    * A node can only be included in a path once at most.
+    * Including the root in the path is not compulsory.
+You can calculate the path sum by adding up all node values in the path. To solve this problem, calculate the maximum path sum given the root of a binary tree so that there won’t be any greater path than it in the tree.
+Flow: 
+- Initialize a maximum sum to negative infinity.
+- For a leaf node, determine its contribution equal to its value.
+- Otherwise, determine a node’s contribution as its value plus the greater of the contributions of its left and right children.
+- Update maximum sum if the above is greater than previous maximum sum.
+O(n) - O(logn)/O(n)
+'''
+class MaxTreePathSum:
+    max_sum = float('-inf')
 
-## 
+    def __init__(self):
+        self.max_sum = float('-inf')
 
+    def max_contrib(self, root):
+        if not root:
+            return 0
+
+        # sum of the left and right subtree
+        max_left = self.max_contrib(root.left)
+        max_right = self.max_contrib(root.right)
+
+        left_subtree = 0
+        right_subtree = 0
+
+        # max sum on the left and right sub-trees of root
+        if max_left > 0:
+            left_subtree = max_left
+        if max_right > 0:
+            right_subtree = max_right
+
+        # the value to start a new path where `root` is a highest root
+        value_new_path = root.data + left_subtree + right_subtree
+
+        # update max_sum if it's better to start a new path
+        self.max_sum = max(self.max_sum, value_new_path)
+
+        # for recursion :
+        # return the max contribution if continue the same path
+        return root.data + max(left_subtree, right_subtree)
+
+    def max_path_sum(self, root):
+        self.max_sum = float('-inf')
+        self.max_contrib(root)
+        return self.max_sum
 
 
 ### *** Practice
