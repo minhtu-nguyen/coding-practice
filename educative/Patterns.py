@@ -3271,6 +3271,68 @@ def find_corrupt_pair(nums):
             missing = j + 1
     return missing, duplicated
 
+## Find the First K Missing Positive Numbers
+'''
+For a given unsorted array, find the first k missing positive numbers in that array.
+Flow:
+- Sort the given input array by swapping the values into their correct positions.
+- If the element is at its correct index or greater than the array’s length, skip it and move to the next element.
+- Continue to check all the elements in this manner until the array is fully sorted.
+- Next, compare each element with its index. Loop through the array and find all possible values that do not lie in the given array.
+'''
+### *** Topological Sort
+'''
+The topological sort pattern is used to find valid orderings of elements that have dependencies on, or priority over each other. Scheduling and grouping problems that have prerequisites or dependencies generally fall under this pattern.
+'''
+## Compilation Order
+'''
+There are a total of n classes labeled with the English alphabet (A, B, C, and so on). Some classes are dependent on other classes for compilation. For example, if class B extends class A, then B has a dependency on A. Therefore, A must be compiled before B.
+Given a list of the dependency pairs, find the order in which the classes should be compiled.
+Flow:
+- Build the graph from the input using adjacency lists.
+- Store the in-degree of each vertex in a hash map.
+- Pop from the queue and store the node in a list, let’s call it sorted order.
+- Decrement the in-degrees of the node’s children by 1. If the in-degree of a node becomes 0, add it to the source queue.
+- Repeat until all vertices have been visited. Return the sorted order list.
+Naive approach: generate all possible compilation orders for the given classes and then select the ones that satisfy the dependencies. O(n!) - O(1)
+Optimized approach: O(V + E) - O(V)
+'''
+def find_compilation_order(dependencies):
+    sorted_order = []
+    graph = {}
+    inDegree = {}
+    for x in dependencies:
+        parent, child = x[1], x[0]
+        graph[parent], graph[child] = [], []
+        inDegree[parent], inDegree[child] = 0, 0
+    if len(graph) <= 0:
+        return sorted_order
+
+
+    for dependency in dependencies:
+        parent, child = dependency[1], dependency[0]
+        graph[parent].append(child)  
+        inDegree[child] += 1  
+
+    sources = deque()
+    for key in inDegree:
+        if inDegree[key] == 0:
+            sources.append(key)
+
+    while sources:
+        vertex = sources.popleft()
+        sorted_order.append(vertex)
+        for child in graph[vertex]: 
+            inDegree[child] -= 1
+            if inDegree[child] == 0:
+                sources.append(child)
+
+    if len(sorted_order) != len(graph):
+        return []
+    return sorted_order
+
+
+
 ### *** Practice
 ## 2 pointers - Valid Palindrome II
 '''
