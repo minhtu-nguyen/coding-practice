@@ -3674,6 +3674,48 @@ def min_remove_parentheses(s):
         builder = builder[0:index] + builder[index+1:len(builder)]
     return builder
 
+## Exclusive Execution Time of Functions
+'''
+We are given an integer number n , representing the number of functions running in a single-threaded CPU, and an execution log, which is essentially a list of strings. Each string has the format {function id}:{"start" | "end"}:{timestamp}, indicating that the function with function_id either started or stopped execution at time identified by the timestamp value. Each function has a unique ID between 0 and n−1 . Compute the exclusive time of the functions in the program.
+Flow:
+- Retrieve function ID, start/end and timestamp from the log string.
+- If the string contains “start”, push the log details to the stack.
+- Else if, the string contains “end”, pop from the stack and compute the function’s execution time.
+- If the stack is not empty after the pop operation, subtract the execution time of the called function from the calling function.
+- Store the execution time in a results array and return.
+Naive approach: select each function and track the time it takes by subtracting the start time from the end time. However, since there are other functions that can have overlapping times, we would need to keep track of function preemptions. We would need to adjust the previously computed execution time of functions that are found to have been preempted. O(n^n) - O(n)
+Optimized solution: O(mlogn) - O(mlogn)
+'''
+class Log:
+    def __init__(self, content):
+        content = content.replace(' ', '')
+        content = content.split(":")
+        self.id = int(content[0])
+        self.is_start = content[1] == "start"
+        self.time = int(content[2])
+
+def exclusive_time(n, logs):
+    logs_stack = []
+    result = [0]*n
+
+    for content in logs:
+        # Extract the logs details from the content(string)
+        logs = Log(content)
+        if logs.is_start:
+            # Push the logs details to the stack
+            logs_stack.append(logs)
+        else:
+            # Pop the logs details from the stack
+            top = logs_stack.pop()
+            # Add the execution time of the current function in the actual result
+            result[top.id] += (logs.time - top.time + 1)
+            # If the stack is not empty, subtract the current child function execution time from the parent function
+            if logs_stack:
+                result[logs_stack[-1].id] -= (logs.time - top.time + 1)
+    return result
+
+##
+
 ### *** Practice
 ## 2 pointers - Valid Palindrome II
 '''
