@@ -3714,7 +3714,98 @@ def exclusive_time(n, logs):
                 result[logs_stack[-1].id] -= (logs.time - top.time + 1)
     return result
 
-##
+## Flatten Nested List Iterator
+'''
+You’re given a nested list of integers. Each element is either an integer or a list whose elements may also be integers or other integer lists. Your task is to implement an iterator to flatten the nested list.
+You will have to implement the Nested Iterator class. This class has the following functions:
+Init (nested list): This initializes the iterator with the nested list.
+Next (): This returns the next integer in the nested list.
+Has Next (): This returns TRUE if there are still some integers in the nested list. Otherwise, it returns FALSE.
+Flow:
+- If the top element of the stack is an integer, return TRUE.
+- If the top element of the stack is a list of integers, pop the list and push each element of the list into the stack in reverse order and return TRUE.
+- If the stack is empty, return FALSE.
+O(l/n) - O(l + n)
+'''
+class NestedIntegers:
+    # Constructor initializes a single integer if a value has been passed
+    # else it initializes an empty list
+    def __init__(self, integer=None):
+        if integer:
+            self.integer = integer
+        else:
+            self.n_list = []
+            self.integer = 0 
+
+    # If this NestedIntegers holds a single integer rather 
+    # than a nested list, returns TRUE, else, returns FALSE
+    def is_integer(self):
+        if self.integer:
+            return True
+        return False
+
+    # Returns the single integer, if this NestedIntegers holds a single integer
+    # Returns null if this NestedIntegers holds a nested list
+    def get_integer(self):
+        return self.integer
+
+    #  Sets this NestedIntegers to hold a single integer.
+    def set_integer(self, value):
+        self.n_list = None
+        self.integer = value
+
+    # Sets this NestedIntegers to hold a nested list and adds a nested 
+    # integer to it.
+    def add(self, ni):
+        if self.integer:
+            self.n_list = [] 
+            self.n_list.append(NestedIntegers(self.integer)) 
+            self.integer = None
+        self.n_list.append(ni) 
+
+    # Returns the nested list, if this NestedIntegers holds a nested list 
+    # Returns null if this NestedIntegers holds a single integer
+    def get_list(self):
+        return self.n_list
+    
+class NestedIterator:
+
+    # NestedIterator constructor initializes the stack using the 
+    # given nested_list list
+    def __init__(self, nested_list):
+        self.nested_list_stack = list(reversed(nested_list))
+
+    # has_next() will return True if there are still some integers in the 
+    # stack (that has nested_list elements) and, otherwise, will return False.
+    def has_next(self):
+        # Iterate in the stack while the stack is not empty
+        while len(self.nested_list_stack) > 0: 
+            # Save the top value of the stack
+            top = self.nested_list_stack[-1]
+            # Check if the top value is integer, if true return True, 
+            # if not continue
+            if top.is_integer():
+                return True
+            # If the top is not an integer, it must be the list of integers
+            # Pop the list from the stack and save it in the top_list
+            top_list = self.nested_list_stack.pop().get_list()
+            # Save the length of the top_list in i and iterate in the list
+            i = len(top_list) - 1
+            while i >= 0:
+                # Append the values of the nested list into the stack
+                self.nested_list_stack.append(top_list[i])
+                i -= 1
+        return False
+
+    # next will return the integer from the nested_list 
+    def next(self): 
+        # Check if there is still an integer in the stack
+        if self.has_next():
+            # If true pop and return the top of the stack
+            return self.nested_list_stack.pop().get_integer()
+        return None
+
+
 
 ### *** Practice
 ## 2 pointers - Valid Palindrome II
