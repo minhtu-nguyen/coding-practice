@@ -3563,8 +3563,50 @@ Flow:
 A stack is a linear data structure that follows a last in, first out (LIFO) order to perform operations on its elements. This means that whenever we obtain an element from the stack, it will always return the last inserted element.
 Stacks in programming are used to store elements that are sequentially dependent on each other. When required, the elements can then be popped from the stack while maintaining a fixed order.
 '''
+## Basic Calculator
+'''
+Given a string containing an arithmetic expression, implement a basic calculator that evaluates the expression string. The expression string can contain integer numeric values and should be able to handle the “+” and “-” operators, as well as “()” parentheses.
+Flow:
+- Initialize three variables: number to store the integer form of the current number in the string (initially 0), sign value to store a multiplication value to change the sign (initially 1), and result to store the evaluated result of different operations (initially 0).
+- Upon encountering a digit character, update the number variable by multiplying its existing value by 10 and adding the integer value of the digit character to it: number = number × 10 + digit
+- Upon encountering a ‘(’ character, push the value of the result variable and then the sign value onto the stack. In addition, reset the value of the sign value, and result variable to 1, 0 respectively.
+- Upon encountering a ‘+’ or ‘-’ character, change the sign value variable to 1 or -1 respectively. Then evaluate the expression on the left by multiplying the existing value of the result variable by the sign value variable and adding the number to this: result = number + (result × sign value)
+- In addition, reset the value of the number variable to 0.
+- Upon encountering a ‘)’ character, update the result variable to evaluate the expression within the parenthesis: result = number + (result × sign value)
+- Then pop the sign value and stored digit from the stack and update the result variable again: result = (result × sign value) + digit
+- In addition, reset the value of the number variable to 0.
+O(n) - O(n)
+'''
+def calculator(expression):
+    number = 0
+    sign_value = 1
+    result = 0
+    operations_stack = []
 
+    for c in expression:
+        if c.isdigit():
+            number = number * 10 + int(c)
+        if c in "+-":
+            result += number * sign_value
+            sign_value = -1 if c == '-' else 1
+            number = 0
+        elif c == '(':
+            operations_stack.append(result)
+            operations_stack.append(sign_value)
+            result = 0
+            sign_value = 1
 
+        elif c == ')':
+            result += sign_value * number
+            pop_sign_value = operations_stack.pop()
+            result *= pop_sign_value
+
+            second_value = operations_stack.pop()
+            result += second_value
+            number = 0
+    
+    return result + number * sign_value
+    
 ### *** Practice
 ## 2 pointers - Valid Palindrome II
 '''
