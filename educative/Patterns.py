@@ -4760,6 +4760,80 @@ Hash maps store data in the form of key-value pairs. They are similar to arrays 
 On the contrary, hash maps allow us to have flexible keys. Each key is unique and is mapped against a value. Therefore, we can look up its value in O(1) time.
 '''
 
+## Design HashMap
+'''
+Design a hash map without using the built-in libraries. We only need to cater integer keys and integer values in the hash map. Return NULL if the key doesn’t exist.
+It should support the following three primary functions of a hash map:
+- Put(key, value): This function inserts a key and value pair into the hash map. If the key is already present in the map, then the value is updated. Otherwise, it is added to the bucket.
+- Get(key): This function returns the value to which the key is mapped. It returns −1, if no mapping for the key exists.
+- Remove(key): This function removes the key and its mapped value.
+Flow:
+- Select a prime number (preferably a large one) as the key space.
+- Initialize an array with empty buckets (empty arrays). The number of buckets in the array should be equal to the specified value of the key space variable.
+- Generate a hash key by taking the modulus of the input key with the key space variable.
+- Perform the appropriate function (Put(), Get(), Remove()).
+'''
+# A class implementation of the bucket data structure
+class Bucket:
+    # Initialize buckets here
+    def __init__(self):
+        self.buckets = []
+
+    # get value from bucket
+    def get(self, key):
+        for (k, v) in self.bucket:
+            if k == key:
+                return v
+        return -1
+
+    # put value in bucket
+    def update(self, key, value):
+        found = False
+        for i, kv in enumerate(self.bucket):
+            if key == kv[0]:
+                self.bucket[i] = (key, value)
+                found = True
+                break
+
+        if not found:
+            self.bucket.append((key, value))
+
+    # delete value from bucket
+    def remove(self, key):
+        for i, kv in enumerate(self.bucket):
+            if key == kv[0]:
+                del self.bucket[i]
+
+class MyHashMap():
+    # Initialize hash map here
+    def __init__(self, key_space):
+        # It’s better to have a prime number, so there's less collision
+        self.key_space = key_space
+        self.buckets = [Bucket()] * self.key_space
+
+    # Function to add value of a given key
+    # hash map at the relevant hash address
+    def put(self, key, value):
+        if key== None or value == None:
+            return
+            
+        hash_key = key % self.key_space
+        self.buckets[hash_key].update(key, value)
+
+    # Function to fetch corresponding value of a given key
+    def get(self, key):
+        if key == None:
+            return -1
+        hash_key = key % self.key_space
+        return self.buckets[hash_key].get(key)
+
+    # Function to remove corresponding value of a given key
+    def remove(self, key):
+        hash_key = key % self.key_space
+        self.buckets[hash_key].remove(key)
+
+
+
 
 ### *** Practice
 ## 2 pointers - Valid Palindrome II
