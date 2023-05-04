@@ -4239,6 +4239,53 @@ def level_order_traversal(root):
                 result += ", "
     return result
 
+## Binary Tree Zigzag Level Order Traversal
+'''
+Given a binary tree, return its zigzag level order traversal. The zigzag level order traversal corresponds to traversing nodes from left to right for one level, and then right to left for the next level, and so on, reversing direction after every level.
+Flow:
+- Add the root of the tree to the deque and initialize the order flag reverse to FALSE.
+- Iterate over the deque as long as it’s not empty.
+- For each dequed element, add its children to the deque from the front if the value of the reverse is TRUE. Otherwise, append them to the back of the deque.
+- To deque elements, enque from the back if the value of the reverse is TRUE. Otherwise, enque them from the front and maitain the order of the nodes.
+- For each level, append array of its nodes to the results array.
+Naive approach: The naive approach would be to get the level order traversal of the binary tree using a queue. We’ll store the nodes at each level in an array and then reverse the contents of alternate levels in-place. O(n) - O(n)
+Optimized approach: O(n) - O(n) .Even though the naive solution has the same time complexity, the optimized approach does the job in one BFS traversal, without the need for a two-dimensional list to store the nodes.
+'''
+def zigzag_level_order(root):
+    if root is None:
+        return []
+
+    results = []
+    reverse = False
+    dq = deque([root])
+    a = 1
+
+    while(len(dq)):
+        size = len(dq)
+        results.insert(len(results), [])
+        a = a + 1
+
+        for i in range(size):
+            if not reverse:
+                node = dq.popleft()
+                results[len(results) - 1].append(node.data)
+                if node.left:
+                    dq.append(node.left)
+                if node.right:
+                    dq.append(node.right)
+            else:
+                node = dq.pop()
+                results[len(results) - 1].append(node.data)
+                if node.right:
+                    dq.appendleft(node.right)
+                if node.left:
+                    dq.appendleft(node.left) 
+
+        reverse = not reverse
+    return results
+
+## Populating Next Right Pointers in Each Node
+
 
 ### *** Practice
 ## 2 pointers - Valid Palindrome II
