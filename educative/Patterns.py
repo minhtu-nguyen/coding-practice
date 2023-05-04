@@ -5449,6 +5449,65 @@ def num_island(grid):
     # Return the final value of count which now contains the number of islands
     count = union_find.get_count()
 
+## Last Day Where You Can Still Cross
+'''
+You are given a 1-based m×n matrix where 0 represents land and 1 represents water. You’re also given a 2-D array of cells which represent that each day, a new cell is flooded with water. On day 0, the whole grid is land. The task is to find the last day when you can walk from the top row to the bottom row using only land cells.
+Flow:
+- Initialize the array.
+- Start traversing the cells array.
+- Check if we can move from the current cell in the grid.
+- Make connection between cells.
+- Verify the connectivity from the top to the bottom row.
+- Repeat until all cells are traversed.
+Naive approach:  find the possible path from the top row to the bottom row for every cell in the cells array. We’ll use a 2-D grid to find the possible path and the day variable to keep track of the last day. To check, we’ll apply a cells loop containing an inner loop for the total number of columns in the first row of the grid. For every column in the first row, we’ll find a possible path that ends at the bottom row. While finding the path, if we get any valid cell containing 0, we’ll move in that direction until we reach the end of the row. After obtaining the possible path for each day, we’ll increment the value of the day variable. We’ll continue this process until the path to the bottom row is blocked. 
+O(4nm^2) - O(n^2)
+Optimized approach:
+'''
+def last_day_to_cross(row, col, cells):
+
+    # Variables to track the top and bottom rows
+    connections = UnionFind(row * col + 2)
+    # Left, Right, Top, Bottom neighbours
+    neighbours = [[0, -1], [0, 1], [-1, 0], [1, 0]]
+    # Subtract -1 from all the values in cells array i.e.
+    # 2 -> 1 and 1-> 0
+    # to make it 0-based
+    cells = [(r - 1, c - 1) for r, c in cells]
+    # Initialize a grid with the same dimensions as the matrix
+    # and mark all the cells array as being filled with water
+    grid = [[1] * col for _ in range(row)]
+
+    # Start backtracking from last cell in cells array
+    for i in range(len(cells) - 1, -1, -1):
+        r, c = cells[i][0], cells[i][1]
+        # Make the current cell as land in the given cells array
+        grid[r][c] = 0
+        for r_neigh, c_neigh in neighbours:
+            first_ind = connections.find_index(r + r_neigh, c + c_neigh, col)
+            # Verify that traversing is within the limits of the grid
+            if r + r_neigh >= 0 and r + r_neigh < row and \
+                c + c_neigh >= 0 and c + c_neigh < col and \
+                    grid[r + r_neigh][c + c_neigh] == 0:
+                # check whether the neighbor is land or water
+                # if we can move in any direction then we'll
+                # find union of both indices
+                second_ind = connections.find_index(r, c, col)
+                connections.union(first_ind, second_ind)
+        if r == 0:
+            connections.union(0, connections.find_index(r, c, col))
+        if r == row - 1:
+            rr = row * col + 1
+            cc = connections.find_index(r, c, col)
+            connections.union(rr, cc)  # last index and current index
+            print("\n")
+
+        f1 = connections.find(0)
+        f2 = connections.find(row*col + 1)
+        if f1 == f2:
+            return i
+
+
+
 ### *** Practice
 ## 2 pointers - Valid Palindrome II
 '''
