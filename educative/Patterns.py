@@ -5561,6 +5561,52 @@ def regions_by_slashes(grid):
     # Finding the number of connected components
     return sum(find_union.find(x) == x for x in range(4 * N * N))
 
+## Minimize Malware Spread
+'''
+You’re given a network of n nodes as an n×n adjacency matrix graph with the ith node directly connected to the jth node if graph[i][j] == 1.
+A list of nodes, initial, is given, which contains nodes initially infected by malware. When two nodes are connected directly and at least one of them is infected by malware, both nodes will be infected by malware. This spread of malware will continue until every node in the connected component of nodes has been infected.
+After the infection has stopped spreading, M will represent the final number of nodes in the entire network that have been infected with malware.
+Return a node from initial such that, when this node is removed from the graph, M is minimized. If multiple nodes can be removed to minimize M, return the node with the smallest index.
+Flow:
+- Make connected components out of all the connected nodes in the graph through the Union Find algorithm.
+- Traverse the initial array and store the number of infections in each connected component with an infection in a hash map, infected.
+- If a connected component from the infected hash map has more than one infected node, ignore it and move to the next iteration of the loop. Otherwise, calculate the size of the component.
+- Find the component of maximum size that has exactly one infected node.
+- If there are multiple components of the same size that would count as the largest connected component, choose the one with the smallest index.
+O(n^2) - O(n)
+'''
+def min_malware_spread(graph, initial):
+    # Stores the length of the graph
+    length = len(graph)
+    # Calls UnionFind constructor
+    union_find = UnionFind(length)
+    # Find all the connected components of the graph
+    for x in range(length):
+        for y in range(length):
+            if graph[x][y]:
+                union_find.union(x, y)
+
+    infected = defaultdict(int)
+
+    # Count the number of initial infected nodes each connected component has
+    for x in initial:
+        infected[union_find.find(x)] += 1
+
+    maximum_size, candidate_node = 0, min(initial)
+    # Count all the infected nodes each connected component has
+    for i in initial:
+        infection_count = infected[union_find.find(i)]
+        component_size = union_find.rank[union_find.find(i)]
+
+        if infection_count != 1:
+            continue
+        # Return the candidate node from largest length connected component
+        if component_size > maximum_size:
+            maximum_size = component_size
+            candidate_node = i
+        elif component_size == maximum_size and i < candidate_node:
+            candidate_node = i
+    return candidate_node
 
 
 ### *** Practice
