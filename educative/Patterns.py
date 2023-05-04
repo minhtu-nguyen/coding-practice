@@ -5506,6 +5506,61 @@ def last_day_to_cross(row, col, cells):
         if f1 == f2:
             return i
 
+## Regions Cut by Slashes
+'''
+An n×n grid is composed of 1×1 squares, where each 1×1 square consists of a “/”, “\”, or a blank space. These characters divide the square into contiguous regions.
+Given the grid represented as a string array, return the number of contiguous regions.
+Flow:
+- Divide each box in the (nxn) grid into four components: north, south, west, and east. This is done by setting 4 elements in the parent list for each character in the grid.
+- Traverse the grid. At each character, connect the components of the respective box based on the character. This is done by merging the components such that the component(s) remaining is the character itself.
+- Connect the neighboring boxes to the top, bottom, left, and right corners of the current box.
+- Repeat this process until the entire grid has been traversed.
+- Count the number of connected components.
+'''
+def regions_by_slashes(grid):
+    N = len(grid)
+    find_union = UnionFind(4 * N * N)
+
+    # Traversing the list
+    for r, row in enumerate(grid):
+        for c, val in enumerate(row):
+            root = 4 * (r * N + c)
+
+            if val in '/ ':
+
+                # Connecting the north and west components of the box
+                find_union.union(root + 0, root + 1)
+
+                # Connecting the east and south componeents of the box
+                find_union.union(root + 2, root + 3)
+
+            if val in '\ ':
+
+                # Connecting the north and east components of the box
+                find_union.union(root + 0, root + 2)
+
+                # Connecting the west and south components of the box
+                find_union.union(root + 1, root + 3)
+
+            # Connecting the south component of the current box with the north component of the box below it
+            if r+1 < N:
+                find_union.union(root + 3, (root + 4 * N) + 0)
+
+            # Connecting the north component of the current box with the south component of the box above it
+            if r-1 >= 0:
+                find_union.union(root + 0, (root - 4 * N) + 3)
+
+            # Connecting the east component of the current box with the west component of the box on its right
+            if c+1 < N:
+                find_union.union(root + 2, (root + 4) + 1)
+
+            # Connecting the west component of the current box with the east component of the box on its left
+            if c-1 >= 0:
+                find_union.union(root + 1, (root - 4) + 2)
+
+    # Finding the number of connected components
+    return sum(find_union.find(x) == x for x in range(4 * N * N))
+
 
 
 ### *** Practice
