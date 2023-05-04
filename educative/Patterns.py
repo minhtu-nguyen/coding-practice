@@ -5005,6 +5005,40 @@ The knowing what to track pattern is mostly used to find the frequency count of 
 This pattern is often used with an array and strings, and helps solve problems that require counting data frequencies or returning boolean values (TRUE/FALSE). More often than not, the problems that can be solved using this pattern include comparison and checks
 '''
 
+## Palindrome Permutation
+'''
+For a given string, find whether or not a permutation of this string is a palindrome. You should return TRUE if such a permutation is possible and FALSE if it isn’t possible.
+Flow:
+- Traverse the input string starting from the first character.
+- Populate a hash map with the characters in the string, along with the frequency of occurrence of each character.
+- Traverse the hash map to get the count of characters with an odd number of occurrences.
+- If the count exceeds 1, no palindromic permutation exists.
+Naive approach: ompute all possible permutations of a given string and then iterate over each permutation to see if it’s a palindrome. We can use two pointers to traverse the computed permutation from the beginning and the end simultaneously, comparing each character at every step. If the two pointers point to the same character until they cross each other, the string is a palindrome. O(n!) + O(n) | O(n!)
+Optimized approach: O(n^2) ~ O(n) - O(n1)
+'''
+def permute_palindrome(st):
+    # Create a hashmap to keep track of the characters and their occurrences
+    frequencies = {}
+    index = 0
+    for i in st:
+        index += 1
+        if i in frequencies:
+            frequencies[i] += 1
+        else:
+            frequencies[i] = 1
+    # Traverse the hashmap and update the count by 1, whenever a
+    # character with odd number of occurences is found.
+    count = 0
+    for ch in frequencies.keys():
+        if frequencies[ch] % 2:
+            count += 1
+    # If the count is smaller than or equal to 1 then the permutation exists,
+    # otherwise does not
+    if count <= 1:
+        return True
+    else:
+        return False
+
 
 ### *** Practice
 ## 2 pointers - Valid Palindrome II
