@@ -5657,6 +5657,66 @@ class SnapshotArray:
     def __str__(self):
         return str(self.node_value)
 
+## Snapshot Array
+'''
+Implement a data structure that can store multiple values of the same key at different timestamps and retrieve the key’s value at a certain timestamp.
+You’ll need to implement the TimeStamp class. This class has the following functions:
+- Init(): This function initializes the values dictionary and timestamp dictionary.
+- Set Value(key, value, timestamp): This function stores the key and value at any given timestamp.
+- Get Value(key, timestamp): This function returns the value set for this key at the specified timestamp.
+Flow: 
+- In order to get a value, verify if the given key exists.
+- Verify if the timestamp we’re passing to get a value is greater than the previous timestamp.
+- Return an empty string if the given timestamp is less than the timestamps that were set previously.
+- Otherwise, return the value for the respective key and timestamp.
+Naive approach: uses three individual lists to set the key and value at any timestamp. These lists will store the key, value, and timestamp data. To set a value, we’ll call the append function for these lists. The other functionality is the Get Value, which can be performed using a linear search. We will search for a specific value for the given timestamp and key parameters throughout the list.
+'''
+class TimeStamp:
+    def __init__(self):
+        self.values_dict = {}
+        self.timestamps_dict = {}
+
+    #  Set TimeStamp data variables
+    def set_value(self, key, value, timestamp):
+        saved = False
+        if key in self.values_dict:
+            if timestamp < self.timestamps_dict[key][- 1]:
+                value = self.timestamps_dict[key][- 1]
+            elif value != self.values_dict[key][len(self.values_dict[key])-1]:
+                self.values_dict[key].append(value)
+                self.timestamps_dict[key].append(timestamp)
+                saved = True
+        else:
+            self.values_dict[key] = [value]
+            self.timestamps_dict[key] = [timestamp]
+            saved = True
+
+    # Find the index of right most occurrence of the given timestamp
+    # using binary search
+    def search_index(self, n, key, timestamp):
+        left = 0
+        j=right = n
+        mid = 0
+        while left < right:
+            mid = (left+right) >> 1
+            if self.timestamps_dict[key][mid] <= timestamp:
+                left = mid + 1
+            else:
+                right = mid
+        return left-1
+
+    # Get time_stamp data variables
+    def get_value(self, key, timestamp):
+        if key not in self.values_dict:
+            return ""
+        else:
+            index = self.search_index(len(self.timestamps_dict[key]),
+                                      key, timestamp)
+            if index > -1:
+                return self.values_dict[key][index]
+            return ""
+
+
 
 ### *** Practice
 ## 2 pointers - Valid Palindrome II
