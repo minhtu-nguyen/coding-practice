@@ -4924,6 +4924,46 @@ class RequestLogger:
             # be rejected, return false
             return False
 
+## Next Greater Element
+'''
+Let's first define the "next greater element" of some element x in an array of integers as the first element we encounter to the right of x (that is, whose index is greater than the index of x) whose value is also greater than x. In mathematical terms, y is the next greater element of x, if and only if: 
+- y > x
+- index of y > index of x 
+- the first two conditions don't hold true for any other element z , where index of z < index of y .
+You are given two distinct integer arrays, nums1 and nums2, where nums1 is a subset of nums2.
+For each index i , where 0 ≤ i < nums1.length , find the index j such that nums1[i] = nums2[j] and determine the next greater element of nums2[j] in nums2. If there is no next greater element, the answer to this query is −1.
+Compose and return an array ans of the same length as that of nums1, such that each value ans[i] is the next greater element of nums1[i] in nums2.
+Flow:
+- Create a hash map that stores the indexes and the values of all the elements in the nums1 array. Also create the ans array. It should have the same size as nums1 and set each slot to -1.
+- Traverse the nums2 array and check if the current element is present in the hash map.
+- If the specific number is not found, we skip to the next element of nums2. Otherwise, note the position of the matching element in nums2 and find the next greater element.
+- If the next greater element exists, store it in the ans array at the correct position. Otherwise retain -1 at that index.
+Naive approach: The naive approach is to select an element of the nums1 array and then search for when it occurs in the nums2 array. If the element is found, we look for the occurrence of the next greater element. If we obtain the next greater element, we store it in the ans array in the slot corresponding to the element in nums1. If we cannot find the next greater element, we simply store −1 in the ans array. We repeat the algorithm above until we have traversed all the elements of the nums1 array. O(n1*n2) - O(1)
+Optimized solution: O(n21 + n22) = O(n22) - O(n1)
+'''
+def next_greater_element(nums1, nums2):
+
+    nums1_indexed = {}  # Initializing the hash map
+    for i, n in enumerate(nums1):
+        nums1_indexed[n] = i
+    ans = [-1] * len(nums1)
+
+    
+    for i in range(len(nums2)):
+        index = nums1_indexed.get(nums2[i])
+        if isinstance(index, type(None)):   # cannot use in operator as index may contain 0
+            # If the value doesn't show up in the nums1 array, we
+            # move on to the next element in nums2 array.
+            continue
+        for j in range(i+1, len(nums2)):
+            if nums2[j] > nums2[i]:
+                ans[index] = nums2[j]
+                # Got the first missing value, we don't need
+                # to continue any further
+                break
+    return ans
+
+
 
 ### *** Practice
 ## 2 pointers - Valid Palindrome II
