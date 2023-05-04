@@ -5117,7 +5117,48 @@ class TicTacToe:
             return player
         return 0
 
+## Group Anagrams
+'''
+Given a list of words or phrases, group the words that are anagrams of each other. An anagram is a word or phrase formed from another word by rearranging its letters.
+Flow:
+- Initialize a hash map to store key-value pairs for the strings’ frequency and its anagrams, respectively. The key will be a character list of length 26, initialized to all 0s, and the value will be an array of anagrams.
+- Start traversing the list of strings. Within each string in the list, traverse each character of the string. Reset the character list to all 0s before beginning this second traversal.
+- Calculate the index of each letter of the string through the ACSII value of the character. In the character list, increment the value at this index by 1.
+- After a string has been traversed, check whether the current character list is present as a key in the hash map.
+- If the current character list is present as a key in the hash map, add the string to the list of anagrams corresponding to this key.
+- Otherwise, add a new key-value pair to the hash map with the current character array as the key and the traversed string as the value in an array.
+- Repeat this process until all the strings have been traversed.
+Naive approach: ort all strings first and then compare them to check whether they are identical. The idea is that if two strings are anagrams, sorting them both will always make them equal to each other. We’ll initialize a hash map to store the anagrams where the key represents the sorted string and the value represents the array of anagrams corresponding to that key. We’ll run a loop on the given list of strings. On each iteration, we will sort the current string. We’ll then check if the sorted string is present as a key in the hashmap. If it is, we’ll append the original, unsorted string to the array corresponding to that key. Otherwise, we’ll add the new key-value pair to the hashmap. At the end of the traversal, the hashmap will contain all the groups of anagrams. O(nllog(l)) - O(1)
+Optimized approach: O(n*k) - O(n*k)
+'''
+def dict_to_lst(subset):
+        result = []
+        if subset == []:
+            return [[]]
+        for dic in subset:
+            result.append(list(dic))
+        return result
 
+
+def group_anagrams(strs):
+    res = {}  # Hashmap for count
+    for s in strs:
+        count = [0] * 26  # A place for every single alphabet in our string
+        # We will compute the frequency for every string
+        for i in s:
+            # Calculating the value from 1 to 26 for the alphabet
+            index = ord(i) - ord('a')
+            count[index] += 1  # Increasing its frequency in the hashmap
+        # Each element in this tuple represents the frequency of an
+        # English letter in the corresponding title
+        key = tuple(count)
+        if key in res:
+            res[key].append(s)
+        else:
+            # We add the string as an anagram if it matched the content
+            # of our res hashmap
+            res[key] = [s]
+    return dict_to_lst(res.values())
 
 
 
