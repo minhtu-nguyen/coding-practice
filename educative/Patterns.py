@@ -4142,6 +4142,102 @@ class MaxTreePathSum:
 Tree breadth-first search is an important tree traversal algorithm for finding a node in a tree that satisfies the given constraints. It starts searching at the root node and moves down level by level, exploring adjacent nodes at level k+1.
 Essentially, it first visits nodes that are one edge away from the root, followed by nodes that are two edges away, and so on. This helps in efficiently finding neighbor nodes, particularly peer-to-peer networking systems.
 '''
+## Level Order Traversal of Binary Tree
+'''
+Given the root of a binary tree, display the values of its nodes while performing a level order traversal. Return the node values for all levels in a string separated by the character :. If the tree is empty, i.e., the number of nodes is 0, then return “None” as the output.
+Flow:
+- Declare two queues, current and next.
+- Push the root node to the current queue and set the level to zero.
+- Dequeue the first element from the current queue and push its children in the next queue.
+- If the current queue is empty, increase the level number and swap the two queues.
+- Repeat until the current queue is empty.
+Naive approach: first calculate the height of the tree and then recursively traverse it, level by level. The printing function would be called for every level in the range [1,height]. O(n^2) - O(n)
+Optimized approach: O(n) - O(n)
+'''
+# Using two queues
+def level_order_traversal(root):
+    #   We print None if the root is None
+    if not root:
+        print("None", end="")
+    else:
+        result = ""
+        # Declaring an array of two queues
+        queues = [deque(), deque()]
+        # Initializing the current and next queues
+        current_queue = queues[0]
+        next_queue = queues[1]
+
+        # Enqueuing the root node into the current queue and setting
+        # level to zero
+        current_queue.append(root)
+        level_number = 0
+
+        n = 0
+        while current_queue:
+            n += 1
+            # Dequeuing and printing the first element of queue
+            temp = current_queue.popleft()
+            result += str(temp.data)
+            # Adding dequeued node's children to the next queue
+            if temp.left:
+                next_queue.append(temp.left)
+            if temp.right:
+                next_queue.append(temp.right)
+
+            # When the current queue is empty, we increase the level, print a new line
+            # and swap the current and next queues
+            if not current_queue:
+                level_number += 1
+                if next_queue:
+                    result += " : "
+                current_queue = queues[level_number % 2]
+                next_queue = queues[(level_number + 1) % 2]
+            else:
+                result += ", "
+        return result
+
+#Using one queue
+def level_order_traversal(root):
+    result = ""
+    # We print None if the root is None
+    if not root:
+        result += ("None")
+    else:
+        # Initializing the current queue
+        current_queue = deque()
+
+        # Initializing the dummy node
+        dummy_node = BinaryTreeNode(0)
+
+        current_queue.append(root)
+        current_queue.append(dummy_node)
+
+        # Printing nodes in level-order until the current queue remains
+        # empty
+        while current_queue:
+            # Dequeuing and printing the first element of queue
+            temp = current_queue.popleft()
+            result += str(temp.data)
+
+            # Adding dequeued node's children to the next queue
+            if temp.left:
+                current_queue.append(temp.left)
+
+            if temp.right:
+                current_queue.append(temp.right)
+
+            # When the dummyNode comes next in line, we print a new line and dequeue
+            # it from the queue
+            if current_queue[0] == dummy_node:
+                current_queue.popleft()
+
+                # If the queue is still not empty we add back the dummy node
+                if current_queue:
+                    result += " : "
+                    current_queue.append(dummy_node)
+            else:
+                result += ", "
+    return result
 
 
 ### *** Practice
