@@ -5266,6 +5266,47 @@ def first_unique_char(s):
     # return -1 if all occurrences of letters have a count greater than 1
     return -1
 
+## Find All Anagrams in a String
+'''
+Given two strings, a and b, return an array of all the start indexes of b's anagrams in a. We may return the answer in any order.
+An anagram is a word or phrase created by rearranging the letters of another word or phrase while utilizing each of the original letters exactly once.
+Flow:
+- If length of string b is more than length of string a, return an empty list.
+- Initialize two hash maps to store the frequency of different characters occurring in our strings.
+- Start populating the hash maps based on characters found in the strings.
+- Compare the two hash maps while traversing string a, and if an anagram is found, return the index of the element we started our search process from.
+- Adjust the size of the window we searched and check if any more indexes exist where we can find string b from.
+O(n + m) - O(n + m)
+'''
+def find_anagrams(a,b):
+  if len(b) > len(a): #If len of b is more than len of a, then there could be no anagram of b in a
+    return []
+  
+  count_a = defaultdict(int) # Hash map for count of a
+  count_b = defaultdict(int) # Hash map for count of b
+
+  for i in range(len(b)): #Storing frequency of characters for length of b
+    count_a[a[i]] += 1
+    count_b[b[i]] += 1
+
+  if count_a == count_b: #A specific case where we add the first index if matched
+    ans = [0]
+  else:
+    ans = []
+
+  sliding_left = 0 # We declare the sliding window pointer
+  for right in range(len(b), len(a)):
+    count_a[a[right]] += 1
+    count_a[a[sliding_left]] -= 1
+  
+    if count_a[a[sliding_left]] == 0:
+      count_a.pop(a[sliding_left])
+  
+    sliding_left = sliding_left + 1
+    if count_a == count_b:
+      ans.append(sliding_left) #If all the characters from b with their respective frequency are found at this index, we append.
+
+  return ans
 
 
 ### *** Practice
