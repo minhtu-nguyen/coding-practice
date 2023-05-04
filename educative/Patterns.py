@@ -4999,7 +4999,11 @@ def is_isomorphic(string1, string2):
 
     return True
 
-
+### *** Knowing What to Track
+'''
+The knowing what to track pattern is mostly used to find the frequency count of the data. It’s able to avoid the O(n^2) time by simplifying the problem and identifying certain key numeric properties in the given data.
+This pattern is often used with an array and strings, and helps solve problems that require counting data frequencies or returning boolean values (TRUE/FALSE). More often than not, the problems that can be solved using this pattern include comparison and checks
+'''
 
 
 ### *** Practice
@@ -5193,4 +5197,15 @@ Flow:
 - Insert numbers from 1 to n in the trie. Each number should be split into digits by the trie and saved as trie nodes.
 - Traverse Trie structure in preorder traversal format and append each trie node to result array by prefixing its parent nodes till the root.
 - Return the result array as it contains the lexicographical order of n numbers.
+'''
+
+## Longest Palindrome
+'''
+Given a string, pal_string, consisting of lowercase or uppercase letters, return the length of the longest palindrome that can be built with those letters.
+Flow:
+- Iterate through the input string to count the occurrences of each character and to store these in a hash map.
+- Iterate through the counts in the hash map, and check whether each value is even or odd.
+- If a count is even, add this value to pal_string–that is, the length of the longest possible palindrome.
+- Otherwise, add/subtract 1 from this odd value and add that to pal_string. Also, set a flag to indicate that an odd-valued count was encountered.
+- After going through all the character counts in the hash map, if the flag for odd-valued counts is set, add it to pal_string.
 '''
