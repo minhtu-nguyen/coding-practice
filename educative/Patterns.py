@@ -4832,6 +4832,61 @@ class MyHashMap():
         hash_key = key % self.key_space
         self.buckets[hash_key].remove(key)
 
+## Fraction to Recurring Decimal
+'''
+Given the two integer values of a fraction, numerator and denominator, implement a function that returns the fraction in string format. If the fractional part repeats, enclose the repeating part in parentheses.
+Flow:
+- Declare a result variable to store the result in the form of a string. In addition, declare a hash map to store the remainder as the key and the length of the result variable as its corresponding value.
+- Calculate the quotient and remainder from the given numerator and denominator.
+- Check if the remainder is 0, then return the result.
+- If the remainder is not 0, then append the dot “.” to the result.
+- Start a loop until the remainder is 0 and at every time check the remainder in the hash map. If the remainder already exists in the hash map, then create the recurring decimal from the fraction. If the remainder does not exist in the hash map, put it in the hash map.
+Naive approach: use the array to store the remainders. Every time we calculate the remainder we can check if it already exists in the array by searching in the array. This approach will use a nested loop. The outer loop will calculate the remainder and the inner loop will search in the array for the remainder. O(|d|^2)
+Optimized approach: O(|d|)
+'''
+def fraction_to_decimal(numerator, denominator):
+    result, hash_map = "", {}
+    # if the numerator is 0, then return 0 in the string
+    if numerator == 0:
+        return '0'
+
+    # If the numerator or denominator is negative, then append "-" to the result
+    if (numerator < 0) ^ (denominator < 0):
+        result += '-'
+
+        # Make the numerator and denominator positive after adding "-" to the result
+        numerator = abs(numerator)
+        denominator = abs(denominator)
+
+    # Calculate the quotient
+    quotient = numerator / denominator
+    # Calculate the remainder
+    remainder = (numerator % denominator) * 10
+    # Append the quotient part in the result
+    result += str(int(quotient))
+    # if the remainder is 0, then return the result
+    if remainder == 0:
+        return result
+    else:
+    # Append . before the right part
+        result += "."
+    # Right side of the decimal point
+        while remainder != 0:
+        # if digits are repeating, it means the remainder is already present in the hashmap
+            if remainder in hash_map.keys():
+                # Convert fraction to recurring decimal
+                beginning = hash_map.get(remainder)
+                left = result[0: beginning]
+                right = result[beginning: len(result)]
+                result = left + "(" + right + ")"
+                return result
+
+        # Otherwise put the remainder in the hashmap
+            hash_map[remainder] = len(result)
+            quotient = remainder / denominator
+            result += str(int(quotient))
+            remainder = (remainder % denominator) * 10
+        return result
 
 
 
