@@ -5613,6 +5613,49 @@ def min_malware_spread(graph, initial):
 A custom data structure does not have to be something completely novel – it can be a modified version of an existing data structure. For example, you can modify the tree structure to also include pointers to parents or even add some other data structure like an array for every node.
 Using custom data structures makes it easier and more efficient to solve problems that would otherwise be difficult with the existing data structures.
 '''
+## Snapshot Array
+'''
+In this challenge, you have to implement a Snapshot Array with the following properties:
+- Init (length): This is the constructor and it initializes the data structure to hold the specified number of indexes. Initially, the value at each index is 0.
+- Set Value (idx, val): This property sets the value at a given index idx to value val.
+- Snapshot(): This method takes no parameters and returns the Snap ID. Snap ID is the number of times that the snapshot function was called, less 1, as we start the count at 0. The first time this function is called, it saves a snapshot and returns 0. The nth time it is called, after saving the snapshot, it returns n−1.
+- Get Value (idx, Snap ID) method returns the value at the index in the snapshot with the given Snap ID.
+Flow:
+- Copy the dictionary at index snapid to a new dictionary at snapid+1.
+- Increment snapid.
+- Return the value of snapid−1.
+Naive approach: using a Hashmap and hashing each snap with a copy of the array in its current state each time the snap function was invoked. Then, if the get function were to be used, we could use the input snap key to get the correct array and return the input index. If the get function was then called, we would be able to grab the appropriate array through the input snap key, then return the input index. O(n)
+Optimized approach: 
+'''
+class SnapshotArray:
+    # Constructor
+    def __init__(self, length):
+        self.snapid = 0
+        self.node_value = dict()
+        self.node_value[0] = dict()
+        self.ncount = length
+
+    # Function set_value sets the value at a given index idx to val.
+    def set_value(self, idx, val):
+        if idx < self.ncount:
+            self.node_value[self.snapid][idx] = val
+
+    # This function takes no parameters and returns the snapid.
+    # snapid is the number of times that the snapshot() function was called minus 1.
+    def snapshot(self):
+        self.node_value[self.snapid + 1] = (self.node_value[self.snapid]).copy()
+        self.snapid += 1
+        return self.snapid - 1
+
+    # Function get_value returns the value at the index idx with the given snapid.
+    def get_value(self, idx, snapid):
+        if snapid < self.snapid and snapid >= 0 and idx < self.ncount:
+            return self.node_value[snapid][idx] if idx in self.node_value[snapid] else 0
+        else:
+            return None
+
+    def __str__(self):
+        return str(self.node_value)
 
 
 ### *** Practice
