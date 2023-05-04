@@ -5657,7 +5657,7 @@ class SnapshotArray:
     def __str__(self):
         return str(self.node_value)
 
-## Snapshot Array
+## Time-Based Key-Value Store
 '''
 Implement a data structure that can store multiple values of the same key at different timestamps and retrieve the key’s value at a certain timestamp.
 You’ll need to implement the TimeStamp class. This class has the following functions:
