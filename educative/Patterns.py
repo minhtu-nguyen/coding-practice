@@ -4520,6 +4520,39 @@ def suggested_products(products, search_word):
         trie.insert(x)
     return trie.search(search_word)
 
+## Replace Words 
+'''
+You’re given a sentence consisting of words and a dictionary of root words. Your task is to find all the words in the sentence whose prefix matches with a root word present in the dictionary, and then to replace each matching word with the root word.
+If a word in a sentence matches more than one root word in the dictionary, replace it with the shortest matching root word, and if the word doesn’t match any root word in the dictionary, leave the word unchanged. Return the modified sentence as the output.
+Flow:
+- Create a trie and iterate over each word from the dictionary to store them in the trie.
+- For each word in the sentence, check whether any initial sequence of characters matches a word in the trie.
+- If one or more matching words are found, replace it with the shortest matching word from the dictionary.
+- Else, move to the next words from the sentence.
+- Return the changed sentence after processing all the words in it.
+Naive approach: For each word in the sentence, we’ll compare it with each dictionary word in turn. If a match is found, we compare its length with the length of the shortest match found up to that point. If it’s shorter, we update the index that keeps track of the shortest match. After checking the entire dictionary, we use the smallest matching word to replace the word in the sentence. O(dw), where d is the number of words in the dictionary and wi is the number of letters of the word in the sentence. O(dws) where s is the number of words in the sentence.
+Optimized approach: O((d + s)l) - O(m)
+'''
+def replace_words(sentence, dictionary):
+    trie = Trie()
+    # iterate over the dictionary words, and
+    # insert them as prefixes into the trie
+    for prefix in dictionary:
+        trie.insert(prefix)
+    # split and assign each word from the sentence to new_list
+    # this new_list is intended to return the final sentence
+    # after all possible replacements have been made
+    new_list = sentence.split()
+
+    # iterate over all the words in the sentence
+    for i in range(len(new_list)):
+        # replace each word in the new_list with the
+        # smallest word from dictionary
+        new_list[i] = trie.replace(new_list[i])
+
+    # after replacing each word with the matching dictionary word,
+    # join them with a space in between them to reconstruct the sentence
+    return " ".join(new_list)
 
 
 ### *** Practice
