@@ -5366,7 +5366,88 @@ def redundant_connection(edges):
 		if not graph.union(v1, v2):
 			return [v1, v2]
 
+## Number of Islands
+'''
+Given an (m×n) 2-D binary grid representing a map of 1s and 0s, where 1 represents land and 0 represents water, we have to return the number of islands. An island is constructed by linking neighboring areas of land horizontally and vertically.
+Flow:
+- Count all the occurences of 1s in the grid and store them in a variable called Count.
+- Traverse the grid and whenever a 1 is encountered, check whether this 1 has any neighboring 1s on its top, bottom, left, or right side in the grid.
+- Connect all neighboring 1s into a single component, subtract the number of neighbors from Count, and change the value of the 1 in the grid to 0.
+- At the end of the traversal, Count contains the number of islands.
+O(m*n) - O(m*n)
+'''
+class UnionFind:
 
+    # Initializing the parent list and count variable by traversing the grid
+    def __init__(self, grid):
+        self.parent = []
+        self.rank = []
+        self.count = 0
+        m = len(grid)
+        n = len(grid[0])
+        for i in range(m):
+            for j in range(n):
+                if grid[i][j] == "1":
+                    self.parent.append(i * n + j)
+                    self.count += 1
+                else:
+                    self.parent.append(-1)
+                self.rank.append(0)
+
+    # Function to find the root parent of a node
+    def find(self, i):
+        if self.parent[i] != i:
+            self.parent[i] = self.find(self.parent[i])
+        return self.parent[i]
+
+    # Function to connect components
+    def union(self, x, y):
+        root_x = self.find(x)
+        root_y = self.find(y)
+        if root_x != root_y:
+            if self.rank[root_x] > self.rank[root_y]:
+                self.parent[root_y] = root_x
+            elif self.rank[root_x] < self.rank[root_y]:
+                self.parent[root_x] = root_y
+            else:
+                self.parent[root_y] = root_x
+                self.rank[root_x] += 1
+            self.count -= 1
+
+    # Function to return the number of conencted components consisting of "1"s
+    def get_count(self):
+        return self.count
+
+def num_island(grid):
+    # Counting the number of rows and returning 0 if they are 0
+    # i.e. an empty grid can't have any islands
+    if not grid:
+        return 0
+
+    cols = len(grid[0])
+    rows = len(grid)
+    union_find = UnionFind(grid)
+
+    # Traversing the grid element by element
+    for r in range(rows):
+        for c in range(cols):
+
+            # If a "1" is encountered, check the top, bottom, left, and right neighbors
+            if grid[r][c] == '1':
+                grid[r][c] = '0'
+
+                # Whenever a neighboring element contains "1" we update the parent list and subtract 1 from the count
+                if r - 1 >= 0 and grid[r-1][c] == "1":
+                    union_find.union(r * cols + c, (r-1) * cols + c)
+                if r + 1 < rows and grid[r+1][c] == "1":
+                    union_find.union(r * cols + c, (r+1) * cols + c)
+                if c - 1 >= 0 and grid[r][c-1] == "1":
+                    union_find.union(r * cols + c, r * cols + c - 1)
+                if c + 1 < cols and grid[r][c+1] == "1":
+                    union_find.union(r * cols + c, r * cols + c + 1)
+
+    # Return the final value of count which now contains the number of islands
+    count = union_find.get_count()
 
 ### *** Practice
 ## 2 pointers - Valid Palindrome II
