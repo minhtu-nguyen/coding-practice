@@ -5230,6 +5230,42 @@ class FreqStack:
 
         return value
 
+## First Unique Character in a String
+'''
+For a given string of characters, s, your task is to find the first non-repeating character in it and return its index. Return −1 if there’s no unique character in the given string.
+Flow: 
+- Iterate over the length of input string.
+- For each character in the string, check if it exists in the hashmap. If it does, increment its value by one. Otherwise, add the character in the hashmap and its initial count of 1 as a new key-value pair.
+- Traverse the hashmap to find the first occurrence of a non-repeating value.
+- If any non-repeating character exists, return its index. Else, return -1.
+O(n) - O(1)
+'''
+def first_unique_char(s):
+
+    character_count = {}  # declaring a hash map
+    string_length = len(s)  # storing the length of the input string
+
+    # loop to iterate over the length of input string
+    for i in range(string_length):
+        # check if the character exists in the hash map
+        if s[i] in character_count:
+            # if the character already exists, 
+            # increase the counter by adding +1
+            character_count[s[i]] += 1
+        else:
+            # if the character doesn't exists, 
+            # set the count of letter to 1
+            character_count[s[i]] = 1
+
+    # this loop will check the first occurrence of a letter whose count is of 1
+    for i in range(string_length):
+        # the first character to have a count of 1 should be returned
+        if character_count[s[i]] == 1:
+            return i
+
+    # return -1 if all occurrences of letters have a count greater than 1
+    return -1
+
 
 
 ### *** Practice
