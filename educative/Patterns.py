@@ -4668,7 +4668,7 @@ class TrieNode():
     def __init__(self):
         self.children = {}
         self.is_string = False
-        
+
 class Trie():
     def __init__(self):
         self.root = TrieNode()
@@ -4754,6 +4754,12 @@ def dfs(words_trie, node, grid, row, col, result, word=''):
             # Restoring state after exploration
             grid[row][col] = char
     
+### *** Hash Maps
+'''
+Hash maps store data in the form of key-value pairs. They are similar to arrays because array values are stored against numeric keys. These keys are known as indexes. We don’t get to pick the value of these keys as they are always sequential integers starting from 0. Therefore, if we want to find an element within an array and don’t know it’s index, we’ll have to search the entire array which, in the worst case, will take O(N) time.
+On the contrary, hash maps allow us to have flexible keys. Each key is unique and is mapped against a value. Therefore, we can look up its value in O(1) time.
+'''
+
 
 ### *** Practice
 ## 2 pointers - Valid Palindrome II
@@ -4937,4 +4943,13 @@ Flow:
 - Else, if the current node has a right child,set the next pointer of the last node to this right child, and set the last pointer to this right child.
 - Update the current node to the current node’s next node.
 - Return the next node of the desired node.
+'''
+
+## Trie - Lexicographical Numbers
+'''
+Given an integer value n, write a function that returns all the numbers in the range 1 to n in lexicographical order.
+Flow:
+- Insert numbers from 1 to n in the trie. Each number should be split into digits by the trie and saved as trie nodes.
+- Traverse Trie structure in preorder traversal format and append each trie node to result array by prefixing its parent nodes till the root.
+- Return the result array as it contains the lexicographical order of n numbers.
 '''
