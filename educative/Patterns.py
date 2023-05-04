@@ -4421,7 +4421,11 @@ def vertical_order(root):
 
     return [node_list[x] for x in range(min_column, max_index + 1)]
 
-
+### *** Trie
+'''
+Trie is a tree data structure used for storing and locating keys from a set. The keys are usually strings that are stored character by character—each node of a trie corresponds to a single character rather than the entire key.
+The order of characters in a string is represented by edges between the adjacent nodes. For example, in the string “are”, there will be an edge from node a to node r to node e. That is, node a will be the parent of node r, and node r will be the parent of node e.
+'''
 
 ### *** Practice
 ## 2 pointers - Valid Palindrome II
@@ -4593,4 +4597,16 @@ Flow:
 - Compare the depths of the left and right subtrees, and select the greater of the two. Add 1 and update this as the depth of this branch.
 - If the depth of the current branch exceeds the maximum depth seen so far, update the maximum depth.
 - When all branches have been explored, return the maximum depth seen so far.
+'''
+
+## BFS - Connect All Siblings of a Binary Tree
+'''
+The task is to connect all nodes in a binary tree. Connect them from left to right so that the next pointer of each node points to the node on its immediate right. The next pointer of the right-most node at each level should point to the first node of the next level in the tree.
+Each node in the given binary tree for this problem includes a next pointer, along with the left and right pointers. Your solution must set the next pointer to connect the same level nodes to each other and across levels.
+Flow:
+- Initialize two pointers, current and last, to root.
+- If the current node has a left child, set the next pointer of the last node to this left child and set the last pointer to this left child.
+- Else, if the current node has a right child,set the next pointer of the last node to this right child, and set the last pointer to this right child.
+- Update the current node to the current node’s next node.
+- Return the next node of the desired node.
 '''
