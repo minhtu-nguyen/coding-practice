@@ -4379,6 +4379,47 @@ def get_next_node(node, nodeData):
     else:
         return node.next
 
+## Vertical Order Traversal of a Binary Tree
+'''
+Find the vertical order traversal of a binary tree when the root of the binary tree is given. In other words, return the values of the nodes from top to bottom in each column, column by column from left to right. If there is more than one node in the same column and row, return the values from left to right.
+Flow:
+- Traverse the tree, level by level, starting from the root node.
+- Push the nodes to a queue along with their column index.
+- If a node has children, assign column index current−1 to the left child and current+1 to the right child.
+- Keep track of the maximum and minimum column indices, and populate a hash map with (index,node) pairs.
+- Return the node values for each column index, from minimum to maximum.
+Naive approach: traversing the tree to get the maximum and minimum horizontal distance of the nodes from the root. Once we have these numbers, we can traverse over the tree again for each distance in the range [maximum, minimum] and return the nodes respectively. O(n^2) - O(n)
+Optimized approach: O(n) - O(n)
+'''
+def vertical_order(root):
+    if root is None:
+        return []
+
+    node_list = defaultdict(list)
+    min_column = 0
+    max_index = 0
+
+    # push root into the queue
+    queue = deque([(root, 0)])
+
+    # traverse over the nodes in the queue
+    while queue:
+        node, column = queue.popleft()
+
+        if node is not None:
+            temp = node_list[column]
+            temp.append(node.data)
+            node_list[column] = temp
+
+            # get min and max column numbers for the tree
+            min_column = min(min_column, column)
+            max_index = max(max_index, column)
+
+            # add current node's left and right child in the queue
+            queue.append((node.left, column - 1))
+            queue.append((node.right, column + 1))
+
+    return [node_list[x] for x in range(min_column, max_index + 1)]
 
 
 
