@@ -5160,6 +5160,76 @@ def group_anagrams(strs):
             res[key] = [s]
     return dict_to_lst(res.values())
 
+## Maximum Frequency Stack
+'''
+Design a stack-like data structure. You should be able to push elements to this data structure and pop elements with maximum frequency.
+You’ll need to implement the FreqStack class that should consist of the following:
+- Init(): This is a constructor used to declare a frequency stack.
+- Push(value): This is used to push an integer data onto the top of the stack.
+- Pop(): This is used to remove and return the most frequent element in the stack.
+Flow:
+- Create a hash map or a dictionary to store frequencies of all elements.
+- Iterate over the input array and store its frequency in a hash map or dictionary. The corresponding frequency value is a stack containing all the elements with that frequency.
+- After all elements are pushed onto the stack, start removing the most frequent elements.
+- While removing elements, also decrease their frequency count from the hash map or dictionary.
+- When there’s a case where two or more elements have the same frequency, pop the latest element that was pushed onto the stack.
+Naive approach: using a heap data structure, specifically a max heap. This approach involves maintaining a hash map to keep track of the frequency of each element in the stack and a counter variable to keep track of the last inserted element.
+To push elements onto the max-heap, we need to follow these steps:
+- Check if the element is already present in a heap. If it is, increment its frequency in the hash map. Otherwise, set its frequency to 1.
+- Increment the counter by 1.
+- Add an array containing the element, its frequency, and the counter to the max-heap.
+To pop elements from the max-heap, we need to follow these steps:
+- Remove the most frequently occurring element from the max-heap.
+- Decrement the frequency of that element in the hash map.
+O(nlogn) - O(n)
+Optimized approach:This code solves the problem by maintaining a stack that tracks the frequency of elements and retrieves the most frequently occurring element efficiently. It uses two dictionaries to keep track of the frequency of each element and the elements associated with a given frequency. When a new element is pushed onto the stack, its frequency is incremented, and it is added to the list of elements corresponding to that frequency. The maximum frequency is updated as needed. When a pop operation is requested, the stack retrieves the element with the highest frequency and decrements its frequency. If there are multiple elements with the same highest frequency, the most recently added element is removed first.
+O(1) - O(n)
+'''
+from collections import defaultdict
+
+# Declare a FreqStack class containing frequency and group hashmaps
+# and maxFrequency integer
+class FreqStack:
+
+    # Use constructor to initialize the FreqStack object
+    def __init__(self):
+        self.frequency = defaultdict(int)
+        self.group = defaultdict(list)
+        self.max_frequency = 0
+
+    # Use push function to push the value into the FreqStack
+    def push(self, value):
+        # Get the frequency for the given value and
+        # increment the frequency for the given value
+        freq = self.frequency[value] + 1
+        self.frequency[value] = freq
+
+        # Check if the maximum frequency is lower that the new frequency
+        # of the given show
+        if freq > self.max_frequency:
+            self.max_frequency = freq
+
+        # Save the given showName for the new calculated frequency
+        self.group[freq].append(value)
+
+    def pop(self):
+        value = ""
+
+        if self.max_frequency > 0:
+            # Fetch the top of the group[maxFrequency] stack and
+            # pop the top of the group[maxFrequency] stack
+            value = self.group[self.max_frequency].pop()
+
+            # Decrement the frequency after the show has been popped
+            self.frequency[value] -= 1
+
+            if not self.group[self.max_frequency]:
+                self.max_frequency -= 1
+        else:
+            return -1
+
+        return value
+
 
 
 ### *** Practice
