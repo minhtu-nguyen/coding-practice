@@ -4888,6 +4888,41 @@ def fraction_to_decimal(numerator, denominator):
             remainder = (remainder % denominator) * 10
         return result
 
+## Logger Rate Limiter
+'''
+For the given stream of message requests and their timestamps as input, you must implement a logger rate limiter system that decides whether the current message request is displayed. The decision depends on whether the same message has already been displayed in the last S seconds. If yes, then the decision is FALSE, as this message is considered a duplicate. Otherwise, the decision is TRUE.
+Flow:
+- Use all incoming messages as keys and their respective timestamps as values, to form key-value pairs to store them in a hash map.
+- When a request arrives, use the hash map to check if it’s a new request or a repeated request. If it’s a new request, accept it and add it to the hash map.
+- If it’s a repeated request, check if S seconds have passed since the last request with the same message. If this is the case, accept it and update the timestamp for that specific message in the hash map.
+- If the repeated request has arrived before the time limit has expired, reject it.
+Naive approach: The problem we’re trying to solve here implies that there’s a queue of messages with timestamps attached to them. Using this information, we can use a queue data structure to process the incoming message requests. In addition to using a queue, we can use a set data structure to efficiently identify and remove duplicates. Our naive approach is an event-driven algorithm, where every incoming message prompts us to identify and remove all those messages from the queue whose timestamps are more than S seconds older than the timestamp of the new message. Whenever we remove a message from the queue, we also remove it from the set. After performing this time limit expiry check, we can be certain that none of the messages in the queue and in the set are more than S seconds older than the new message. Now, if this new message is present in the set, it’s a duplicate and we return FALSE. Otherwise, we add it to the message queue and to the message set, and return TRUE. O(n)
+Optimized approach: O(1) - O(n)
+'''
+class RequestLogger:
+
+    # initailization of requests hash map
+    def __init__(self, time_limit):
+        self.requests = {}
+        self.limit = time_limit
+
+    # function to accept and deny message requests
+    def message_request_decision(self, timestamp, request):
+
+        # checking whether the specific request exists in
+        # the hash map or not if it exists, check whether its
+        # time duration lies within the defined timestamp
+        if request not in self.requests or timestamp - self.requests[request] >= self.limit:
+
+            # store this new request in the hash map, and return true
+            self.requests[request] = timestamp
+            return True
+
+        else:
+            # the request already exists within the timestamp
+            # and is identical, request should
+            # be rejected, return false
+            return False
 
 
 ### *** Practice
