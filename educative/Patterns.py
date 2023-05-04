@@ -5608,6 +5608,12 @@ def min_malware_spread(graph, initial):
             candidate_node = i
     return candidate_node
 
+### *** Custom Data Structures
+'''
+A custom data structure does not have to be something completely novel – it can be a modified version of an existing data structure. For example, you can modify the tree structure to also include pointers to parents or even add some other data structure like an array for every node.
+Using custom data structures makes it easier and more efficient to solve problems that would otherwise be difficult with the existing data structures.
+'''
+
 
 ### *** Practice
 ## 2 pointers - Valid Palindrome II
@@ -5823,4 +5829,16 @@ Flow:
 - Check if the character is present in the hash map. If the character is not present, return FALSE.
 - Check if the count of the character is not 0 in the hash map. If 0, return FALSE.
 - If we find the character in the hash map with no 0 count, we decrement the character count in the hash map.
+'''
+
+## Union Find - Evaluate Division
+'''
+You are given an array of variable pairs equations and an array of real numbers, values, where the equations[i] = [A[i], B[i]] and values[i] represent the equation values[i] = A[i] / B[i] Each A[i] or B[i] is a string that represents a single variable. You are also given some queries, where queries[j] = [C[j], D[j]] represents the jth query where you must find the answer for C[j] / D[j]. Return the answers to all queries. If any single answer cannot be determined, return −1.0.
+Flow:
+- Initialize the union find structure so that we can group our variables. Variables that are connected by a chain of divisions should be in the same group. Additionally, set up the dictionary that stores the variables with the respective weights and groups they belong to. The weight of every variable is initially set to 1.
+- Iterate through the list of input equations, invoking union(dividend, divisor, quotient) with each in order to populate our union find structure.
+- If either of the query variables do not appear in the input equations, return -1.0.
+- Otherwise, if both variables do appear in the input equations, use the find(variable) function to get the group and weight of each of them. The find(variable) function will update the weights in case of any discrepancies.
+- If both variables belong to the same group, a chain of division exists between them and we can return the division of their weights as the result.
+- Otherwise, if the two variables don’t belong to the same group, they aren’t connected by a chain of divisions and we return -1.0 as result.
 '''
