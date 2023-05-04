@@ -4426,6 +4426,56 @@ def vertical_order(root):
 Trie is a tree data structure used for storing and locating keys from a set. The keys are usually strings that are stored character by character—each node of a trie corresponds to a single character rather than the entire key.
 The order of characters in a string is represented by edges between the adjacent nodes. For example, in the string “are”, there will be an edge from node a to node r to node e. That is, node a will be the parent of node r, and node r will be the parent of node e.
 '''
+## Implement Trie
+'''
+Trie is a tree-like data structure used to store strings. The tries are also called prefix trees because they provide very efficient prefix matching operations. Implement a trie data structure with three functions that perform the following tasks:
+- Insert a string.
+- Search a string.
+- Search for a given prefix in a string.
+Flow: 
+- Begin from the root node and iterate over the string one character at a time.
+- At each node, check if the character present in the trie.
+- If it’s not present, a new node is initialized.
+- Else, if it’s present, move to the next node.
+- For the last character of the word, set a boolean variable to TRUE for the corresponding node.
+'''
+class TrieNode():
+    def __init__(self):
+        self.children = {}
+        self.is_word = False
+
+class Trie():
+    def __init__(self):
+        self.root = TrieNode()
+
+    # inserting string in trie
+    def insert(self, word):
+        node = self.root
+        for c in word:
+            if c not in node.children:
+                node.children[c] = TrieNode()
+            node = node.children.get(c)
+        node.is_word = True  
+
+    # searching for a string
+    def search(self, word):
+        node = self.root
+        for c in word:
+            if c not in node.children:
+                return False
+            node = node.children.get(c)
+        return node.is_word
+
+    def search_prefix(self, prefix):
+        node = self.root
+        for c in prefix:
+            if c not in node.children:
+                return False
+            node = node.children.get(c)
+        return True
+
+
+
 
 ### *** Practice
 ## 2 pointers - Valid Palindrome II
