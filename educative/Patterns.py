@@ -4285,6 +4285,101 @@ def zigzag_level_order(root):
     return results
 
 ## Populating Next Right Pointers in Each Node
+'''
+Given a binary tree, connect all nodes of the same hierarchical level. We need to connect them from left to right, so that the next pointer of each node points to the node on its immediate right. The next pointer of the right-most node at each level will be NULL.
+For this problem, each node in the binary tree has one additional pointer (the next pointer) along with the left and right pointers.
+Flow:
+- Traverse the tree level by level, starting from the root node.
+- If both children of the current node exist, first connect them with each other and then with the previous nodes at the same level.
+- Else, if only the left child of the current node exists, connect it with the previous nodes at the same level.
+- Else, if only the right child of the current node exists, connect it with the previous nodes at the same level.
+- Set the next pointer of the right-most node to NULL and move to the next level.
+- Stop traversing the tree when all nodes have been visited.
+Naive approach: use a queue for the level order traversal of our binary tree. Since we also need to keep track of the node’s level, we can push a (node, level) pair to the queue. O(n) - O(n)
+Optimized approach: O(n) - O(1)
+'''
+# Helper function to connect all children nodes at the next level
+def connect_next_level(head):
+    #   Declaring the necessary pointers
+    current = head
+    next_level_head = None
+    prev = None
+
+    while current:
+        if current.left and current.right:
+            # If both current node children are not null
+            # then connect them with each other and previous
+            # nodes in the same level.
+            if not next_level_head:
+                next_level_head = current.left
+
+            current.left.next = current.right
+
+            if prev:
+                prev.next = current.left
+
+            prev = current.right
+        elif current.left:
+            # If only the left child node is not null
+            # then only connect it with previous same level nodes
+            if not next_level_head:
+                next_level_head = current.left
+
+            if prev:
+                prev.next = current.left
+
+            prev = current.left
+        elif current.right:
+            # If only the right child node children is not null
+            # then only connect it with previous same level nodes
+            if not next_level_head:
+                next_level_head = current.right
+
+            if prev:
+                prev.next = current.right
+
+            prev = current.right
+
+        # Update current pointer
+        current = current.next
+
+    # Pointing the last node (right-most node) of the next level
+    # to None
+    if prev:
+        prev.next = None
+
+    # Return the head node (left-most node) of the next level
+    return next_level_head
+
+
+# Function to populate same level pointers
+def populate_next_pointers(node):
+    if node:
+        node.next = None
+
+        while True:
+            node = connect_next_level(node)
+            if not node:
+                break
+
+
+# Function to find the given node and return its next node
+def get_next_node(node, nodeData):
+    # Performing Binary Search
+    while node and nodeData != node.data:
+        if nodeData < node.data:
+            node = node.left
+        else:
+            node = node.right
+
+    # If node is not found return -1 else return its next node
+    if not node:
+        non_existing_node = BinaryTreeNode(-1)
+        return non_existing_node
+    else:
+        return node.next
+
+
 
 
 ### *** Practice
