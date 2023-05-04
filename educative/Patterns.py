@@ -4963,6 +4963,43 @@ def next_greater_element(nums1, nums2):
                 break
     return ans
 
+## Isomorphic Strings
+'''
+Given two strings, check whether two strings are isomorphic to each other or not.  Two strings are isomorphic if a fixed mapping exists from the characters of one string to the characters of the other string. For example, if there are two instances of the character "a"  in the first string, both these instances should be converted to another character (which could also remain the same character if "a" is mapped to itself) in the second string. This converted character should remain the same in both positions of the second string since there is a fixed mapping from the character "a" in the first string to the converted character in the second string.
+Flow:
+- Create two hash maps. One to store mapping from string1 to string2 and another to store mapping from string2 to string1.
+- Before storing the mapping of characters in the hash maps, first check if the character is present in its hash map.
+- If the character is already in the hash map, and is mapped to a different character in the hash map than the character to be mapped, the algorithm terminates and FALSE is returned.
+- If all the mappings are valid in both the hash maps, TRUE is returned.
+O(n) - O(1)
+'''
+def is_isomorphic(string1, string2):
+
+    # Initializing the hashmaps
+    map_str1_str2 = {}
+    map_str2_str1 = {}
+
+    for i in range(len(string1)):
+        char1 = string1[i]
+        char2 = string2[i]
+
+        # returning false if char_1 in string1 exist in hashmap
+        # and the char_1 has different mapping in hashmap
+        if char1 in map_str1_str2 and map_str1_str2[char1] != char2:
+            return False
+
+        # returning false if char_2 in string2 exist in hashmap
+        # and the char_2 has different mapping in hashmap
+        if char2 in map_str2_str1 and map_str2_str1[char2] != char1:
+            return False
+
+        # mapping of char of one string to another and vice versa
+        map_str1_str2[char1] = char2
+        map_str2_str1[char2] = char1
+
+    return True
+
+
 
 
 ### *** Practice
