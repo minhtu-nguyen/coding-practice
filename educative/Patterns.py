@@ -5308,6 +5308,12 @@ def find_anagrams(a,b):
 
   return ans
 
+### *** Union Find
+'''
+The union find pattern is used to group elements into sets based on a specified property. Each set is non-overlapping, that is, it contains unique elements that are not present in any other set. The pattern uses a disjoint set data structure such as an array, to keep track of which set each element belongs to.
+Each set forms a tree data structure and has a representative element that resides at the root of the tree. Every element in this tree maintains a pointer to its parent. The representative’s parent pointer points to itself. If we pick any element in a set and follow its parent pointers, we’ll always reach the set representative.
+'''
+
 
 ### *** Practice
 ## 2 pointers - Valid Palindrome II
@@ -5511,4 +5517,16 @@ Flow:
 - If a count is even, add this value to pal_string–that is, the length of the longest possible palindrome.
 - Otherwise, add/subtract 1 from this odd value and add that to pal_string. Also, set a flag to indicate that an odd-valued count was encountered.
 - After going through all the character counts in the hash map, if the flag for odd-valued counts is set, add it to pal_string.
+'''
+
+## Knowing What to Track - Ransom Note
+'''
+Given two strings, “ransom note” and “magazine”, check if the ransom note can be constructed using the letters from the magazine string. Return TRUE if a ransom note can be constructed. Otherwise, return FALSE.
+Flow:
+- Fill the hash map using the magazine string.
+- Keep the count of every unique character in the hash map.
+- Iterate the ransom note string.
+- Check if the character is present in the hash map. If the character is not present, return FALSE.
+- Check if the count of the character is not 0 in the hash map. If 0, return FALSE.
+- If we find the character in the hash map with no 0 count, we decrement the character count in the hash map.
 '''
