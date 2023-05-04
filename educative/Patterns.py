@@ -5314,6 +5314,59 @@ The union find pattern is used to group elements into sets based on a specified 
 Each set forms a tree data structure and has a representative element that resides at the root of the tree. Every element in this tree maintains a pointer to its parent. The representative’s parent pointer points to itself. If we pick any element in a set and follow its parent pointers, we’ll always reach the set representative.
 '''
 
+## Redundant Connection
+'''
+We’re given a graph that is actually a tree with n nodes labeled from 1 to n, plus one additional edge. The additional edge connects two different vertices and is not a duplicate of an existing edge.
+The graph is represented as an array called edges of length n where edges[i] = [a, b] indicates that there is an edge between nodes a and b in the graph.
+Return an edge that can be removed so that the resulting graph is a tree of n nodes. If there are multiple candidates for removal, return the edge that occurs last in edges.
+Flow:
+- Declares the parent and rank list with lengths based on the edges list.
+- Find the root parent of the required vertex.
+- Take two vertices and return False if both vertices have the same parent. Also, update the parent and rank lists by making a connection based on the passed edge. Otherwise, return True if no cycle exists in the graph.
+- Traverse the edges of the graph to check for the redundant edge.
+Naive approach: using techniques like DFS or BFS. The goal is to use the provided list of edges to enumerate all the nodes in the tree. Once all the nodes have been accounted for, the edge not used is the redundant connection. O(n^2)
+Optimized approach: O(n) - O(n)
+'''
+class UnionFind:
+
+    def __init__(self, n):
+        self.parent = []
+        self.rank = rank = [1] * (n + 1)
+        for i in range(n + 1):
+            self.parent.append(i)
+
+    def find_parent(self, x):
+        if self.parent[x] != x:
+            self.parent[x] = self.find_parent(self.parent[x])
+        return self.parent[x]
+
+    # returns false if both vertices have the same parent, otherwise, updates the parent and rank lists by making a connection based on the passed edge
+    # true will be returned if no cycle exits in the graph
+    def union(self, v1, v2):
+        #finds the root parents of both v1 and v2
+        p1, p2 = self.find_parent(v1), self.find_parent(v2)
+        #if both parents are the same, a cycle exists and v1,v2 is the redundant edge
+        if p1 == p2:
+            return False
+        #updates the parent and rank lists otherwise 
+        elif self.rank[p1] > self.rank[p2]:
+            self.parent[p2] = p1
+            self.rank[p1] = self.rank[p1] + self.rank[p2]
+        else:
+            self.parent[p1] = p2
+            self.rank[p2] = self.rank[p2] + self.rank[p1]
+        return True
+
+def redundant_connection(edges):	
+	#declares the parent and rank list with lengths based on the edges list
+	graph = UnionFind(len(edges))
+	
+	# traverses the edges of the graph to check for the redundant edge
+	for v1, v2 in edges:
+		if not graph.union(v1, v2):
+			return [v1, v2]
+
+
 
 ### *** Practice
 ## 2 pointers - Valid Palindrome II
