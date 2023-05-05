@@ -5955,7 +5955,35 @@ class MinStack:
 Bitwise Manipulation is the process of modifying bits algorithmically using bitwise operations. Logical bitwise operations are the fastest computations, because processors natively support them. This approach generally leads to efficient solutions in problems where we can efficiently transform the input into its binary form or manipulate it directly at the bit level to produce the required output.
 A bitwise operation works on a bit string, bit array, or a binary numeral. Bitwise operators take bits as their operands and calculate the corresponding bit value in the result.
 '''
+## Find the Difference
+'''
+Given two strings, str1 and str2, find the index of the extra character that is present in only one of the strings.
+Flow:
+- Initialize a variable named result as 0.
+- Traverse the first string till the end, and perform a bitwise XOR operation of result with the ASCII value of every character. Update result with this calculated value.
+- Traverse the second string till the end, and perform a bitwise XOR operation of result with the ASCII value of every character. Update result with this calculated value.
+- result now corresponds to the ASCII value of the extra character. Return the index of this character from the longer of the two strings.
+Naive approach:  sort both the strings. Then loop over the longer string and compare both strings, character by character. Finally, when one extra character is found in the longer string which does not match with the character at the corresponding index in the other string, we break out of the loop and return the index where the comparison failed. O(nlogn) - O(1)
+Optimized approach: O(n) - O(1)
+'''
+def extra_character_index(first_string, second_string):
 
+    result = 0
+    first_string_length = len(first_string)
+    second_string_length = len(second_string)
+
+    for i in range(first_string_length):
+        result = result ^ (ord)(first_string[i])
+
+    for j in range(second_string_length):
+        result = result ^ (ord)(second_string[j])
+
+    if len(first_string) > len(second_string):
+        index = first_string.index((chr)(result))
+        return index
+    else:
+        index = second_string.index((chr)(result))
+        return index
 
 
 
