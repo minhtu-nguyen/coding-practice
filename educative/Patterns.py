@@ -5950,6 +5950,15 @@ class MinStack:
         else:
             return self.min_stack.top()
 
+### *** Bitwise Manipulation
+'''
+Bitwise Manipulation is the process of modifying bits algorithmically using bitwise operations. Logical bitwise operations are the fastest computations, because processors natively support them. This approach generally leads to efficient solutions in problems where we can efficiently transform the input into its binary form or manipulate it directly at the bit level to produce the required output.
+A bitwise operation works on a bit string, bit array, or a binary numeral. Bitwise operators take bits as their operands and calculate the corresponding bit value in the result.
+'''
+
+
+
+
 
 ### *** Practice
 ## 2 pointers - Valid Palindrome II
@@ -6177,4 +6186,19 @@ Flow:
 - Otherwise, if both variables do appear in the input equations, use the find(variable) function to get the group and weight of each of them. The find(variable) function will update the weights in case of any discrepancies.
 - If both variables belong to the same group, a chain of division exists between them and we can return the division of their weights as the result.
 - Otherwise, if the two variables don’t belong to the same group, they aren’t connected by a chain of divisions and we return -1.0 as result.
+'''
+
+## Custom Data Structures - LFU Cache
+'''
+Design and implement a data structure for a Least Frequently Used (LFU) cache.
+Implement the LFUCache class. Here is how it should be implemented:
+- LFUCache(capacity): This function initializes the object with the capacity of the data structure.
+- Get(key): This function gets the value of the key if it exists in the cache. Otherwise, it returns -1.
+- Put(key, value): This function updates the value of the key if present, or inserts the key if it’s not present. When the cache reaches its capacity, it should invalidate and remove the least frequently used key before inserting a new item. For this problem, when there’s a tie, that is, two or more keys have the same frequency, the least recently used key is invalidated.
+To determine the least frequently used key, a use counter is maintained for each key in the cache. The key with the smallest use counter is the least frequently used key. When a key is first inserted into the cache, its use counter is set to 1 (due to the Put() operation). The use counter for a key in the cache is incremented and either a Get() or Put() operation is called on it.
+The Get() and Put() functions should both run with an average time complexity of O(1).
+Flow:
+- If the key is present, update it. Otherwise, insert the key. Update the use counter for this key.
+- When the cache reaches its full capacity, we locate the key with the lowest use counter value. This is the least frequently used key. We evict this key-value pair and then add a new one.
+- If two keys have the same frequency, remove the least recently used one.
 '''
