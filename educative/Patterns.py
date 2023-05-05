@@ -5812,6 +5812,76 @@ class LRUCache:
         print("}")
         print("-"*100, "\n")
 
+## Insert Delete GetRandom O(1)
+'''
+Implement a data structure that can perform the following operations:
+- Insert(): This function takes an integer as its parameter and, if it does not already exist in the set, adds it to the set, returning TRUE. If the integer already exists in the set, the function returns FALSE.
+- Delete(): This function takes an integer as its parameter and, if it exists in the set, removes it, returning TRUE. If the integer does not exist in the set, the function returns FALSE.
+- GetRandom(): This function takes no parameters. It returns an integer chosen at random from the set.
+Flow:
+- We store our data in an array and use a hash map to track the location at which each data element is stored in the array.
+- We use the hash map to look up the location of the element to delete.
+- Swap the last element in the array with the one to be deleted.
+- In the hash map, update the location of the element we just moved.
+- Delete the key-value pair of the target data element from the hash map and then delete the target element from our array.
+Naive approach: using an array. Elements can be inserted and deleted from an array. Random values from an array can also be fetched by getting a random index first and then retrieving the array element. O(n)
+Optimized approach:
+For our setup, we store our data in an array and the location of each data element in a hash map.
+-For insertion:
+    * We append an element to the array.
+    * Now we insert the key-value pair in the hash map where the key is the element and its value is the element’s index in the array.
+- For deletion:
+    * We use a hash map to find the index at which the element is located in our array.
+    * After finding the position of the element in an array, swap the last element in the array with the one to be deleted.
+    * Update the relevant key-value pair in the hash map so that its value is the new index of the element we just swapped with the target element.
+    * Delete the key-value pair of the target element from the hash map and then delete the target element from our array.
+- To get a random element, generate a random number in the range up to the amount of elements stored, and return the element in the array at this random index.
+O(1) - O(n)
+'''
+from random import choice
+class RandomSet():
+    def __init__(self):
+        self.indexor = {}  # Maps the actual value to its index
+        self.store = []   # Store the actual values in an array
+
+    # Function to insert a value
+    def insert(self, val):
+        """
+        Inserts a value in the data structure.
+        Returns True if it did not already contain the specified element.
+        """
+        if val in self.indexor:
+            return False
+        # Insert the actual value as a key and its index as a value
+        self.indexor[val] = len(self.store)
+        # Append a new value to array
+        self.store.append(val)
+        return True
+
+    # Function to remove a value
+    def delete(self, val):
+        """
+        Removes a value from the data structure.
+        Returns True if it contains the specified element.
+        """
+        if val in self.indexor:
+            # swap the last element in the array with the element
+            # to delete, update the location of the moved element
+            # in its entry in the hash map
+            last, i = self.store[-1], self.indexor[val]
+            self.store[i], self.indexor[last] = last, i
+            # delete the last element
+            del self.indexor[val]
+            self.store.pop()
+            return True
+        return False
+
+    # Function to generate a random value
+    def get_random(self):
+        """
+        Choose an element at random from the data structure.
+        """
+        return choice(self.store)
 
 
 ### *** Practice
