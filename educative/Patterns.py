@@ -5716,6 +5716,102 @@ class TimeStamp:
                 return self.values_dict[key][index]
             return ""
 
+## Implement LRU Cache
+'''
+Implement an LRU cache class with the following functions:
+- Init(capacity): Initializes an LRU cache with the capacity size.
+- Set(key, value): Adds a new key-value pair or updates an existing key with a new value.
+- Get(key): Returns the value of the key, or −1 if the key does not exist.
+Flow:
+- To set a pair, if the given key already exists, then we’ll update the value and move the pair to the front of the list.
+- If the key doesn’t exist, check whether the cache is full. If there’s the capacity to add a new pair, then add it at the front of the list.
+- If the cache is full, remove the LRU pair and add the pair at the front of the list.
+- To get a value if the given key doesn’t exist, return -1.
+- Else, return the corresponding value to the key and move the pair to the front of the list.
+Naive approach: The naive approach is to implement the LRU cache using a linked list. If the length of the linked list is less than the size of the cache, we can set the key-value pair at the head of the linked list. But when the linked list is filled, we'll remove the least recently used (LRU) node from it, which will be at the tail of the linked list. Then we'll add the new key-value pair at the head of the linked list. To get a specific element from the linked list, we'll need to traverse it until we reach the required node. Then, we'll move the current node to the head of the linked list because it's the most recently used node. If the key we are trying to get the value for does not exist, we'll simply return −1.
+O(n) - O(n)
+Optimized approach: To set a new value, first we need to verify whether the given key exists or not. If it exists, update its value and move it to the front of the linked list. If it doesn’t, add the new pair at the front of the linked list if we have enough space to add a new element. If the cache is already filled, evict the LRU element and add the new one at the front of the linked list. In order to get a value for the given key, return −1 if we don’t have such a key available in the hash map. Otherwise, move the node on the head of the linked list as the most recently used value and return the value corresponding to the given key.
+O(1) - O(n)
+'''
+class LRUCache:
+    # Initializes an LRU cache with the capacity size
+    def __init__(self, capacity):
+        self.cache_capacity = capacity
+        self.cache_map = {}
+        self.cache_list = LinkedList()
+
+    # Returns the value of the key, or -1 if the key does not exist.
+    def get(self, key):
+        # If the key doesn't exist, we return -1
+        found_itr = None
+        if key in self.cache_map:
+            found_itr = self.cache_map[key]
+        else:
+            return -1
+
+        list_iterator = found_itr
+
+        # If the key exists, we need to move it to the front of the list
+        self.cache_list.move_to_head(found_itr)
+
+        return list_iterator.pair[1]
+
+    # Adds a new key-value pair or updates an existing key with a new value
+    def set(self, key, value):
+        # Check if the key exists in the cache hashmap
+        # If the key exists
+        if key in self.cache_map:
+            found_iter = self.cache_map[key]
+            list_iterator = found_iter
+
+            # Move the node corresponding to key to front of the list
+            self.cache_list.move_to_head(found_iter)
+
+            # We then update the value of the node
+            list_iterator.pair[1] = value
+            return
+
+        # If key does not exist and the cache is full
+        if len(self.cache_map) == self.cache_capacity:
+            # We will need to evict the LRU entry
+
+            # Get the key of the LRU node
+            # The first element of each cache entry is the key
+            key_tmp = self.cache_list.get_tail().pair[0]
+
+            # This is why we needed to store a <key, value> pair
+            # in the cacheList. We would not have been able to get
+            # the key if we had just stored the values
+
+            # Remove the last node in list
+            self.cache_list.remove_tail()
+
+            # Remove the entry from the cache
+            del self.cache_map[key_tmp]
+
+        # The insert_at_head function inserts a new element at the front
+        # of the list in constant time
+        self.cache_list.insert_at_head([key, value])
+
+        # We set the value of the key as the list begining
+        # since we added the new element at head of the list
+        self.cache_map[key] = self.cache_list.get_head()
+
+    def print(self):
+        print("Cache current size: ", self.cache_list.size,
+              ", ", end="")
+        print("Cache contents: {", end="")
+
+        node = self.cache_list.get_head()
+        while node:
+            print("{", str(node.pair[0]), ",", str(node.pair[1]),
+                  "}", end="")
+            node = node.next
+            if node:
+                print(", ", end="")
+        print("}")
+        print("-"*100, "\n")
+
 
 
 ### *** Practice
