@@ -6039,6 +6039,24 @@ def flip_and_invert_image(image):
             row[len(row) - 1 - i] = temp
     # return the flipped and inverted image
     return image
+## Single Number
+'''
+Given an array of integers in which every element in the list appears twice except for one, find the element that occurs once.
+Flow:
+- Initialize a variable named result with 0.
+- Traverse the input array, and perform the bitwise XOR of every element with the result variable, updating it each time.
+- After you have traversed the whole array, the result has the number that appears once. Return result.
+O(n) - O(1)
+'''
+def single_number(nums):
+    # Initialize the result variable with a 0 value
+    result = 0
+    # Loop through every element
+    for num in nums:
+    # Take bitwise xor of all elements with the result
+        result ^= num
+    # return the result that contains single number
+    return result
 
 ### *** Practice
 ## 2 pointers - Valid Palindrome II
