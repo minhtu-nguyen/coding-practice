@@ -6327,3 +6327,274 @@ Flow:
 - When the cache reaches its full capacity, we locate the key with the lowest use counter value. This is the least frequently used key. We evict this key-value pair and then add a new one.
 - If two keys have the same frequency, remove the least recently used one.
 '''
+
+## Bitwise Manipulation - Reverse Bits
+'''
+Given an integer n, we need to calculate the 32-bit unsigned integer it would be if we reversed its bits. When we say “reverse” we don’t mean flipping the 0s to 1s and vice versa, but simply reversing the order in which they appear – from left-to-right to right-to-left. We need to return the integer the reversed bits result in.
+Flow:
+- Initialize the step counter to 31.
+- Loop while the number is greater than 0.
+- Perform the bitwise AND operation: 1 AND number.
+- Left-shift the result of the AND operation as many times as the value of the step counter.
+- Add the result of the left-shift operation to an accumulator.
+- Divide the number by 2 and decrement the step counter.
+- Return the accumulator.
+'''
+
+### *** Challenge
+
+## Shortest Bridge
+'''
+We are given an nxn binary matrix grid containing 0s and 1s. Each cell in the grid represents either land or water. A cell with a value of 1 represents land. Whereas, a cell with a value of 0 represents water. A group of adjacent cells with the value 1 constitutes an island. Two cells are considered adjacent if one of them is above, below, to the left of, or to the right of the second cell. We have to return the smallest number of 0s we must flip to connect the two islands.
+Hint: Union Find
+'''
+
+## Number of Connected Components in an Undirected Graph
+'''
+For a given integer, n, and an array, edges, return the number of connected components in a graph containing n nodes.
+Hint: Union Find
+'''
+
+## Pacific Atlantic Water Flow
+'''
+Consider an (m×n) rectangular island that borders the Pacific and Atlantic oceans. The northern and western side of the island touches the Pacific Ocean, while the southern and eastern side of the island touches the Atlantic Ocean.
+Say that the island is partitioned into square cells. To represent how much of the ground is above sea level, say you have an (m×n) integer matrix, heights, where heights[r][c] represents the height above sea level of the cell at the (r, c) coordinate.
+Every few months, there’s a lot of rain on this island which, as a result, flows from the island to the Pacific and Atlantic oceans. The flow is determined by the height of the cells of the island.
+Suppose a cell on the island has a height of 9, and say it’s higher than (or equal to) any cell to its north, east, west, and south. Then this means that water from this cell can flow to the adjacent cells. If water can flow from the cell to the Pacific and the Atlantic Ocean border, add this cell to the results grid.
+Hint: DFS
+'''
+
+## Contains Duplicate
+'''
+You’re given an integer array, nums. If any value inside the array appears at least twice, return TRUE. Otherwise, return FALSE.
+Hint: Knowing What To Track
+'''
+
+## Maximum Subarray
+'''
+Given an integer array, nums, find the contiguous subarray (containing at least one number) which has the largest sum and return its sum.
+Hint: Sliding Window
+'''
+
+## Two Sum
+'''
+For the given array of integers arr and a target t, you have to identify the two indices that add up to generate the target t. Moreover, you can’t use the same index twice, and there will be only one solution.
+Hint: Knowing What To Track 
+'''
+
+## Find Minimum in Rotated Sorted Array
+'''
+You’re given a rotated sorted array arr in ascending order so that after the first rotation, the last element of the array will be shifted to the starting position and so on. For the given array (containing unique elements), your task is to find the minimum element of this array.
+Hint: Modified Binary Search 
+'''
+
+## Non-overlapping Intervals
+'''
+Given an array of intervals where intervals[i] = [starti, endi], your task is to find the minimum number of intervals you need to remove to make the rest of the intervals non-overlapping.
+Hint: Merge Intervals
+'''
+
+## Meeting Rooms
+'''
+Given the array of meeting time intervals, where each interval consists of a pair of starting times and an ending times, you need to identify whether a person can attend all meetings or not.
+Hint: Merge Intervals 
+'''
+
+## Largest Rectangle in Histogram
+'''
+Given an array of integers, heights, which represents the histogram’s bar height, find the area of the largest rectangle in the histogram, where the width of each bar is constant (such as, 1).
+Hint: Stacks
+'''
+
+## Subtree of Another Tree
+'''
+Given the roots of two binary trees as root and sub_root, return TRUE if there is a subtree of root with the same structure and nodes of sub_root. Otherwise, return FALSE.
+Hint: Tree Depth-first Search
+'''
+
+## Sort List
+'''
+Given the head of a linked list, return the list after sorting it in ascending order.
+Hint: In-place Reversal of a Linked List
+'''
+
+## Number of 1 Bits
+'''
+Write a function that takes an unsigned integer n and returns the number of 1 bits it has.
+Hint: Bitwise Manipulation
+'''
+
+## Container with the Most Water
+'''
+You’re given an integer array height of length n, there are n vertical lines drawn such that the two endpoints of the ith line are (i,0) and (i, height[i]).
+Find two lines that, together with the x-axis, form a container that holds as much water as possible. Return the maximum amount of water a container can store.
+Hint: Two Pointers
+'''
+
+## Evaluate Reverse Polish Notation
+'''
+Evaluate the value of an arithmetic expression in Reverse Polish Notation. Reverse Polish notation (RPN) is a mathematical notation, where every operator follows all of its operands.
+Valid operators are +, -, *, and /. Each operand may be an integer or another expression. The division between two integers should truncate toward zero.
+It’s guaranteed that the given Reverse Polish Notation expression is always valid. That means the expression always evaluates a result, and there shouldn’t be any division by zero operations.
+Hint: Stacks 
+'''
+
+## 4Sum
+'''
+Given an array nums of n integers, return an array of all the unique quadruplets, [nums[a], nums[b], nums[c], nums[d]] such that we get the following:
+- 0≤ a, b, c, d <n
+- a, b, c, and d are distinct.
+- nums[a] + nums[b] + nums[c] + nums[d] = target
+Hint: Knowing What To Track
+'''
+
+## Loud and Rich
+'''
+You’re given a group of people where everyone has a specific amount of money and a different level of quietness. Additionally, you’re given an array richer = [xi, yi], so that xi has more money than yi. The quietness level of each person is represented using an array named quiet.
+Return an integer array res, where res[i] = y if y has the lowest value in quiet[y] among all people who have equal or more money than the person i.
+Hint: Topological Sort 
+'''
+
+## Product of Array Except Self
+'''
+You’re given an integer array, arr. Return a resultant array so that res[i] is equal to the product of all the elements of arr except arr[i].
+Write an algorithm that runs in O(n) time without using the division operation.
+Hint: Two Pointers 
+'''
+
+## Longest Increasing Subsequence
+'''
+Given an integer array, nums, return the length of the longest strictly increasing subsequence.
+Hint: Dynamic Programming
+'''
+
+## Sum of Two Integers
+'''
+Given two integers, a and b, return the sum of the two integers without using the operators + and -.
+Hint: Bitwise Manipulation 
+'''
+
+## Majority Element
+'''
+Given an array, nums of size n, return the majority element.
+The majority element is the element that appears more than ⌊n/2⌋ times. You may assume that the majority element always exists in the array.
+Hint: Knowing What To Track
+'''
+
+## Unique Paths
+'''
+An m∗n grid contains a robot. Initially, the robot is located at the top-left corner of the grid at location grid[0][0]. The robot makes an attempt to move to the bottom-right corner of the grid at location grid[m - 1][n - 1]. At any one time, the robot can only move to the right or down.
+Given the two integers, m and n, return the total number of distinct paths that the robot can take to reach the bottom-right corner of the grid.
+Hint: Dynamic Programming 
+'''
+
+## Longest Palindromic Substring
+'''
+Given a string pal_string, return the longest palindromic substring in pal_string.
+Hint: Two Pointers
+'''
+
+## Permutations II
+'''
+For a given integer list, nums, which might contain duplicates, return all possible unique permutations derived from nums.
+Hint: Subsets 
+'''
+
+## Number of Provinces
+'''
+Let’s say we have n number of cities, and some of them are connected, while some are not. If a city A is connected directly with city B, and city B is connected directly with city C, then we can say that city A is connected indirectly with city C.
+An (n×n) matrix, is_city_connected, is given, where is_city_connected[i][j] = 1 indicates that the ith and the jth cities are directly connected. Otherwise, the value is is_city_connected[i][j] = 0.
+Use this information to return the total number of provinces.
+Hint: Union Find 
+'''
+
+## Union Find 
+'''
+Given a string array, words, and an integer k, return the k most frequent strings.
+Sort the frequencies from highest to lowest and then return the top k frequent words. Words with the same frequency should be sorted by their lexicographical order.
+Hint: Top K Elements
+'''
+
+## Linked List Cycle II
+'''
+Given the head of a linked list, return the node where the cycle begins. If there is no cycle, return −1.
+A cycle exists in a linked list if there is some node in the list that can be reached again by continuously following the next pointer. Internally, pos is used to denote the node’s index to which the tail’s next pointer is connected.
+Hint: Fast and Slow Pointers 
+'''
+
+## Minimum Flips to Make the Binary String Alternate
+'''
+Given a binary string s, the following two operations can be performed in any sequence:
+- Remove the character at the start of the string s and append it to the end of the string.
+- Pick any character from the string and flip its value. in other words, if its value is 0, it becomes 1 and vice versa.
+Your task is to return the minimum number of type-2 operations that you need to perform before s becomes alternating.
+Hint: Sliding Window 
+'''
+
+## Lemonade Change
+'''
+At a lemonade stand, one lemonade costs €5. Customers are standing in line to buy lemonade can order one at a time. Each customer will buy only one lemonade and pay with a €5, €10, or €20 bill. You need to provide the correct change to each customer so that the net transaction is completed successfully with a total payment of €5. Initially, you do not have any change available.
+Return TRUE if you can provide every customer with the correct change. Otherwise, return FALSE.
+Hint: Greedy Techniques 
+'''
+
+## House Robber
+'''
+You are a professional robber, and after weeks of planning, you plan to rob some houses along a street. Each of these houses has a lot of money and valuables. Let’s say that you cannot rob houses adjacent to each other since they have security and burglar alarms installed.
+Following the above mentioned constraint and given an integer array, nums, representing the amount of money in each house, return the maximum amount of money you can steal tonight without alerting the police.
+Hint: Dynamic Programming
+'''
+
+## Find All Numbers Disappeared in an Array
+'''
+Given an array, nums, of n integers where nums[i] is in the range [1,n], return an array of all the integers in the range [1,n] that doesn’t appear in nums.
+Hint: Cyclic Sort 
+'''
+
+## Find All Duplicates in an Array
+'''
+Given an integer array, nums, of length n, where all the integers of nums are in the range [1,n] and each integer appears once or twice, return an array of all the integers that appear twice.
+Hint: Cyclic Sort 
+'''
+
+## Same Tree
+'''
+Given the roots of two binary trees, p and q, write a function to check if they are the same or not. Two binary trees are considered the same if they’re structurally identical and the nodes have the same value.
+Hint: BFS
+'''
+
+## Design In-Memory File System
+'''
+Design an in-memory file system. The skeleton for the class FileSystem is provided to you. Simulate the following functions:
+- ls: You’re given a string representing a path. If it’s a file path, return a list that only contains the file’s name. If it’s a directory path, return the list of file and directory names in this directory. Your function should return the output (file and directory names together) in lexicographical order.
+- mkdir: If you have a directory path that does not exist, make a new directory according to the given path. The function should create all the middle directories in the path if they don’t exist. This function’s return type is void.
+- add_content_to_file: You’re given a file path and file content in string format. If the file doesn’t exist, create that file containing the given content. If the file already exists, append the given content to the original content. This function’s return type is void.
+- read_content_from_file: Given a file path, return its content in string format.
+Hint: Trie
+'''
+
+## Design File System
+'''
+Design a file system that allows us to create new paths and associate them with different values. A path has one or more concatenated strings of the form / followed by one or more lowercase English letters. For example, valid paths include "/educative" and "/educative/problems", while an empty string "" and "/" are not valid paths.
+Implement the FileSystem class with the following functions:
+- bool createPath(string path, int value): This function creates a new path and associates a value to it if possible and returns TRUE. It returns FALSE if the path already exists or if its parent path doesn’t exist.
+- int get(string path): This function returns the value associated with the path or returns -1 if the path doesn’t exist.
+Hint: Custom Data Structures
+'''
+
+## Asteroid Collision
+'''
+You’re given an array of integers, asteroids, representing a number of asteroids in a row. For each asteroid, the absolute value represents its size, and the sign represents its direction (positive meaning right, negative meaning left). Each asteroid moves at the same speed.
+Find out the state of the asteroids after all collisions. If two asteroids meet, the smaller one will explode. If both are the same size, both will explode. Two asteroids moving in the same direction will never meet.
+Hint: Stacks
+'''
+
+## Rotting Oranges
+'''
+You’re given an (m×n) matrix where each cell of the matrix can have one of three values:
+- 0 represents an empty cell
+- 1 represents a fresh orange
+- 2 represents a rotten orange
+Every minute, an orange becomes rotten if it’s adjacent to a rotten orange in any direction. Return the minimum number of minutes that must elapse until no cell has a fresh orange. If this is impossible, return -1.
+Hint: BFS
+'''
