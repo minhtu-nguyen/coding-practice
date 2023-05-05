@@ -5985,8 +5985,33 @@ def extra_character_index(first_string, second_string):
         index = second_string.index((chr)(result))
         return index
 
+## Complement of Base 10 Number
+'''
+For any n positive number in base 10, return the complement of its binary representation as an integer in base 10.
+Flow:
+- Calculate the number of bits required to store any given positive integer.
+- Create an all bits set against the number of bits of the input value.
+- Flip all occurrences of 1s to 0s and 0s to 1s by computing the XOR operation.
+- Convert the binary value back to base 10 and return the complement.
+Naive approach: 
+- Convert the positive base 10 integer to its binary value.
+- Once we have the binary value, we can use a loop to incrementally convert each 1 to 0 and each 0 to 1.
+- Now that we have the complemented binary number, we can convert it to its respective base 10 value.
+O(m)
+Optimized approach: O(1) - O(1)
+'''
+from math import log2, floor  # using necessary libraries for this algorithm
 
+def find_bitwise_complement(num):
+    if num == 0:  # if the value of num is 0, return 1
+        return 1
 
+    # counting the number of bits required by this number in binary representation
+    bit_count = floor(log2(num)) + 1
+    # computing the all bits set of the number
+    all_bits_set = pow(2, bit_count) - 1
+    # flipping all bits of number by taking xor with all_bits_set
+    return num ^ all_bits_set
 
 ### *** Practice
 ## 2 pointers - Valid Palindrome II
