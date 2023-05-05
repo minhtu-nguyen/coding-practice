@@ -6057,6 +6057,33 @@ def single_number(nums):
         result ^= num
     # return the result that contains single number
     return result
+## Two Single Numbers
+'''
+Given a non-empty array arr, in which exactly two elements appear once and all the other elements appear twice, return the two elements that come only once.
+Flow:
+- Initialise a variable named bitwise_sum with 0.
+- Traverse the array and perform bitwise XOR of bitwise_sum with each element. Update bitwise_sum with the calculated value each time.
+- Get the rightmost 1-bit of bitwise_sum in a variable bit_mask.
+- Intialise a variable named result with 0. Traverse over the array elements and check if their bit is set. If yes, take their XOR with result, updating its value with every computation.
+- result and result ^ bitwise_sum will correspond to the two single numbers.
+O(n) - O(1)
+'''
+def two_single_numbers(arr):
+    bitwise_sum = 0
+    for i in arr:
+        bitwise_sum ^= i
+
+    # the least significant bit can be found with number ^ (-number)
+    bitwise_mask = bitwise_sum & (-bitwise_sum)
+
+    # divide into two groups of numbers, here we want the group with bit set
+    # which results in one of the numbers we want due to the property X ^ X = 0
+    results = 0
+    for i in arr:
+        if bitwise_mask & i:
+            results = results ^ i
+
+    return [results, bitwise_sum ^ results]
 
 ### *** Practice
 ## 2 pointers - Valid Palindrome II
