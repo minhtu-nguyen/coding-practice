@@ -6013,6 +6013,33 @@ def find_bitwise_complement(num):
     # flipping all bits of number by taking xor with all_bits_set
     return num ^ all_bits_set
 
+## Flipping an Image
+'''
+Inverting an image means that every 0 is replaced by 1, and every 1 is replaced by 0. Inverting [0,1,1] results in [1,0,0].
+Flow:
+- Calculate the mid of the row.
+- Iterate over the first half of the each row.
+- Compute the bitwise XOR of the current element with 1, which will invert the element’s value.
+- Swap the current element with the corresponding element in the second half of the row, i.e., the element at the same distance from the end of the row as the current element is from the beginning of the row, after performing the same XOR operation on the second element as well.
+- After iterating over all the rows, return the resultant image.
+Naive approach: The naive approach of solving this problem is to create separate functions for flipping the matrix horizontally and then inverting each individual element of the matrix. We’ll use nested loops to flip the rows of the matrix by swapping the elements from both ends until we reach the middle of the row. Once the matrix has been flipped, we’ll traverse it again and replace 1s with 0s and 0s with 1s to invert it. The naive approach uses two iterations of the whole matrix to flip and invert the matrix.
+O(n^2)
+Optimized approach: O(n^2) - O(1)
+'''
+def flip_and_invert_image(image):
+    row_count = len(image)
+    mid = (row_count+1)//2
+    # iterate over each row of the image
+    for row in image:
+        # iterate over first half of each row
+        for i in range(mid):
+            # flip and invert the row
+            temp = row[i] ^ 1
+            row[i] = row[len(row) - 1 - i] ^ 1
+            row[len(row) - 1 - i] = temp
+    # return the flipped and inverted image
+    return image
+
 ### *** Practice
 ## 2 pointers - Valid Palindrome II
 '''
