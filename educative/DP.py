@@ -79,3 +79,93 @@ def find_knapsack(capacity, weights, values, n):
                 dp[i][j] = dp[i-1][j]
  
     return dp[-1][-1] #[n][capacity]
+
+## Target Sum
+'''
+Given an array of positive integers arr and a target T, build an expression using these numbers by inserting a + or a − before each integer, and evaluating this expression. Find the total number of different expressions that evaluate to T.
+Naive approach: find all expressions using the given numbers and then count the number of expressions that evaluate to the given target. In other words, we divide the problem into subproblems, and for each number, we place a + or − before it and generate new expressions.
+O(n^2) - O(n)
+---
+Optimized solution
+Top-down solution: we create a lookup table called dp of n rows and 2∗sum(arr)+1 columns. The number of rows represents the number of given integers and the number of columns represents all possible target sums that can be built using these integers. For any given integer, whenever we generate and evaluate an expression, we store it at dp[i][T], where i and T represent the index of the integer and the generated sum, respectively. 
+O(n * k), k = sum(arr) - O(n * k)
+Bottom-up solution:
+create a lookup table of size n×2∗sum(arr)+1. The table is initialized with 0 except for the indexes corresponding to the first integer. Two expressions can be generated using the first integer by inserting a + or a − before it. Therefore, we store 1 at the respective indices.
+the algorithm iterates over all integers and for every possible target sum t, it checks if it was generated during the previous iterations i.e., if dp[i-1][total+t] > 0, where total is the sum of all elements of the array. If it was generated, two new expressions are considered by inserting a + or a − before the current integer and the count of expressions is increased i.e., dp[i-1][total+t] is added to the values of dp[i][total+t+arr[i]] and dp[i][total+t-arr[i]].
+O(n * k) - O(n * k)
+'''
+# Naive
+def find_target_sum_ways(arr, T):
+    return find_target_sum_ways_rec(arr, 0, T)
+
+def find_target_sum_ways_rec(arr, i, T):
+    # If all integers are processed
+    if i == len(arr):
+        # If target is reached
+        if T == 0:
+            return 1
+        # If target is not reached
+        return 0
+ 
+    # Return total count of the following cases:
+    #       1. Add current element to the target
+    #       2. Subtract current element from the target
+    return (find_target_sum_ways_rec(arr, i + 1, T + arr[i]) +
+            find_target_sum_ways_rec(arr, i + 1, T - arr[i]))
+
+# Optimized
+# -- Top down
+def find_target_sum_ways(arr, T):
+    total = sum(arr)
+
+    # If the target can't be generated using the given numbers
+    if total < abs(T):
+        return 0
+    
+    # Initialize a lookup table
+    dp = [[-1 for _ in range(2*total+1)] for _ in range(len(arr))]
+    
+    return find_target_sum_ways_rec(arr, 0, T, dp)
+
+def find_target_sum_ways_rec(arr, i, T, dp):
+    # If all integers are processed
+    if i == len(arr):
+        # If target is reached
+        if T == 0:
+            return 1
+        # If target is not reached
+        return 0
+
+    #If we have solved it earlier, then return the result from memory
+    if dp[i][T] != -1:
+        return dp[i][T]
+    
+    # Calculate both sub-problems and save the results in the memory
+    dp[i][T] = find_target_sum_ways_rec(arr, i + 1, T + arr[i], dp) + \
+               find_target_sum_ways_rec(arr, i + 1, T - arr[i], dp)
+    
+    return dp[i][T]
+
+# -- Bottom up
+def find_target_sum_ways(arr, T):
+    total = sum(arr)
+
+    # If the target can't be generated using the given numbers
+    if total < abs(T):
+        return 0    
+
+    # Initialize a lookup table
+    dp = [[0 for _ in range(2*total+1)] for _ in range(len(arr))]
+    dp[0][total + arr[0]] = 1
+    dp[0][total - arr[0]] += 1
+
+    # For every integer
+    for i in range(1, len(arr)):
+        # For every possible target sum
+        for t in range(-total, total+1):
+            # If at least one expression (during previous iterations) evaluated to this target sum
+            if dp[i - 1][total + t] > 0:
+                dp[i][total + t + arr[i]] += dp[i - 1][total + t]
+                dp[i][total + t - arr[i]] += dp[i - 1][total + t]
+    
+    return dp[len(arr)-1][T+total]
