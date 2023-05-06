@@ -169,3 +169,94 @@ def find_target_sum_ways(arr, T):
                 dp[i][total + t - arr[i]] += dp[i - 1][total + t]
     
     return dp[len(arr)-1][T+total]
+
+## Subset Sum
+'''
+Given a set of positive numbers arr and a value total, determine if there exists a subset in the given set whose sum is equal to total. A subset can be an empty set, or it can either consist of some elements of the set or all the elements of the set.
+Naive approach: all the possible combinations from the set, which makes our total. The recursive solution will be to check every element of the arr:
+If it does not contribute to making up the total, we ignore that number and proceed with the rest of the elements, i.e., subset_sum_rec(arr, n-1, total).
+OR
+If it does contribute to making up the total, we subtract the total from the current number and proceed with the rest of the elements till the given total is zero, i.e., subset_sum_rec(arr, n-1, total-arr[n-1]).
+O(2^n) - O(n)
+---
+Optimized solution
+Top-down solution: we will use a 2-D table dp that will store the computed results at each step. Whenever we encounter a subproblem whose value is already calculated, we will simply look up from the table instead of recalculating it. The last index of dp will contain the required output.
+O(n * m) - O(n * m)
+Bottom-up solution: A 2-D table of size [n + 1] * [total + 1] is used here. We will initialize the table so that the rows will represent the possible subsets, and the columns will show the total we need to achieve. At any given time, each column represents the amount that we have to calculate using the elements of the given set at the respective row. Now, there will be a check for each element as to whether it will contribute to making up the total or not.
+O(n * m) - O(n * m)
+'''
+# Naive
+def subset_sum(arr, total):
+    n = len(arr)
+    return subset_sum_rec(arr, n, total)
+
+# helper function
+def subset_sum_rec(arr, n, total): 
+    # base case
+    if total == 0:
+        return True
+    
+    if n == 0:
+        return False
+
+    if (arr[n-1] > total):
+        return subset_sum_rec(arr, n-1, total)
+
+    # We either exclude the element or include the element
+    return subset_sum_rec(arr, n-1, total) or subset_sum_rec(arr, n-1, total-arr[n-1])
+
+# Optimized
+# -- Top down
+def subset_sum(arr, total): # main function
+    n = len(arr)
+    dp = [[-1 for i in range(total + 1)] for j in range(n + 1)]
+    return subset_sum_rec(arr, n, total, dp)
+
+
+def subset_sum_rec(arr, n, total, dp): # helper function
+    # Base case
+    if total == 0:
+        return True
+    
+    if n == 0:
+        return False
+
+    # If we have solved it earlier, then return the result from memory
+    if dp[n][total] != -1:
+        return dp[n][total]
+
+    #Otherwise, we calculate it and store it for later use
+    if (arr[n-1] > total):
+        dp[n][total] = subset_sum_rec(arr, n-1, total, dp)
+        return dp[n][total]
+    
+    # We either exclude the element or include the element
+    dp[n][total] = subset_sum_rec(arr, n-1, total, dp) or subset_sum_rec(arr, n-1, total-arr[n-1], dp)
+    return dp[n][total]
+
+# -- Bottom up
+def subset_sum(arr, total): # main function
+    n = len(arr)
+    dp = [[False for i in range(total + 1)] for j in range(n + 1)]
+
+    # Bases cases
+    for i in range (n):
+        for j in range(total):
+            if i == 0:
+                dp[i][j] = False
+
+            if j == 0:
+                dp[i][j] = True
+
+    # solving for the total 
+    for i in range(1, n + 1):
+        for j in range(1, total + 1):
+            # if last element is greater than total we exclude it
+            if arr[i-1] > j:
+                dp[i][j] = dp[i-1][j]
+            else:
+                # otherwise we proceed on to rest of the elements
+                # we either exclude the element or include the element
+                dp[i][j] = dp[i-1][j] or dp[i-1][j-arr[i-1]]
+    
+    return dp[n][total]
