@@ -1523,4 +1523,98 @@ def count_ways(n):
     # Return the nth Fibonacci number
     return lookup_table[n]  
 
+## Number Factors
+'''
+Given a fixed list of numbers, [1,3,4], and a target number, n, count all the possible ways in which n can be expressed as the sum of the given numbers. If there is no possible way to represent n using the provided numbers, return 0.
+Naive approach: To reach a target number n, we have the following three possibilities:
+- Number of ways to reach n−1, as we can then add 1 to reach n
+- Number of ways to reach n−3, as we can then add 3 to reach n
+- Number of ways to reach n−4, as we can then add 4 to reach n
+These are all valid ways to reach the target number n. We can now sum them up to get all the possible ways in which n can be expressed as a sum of the available numbers.
+O(2^n) - O(n)
+---
+Optimized solution
+Top-down solution: O(n) - O(n)
+Bottom-up solution: We first create and initialize the fixed array, dp, that will store our results. Then, we set dp[0] to 1, which is our base case, that is, there is only one way to reach a target number of 0 by not choosing any of the available numbers.
+To calculate the final result, we sum up the number of ways to get the target numbers n−1, n−3, and n−4. This is similar to our recurrence relation. 
+During the calculations, if at any point, the remaining value needed to reach n becomes negative, we will simply return 0, as there is no way to reach a negative target number.
+O(n) - O(n)
+'''
+# Naive
+# Available numbers are 1, 3, and 4
+def count_ways(n):
+
+    # Setting up our base cases
+    # We can not get a negative target number at any point, 
+    # so we return 0 for negative values
+    if n < 0:
+        return 0
+
+    # There is only 1 way to reach a target number of 0, 
+    # by not using any available numbers
+    if n == 0:
+        return 1
+
+    # Recursively calculate the number of ways using the
+    # recurrence relation
+    return count_ways(n - 1) + count_ways(n - 3) + count_ways(n - 4)
+# Optimized
+# -- Top down
+# Available numbers are 1, 3, and 4
+def count_ways_rec(n, memo):
+
+    # Setting up our base cases
+    # We can not get a negative target number at any point, 
+    # so we return 0 for negative values
+    if n < 0:
+        return 0
+
+    # There is only 1 way to reach a target number of 0, 
+    # by not using any available numbers
+    if n == 0:
+        return 1
+
+    if memo[n] == -1:
+        # Recursively calculate the number of ways using the
+        # recurrence relation and store in memo
+        memo[n] = count_ways_rec(n - 1, memo) + count_ways_rec(n - 3, memo) + count_ways_rec(n - 4, memo)
+    
+    return memo[n]
+
+def count_ways(n):
+
+    # Initializing our solution array
+    memo = [-1 for x in range(n+1)]
+
+    # Set up the base case, 1 way to get to the number 0
+    memo[0] = 1
+
+    # Pass our array to the helper function
+    return count_ways_rec(n, memo)
+
+# -- Bottom up
+# Available numbers are 1, 2, and 4
+def count_ways(n):
+    # Initializing our solution array
+    dp = [0] * (n + 1)
+
+    # Each array index holds the number of ways to
+    # reach a number equal to the index
+    dp[0] = 1
+
+    # Variables to store sub-target numbers
+    n1 = n3 = n4 = 0
+
+    # Iteratively calculate the number of ways to reach a
+    # target number and store it in the solutions' array
+    for sn in range(1, n+1):
+        # Return 0 if index is less than 0, otherwise
+        # set to array value
+        n1 = 0 if sn - 1 < 0 else dp[sn - 1]
+        n3 = 0 if sn - 3 < 0 else dp[sn - 3]
+        n4 = 0 if sn - 4 < 0 else dp[sn - 4]
+
+        # Using our recurrence relation to calculate new answers
+        dp[sn] = n1 + n3 + n4
+    return dp[n]
 
