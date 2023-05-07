@@ -1444,3 +1444,83 @@ def get_fibonacci(n):
 
     return lookup_table[n]
 
+## Staircase Problem
+'''
+A child is running up a staircase with n steps and can hop either 1 step, 2 steps, or 3 steps at a time. Your task is to count the number of possible ways that the child can climb up the stairs.
+Naive approach: Given that you can only hop either 1, 2, or 3 steps at a time, we can say that the number of ways to climb n stairs is the sum of the following:
+the number of ways to reach the (n−1)th stair, as we can then hop 1 step to reach the nth stair 
+the number of ways to reach the (n−2)th stair, as we can then hop 2 steps to reach the nth stair 
+the number of ways to reach the (n−3)th stair, as we can then hop 3 steps to reach the nth stair
+We can now formulate our recursive algorithm to count the number of ways to climb n stairs:
+Base case 1: If n<0, there are no more steps left to climb, so we return 0.
+Base case 2: If n=0, we’re at the top of the staircase. As per the rules of the calculation, we return 1.
+Recursive case: The total number of ways that the child can hop the stairs is:
+countways(n - 1) + countways(n - 2) + countways(n - 3)
+O(3^n) - O(n)
+---
+Optimized Solution
+Top-down solution: O(n) - O(n)
+Bottom-up solution: O(n) - O(n)
+'''
+# Naive
+def count_ways(n):
+    # Base Conditions
+    if n < 0: 
+        return 0
+
+    elif n == 0:
+        return 1
+
+    # Check each possible combination
+    else:
+        return count_ways(n - 1) + count_ways(n - 2) + count_ways(n - 3)
+# Optimized
+# -- Top down
+def count_ways_rec(n, lookup_table):
+    # Negative staircases i.e., invalid input
+    if n < 0:  
+        return 0
+
+    # If 0 staircases
+    elif n == 0:  
+        return 1
+
+    # If already present in the table
+    elif lookup_table[n] > -1:  
+        return lookup_table[n]
+
+    # If not present in the table
+    else:   
+        lookup_table[n] = count_ways_rec(n - 1, lookup_table) +\
+                                         count_ways_rec(n - 2, lookup_table) +\
+                                         count_ways_rec(n - 3, lookup_table)
+    return lookup_table[n]
+
+
+def count_ways(n):
+    lookup_table = [-1 for x in range(n + 1)]
+    return count_ways_rec(n, lookup_table)
+
+# -- Bottom up
+def count_ways(n):
+    if n < 0:
+      return 0
+    if n==0:
+        return 1
+
+    # Initialize lookup table
+    lookup_table = [0 for x in range(n + 1)]  
+
+    # Setting the first three values
+    lookup_table[0] = 1  
+    lookup_table[1] = 1
+    lookup_table[2] = 2
+
+    for i in range(3, n + 1):
+        # Fill up the table by summing up previous three values
+        lookup_table[i] = lookup_table[i - 1] + lookup_table[i - 2] + lookup_table[i - 3]  
+        
+    # Return the nth Fibonacci number
+    return lookup_table[n]  
+
+
