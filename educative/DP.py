@@ -1881,3 +1881,64 @@ def tribonacci(n):
         dp[i] = dp[i - 1] + dp[i - 2] + dp[i - 3]
     
     return dp[n]
+
+## The Catalan Numbers
+'''
+Given a number n, find the nth Catalan number.
+Naive approach: O(3^n) - O(n)
+---
+Optimized Solution
+Top-down solution: O(n^2) - O(n)
+Bottom-up solution: O(n^2) - O(n)
+'''
+# Naive
+def catalan(n):
+  # base case; C(0) = 1
+  if n == 0:      
+    return 1
+  sum = 0
+  # iterate from 1...n to evaluate: C(0)*C(n-1) + C(1)*C(n-2) ... + C(n-1)*C(0)
+  for i in range(n):  
+    # C(i)*C(n-1-i)
+    sum += (catalan(i) * catalan(n-1-i))  
+  return sum
+
+# Optimized
+# -- Top down
+def catalan_memo(n, memo):
+  # base case; C(0) = 1
+  if n == 0:          
+    return 1
+  # if n already evaluated, return from memo
+  elif n in memo:       
+    return memo[n]
+  sum = 0
+  # iterate from 1...n to evaluate: C(0)*C(n-1) + C(1)*C(n-2) ... + C(n-1)*C(0)
+  for i in range(n):  
+     # C(i)*C(n-1-i)
+    sum += (catalan_memo(i, memo) * catalan_memo(n-1-i, memo)) 
+  # store result in memo
+  memo[n] = sum         
+  return memo[n]
+
+
+def catalan(n):
+  memo = {}
+  return catalan_memo(n, memo)
+
+# -- Bottom up
+def catalan(n):
+  # tabulating 
+  dp = [None] * (n+1)  
+  # handling the base case
+  dp[0] = 1            
+  # iterating to fill up the tabulation table
+  for i in range(1,n+1):  
+    # initializing the i-th value to 0
+    dp[i] = 0          
+    # iterate from 0 to i; according to formula of catalan i.e. 
+    # C0*Ci + C1*Ci-1 + ... Ci*C0
+    for j in range(i):
+      # C(j) * C(i-j-1)    
+      dp[i] += (dp[j] * dp[i-j-1]) 
+  return dp[n]  
