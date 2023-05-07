@@ -2098,3 +2098,76 @@ def find_min_jumps(nums):
         break
       
   return lookup[n - 1]
+
+## Minimum Jumps With Fee
+'''
+You are given n steps of stairs and a list fee because each step has a fee associated with it. Your task is to calculate the minimum fee required to reach the top of the stairs (beyond the top step), assuming you start with the first step. At every step, you can take 1 step, 2 steps, or 3 steps.
+Naive approach: We would then return the combination with the minimum fee:
+- If you hop 1 step, you have n−1 remaining steps.
+- If you hop 2 steps, then you have n−2 remaining steps.
+- If you hop 3 steps, then you have n−3 remaining steps.
+If you hop 1 step, you can hop 1, 2, or 3 steps again until n equals 0.
+O(3^n) - O(n)
+---
+Optimized Solution
+Top-down solution: O(n) - O(n)
+Bottom-up solution: O(n) - O(n)
+'''
+# Naive
+def min_fee(fee, n):
+  #Check if the number of steps are 0
+  if n < 1:
+    return 0
+
+  #calculate fee for each choice
+  one_step = fee[n-1] + min_fee(fee, n - 1)
+  two_step = fee[n-2] + min_fee(fee, n - 2)
+  three_step = fee[n-3] + min_fee(fee, n -3 )
+
+  #return the minimum fee from the three choices calculated above
+  return min(one_step, two_step, three_step)
+
+# Optimized
+# -- Top down
+def min_fee_rec(fee, n, lookup_array):
+  # If the number of steps get to 0
+  if n < 1:
+    return 0
+
+  # Check if the fee has already been calculated and stored in the lookup array
+  elif lookup_array[n] > -1:
+    return lookup_array[n]
+  
+  # Find the fee for each step and then storing the minimum in the array
+  else:
+    one_step = fee[n - 1] + min_fee_rec(fee, n - 1, lookup_array)
+    two_step = fee[n - 2] + min_fee_rec(fee, n - 2, lookup_array)
+    three_step = fee[n - 3] + min_fee_rec(fee, n - 3, lookup_array)
+    lookup_array[n] = min(one_step, two_step, three_step)
+    
+  return lookup_array[n]
+
+def min_fee(fee, n):
+  lookup_array = [-1 for x in range(n + 1)]
+  return min_fee_rec(fee, n, lookup_array)
+
+# -- Bottom up
+def min_fee(fee, n):
+
+  #Create a lookup array
+  lookup_array = [0 for x in range(n + 1)]
+
+  # Add the initial values to the array
+  lookup_array[0] = 0
+  lookup_array[1] = fee[0]
+  lookup_array[2] = fee[0] 
+
+  for i in range(3, n + 1):
+    # Fill up the table by finding the minimum of the previous three values
+    one_step = fee[i - 1] + lookup_array[i - 1]
+    two_step = fee[i - 2] + lookup_array[i - 2]
+    three_step = fee[i-3] + lookup_array[i - 3]
+    lookup_array[i] = min(one_step, two_step, three_step)
+    
+  return lookup_array[n]
+
