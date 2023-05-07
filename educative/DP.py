@@ -373,3 +373,128 @@ def count_subset_sum(nums, target_sum):
             lookup[current][required_sum] = sum1 + sum2
     
     return lookup[nums_len - 1][target_sum]
+
+## Partition Array Into Two Arrays to Minimize Sum Difference
+'''
+Suppose you are given an array, nums, containing positive numbers. You need to partition the array into two arrays such that the absolute difference between their sums is minimized.
+Naive approach: we divide the problem into subproblems, and for each array element, we decide whether to place it in the first or second partitioned array. This is done using the following rules:
+Base case: If we reach the end of the array, and there are no elements to add in either of the partitioned arrays, we return the absolute difference between the sums of the two arrays.
+Otherwise, we calculate the difference in the sums of the two arrays for the two scenarios:
+- add the current element to the first partitioned array
+- add it to the second partitioned array
+We then select the option that results in the minimum difference.
+O(2^n) - O(n)
+---
+Optimized solution
+Top-down solution: n the recursive approach, the following three variables kept changing:
+- The array index, i.
+- The sum of the first partitioned array, sum1.
+- The sum of the second partitioned array, sum2.
+We will use a 2-D table, dp with i rows, and sum1 + 1 columns to store the result, i.e., the difference between the sums of the partitioned arrays. We haven’t considered sum2 since, for a given i and sum1, sum2 of the remaining numbers will always be the same.
+O(n * S) - O(n * S)
+Bottom-up solution: Check solution
+'''
+# Naive
+# Helper function with updated signature: i is current index in nums
+# sums1 is the sum of the first partitioned array
+# sums2 is the sum of the second partitioned array
+def minimum_partition_array_sum_difference_helper(nums, i, sum1, sum2):
+
+    # Base case: If i becomes equal to the length of nums, there are no more
+    # elements left to add, so return the absolute difference between the
+    # two sums
+    if i == len(nums):
+        return abs(sum1 - sum2)
+
+    # Otherwise, recuresively calculate the minimum of adding the current
+    # array element to either the first, or second partitioned array
+    return min(
+        minimum_partition_array_sum_difference_helper(nums, i + 1, sum1 + nums[i], sum2),
+        minimum_partition_array_sum_difference_helper(nums, i + 1, sum1, sum2 + nums[i]),
+    )
+
+def minimum_partition_array_sum_difference(nums):
+    return minimum_partition_array_sum_difference_helper(nums, 0, 0, 0)
+
+# Optimized
+# -- Top down
+# Helper function with updated signature: i is current index in nums
+# sums1 is the sum of the first partitioned array
+# sums2 is the sum of the second partitioned array
+def minimum_partition_array_sum_difference_helper(nums, i, sum1, sum2, dp):
+    # Base case: If i becomes equal to the length of nums, there are no more
+    # elements left to add, so return the absolute difference between the
+    # two sums
+    if i == len(nums):
+        return abs(sum1 - sum2)
+
+    # If the 2-D array contains the default value of -1, update its value with the minimum of adding the current
+    # array element to either the first, or second partitioned array
+    if dp[i][sum1] == -1:
+
+        dp[i][sum1] = min(
+            minimum_partition_array_sum_difference_helper(
+                nums, i + 1, sum1 + nums[i], sum2, dp
+            ),
+            minimum_partition_array_sum_difference_helper(
+                nums, i + 1, sum1, sum2 + nums[i], dp
+            ),
+        )
+
+    # Return the value stored in the 2-D array if the sub-problem has already been computed
+    return dp[i][sum1]
+
+def minimum_partition_array_sum_difference(nums):
+    # Initializing the 2-D array
+    dp = [[-1 for x in range(sum(nums) + 1)] for y in range(len(nums))]
+
+    return minimum_partition_array_sum_difference_helper(nums, 0, 0, 0, dp)
+
+# -- Bottom up
+def minimum_partition_array_sum_difference(nums):
+
+    # Calculating the sum of the original array
+    sum_array = sum(nums)
+
+    # Calculating the number of rows and columns in the 2-D array
+    rows = len(nums)
+    cols = (sum_array // 2) + 1
+
+    # Initializing the 2-D array
+    dp = [[-1 for x in range(cols)] for y in range(rows)]
+
+    # The first column will be initialized to all 1s, since a sum s = 0
+    # will always be true if no elements are added to the subset
+    for i in range(rows):
+        dp[i][0] = 1
+
+    # For the first row, each entry will be 1 if the sum s is equal to the
+    # first element, and 0 otherwise
+    for s in range(1, cols):
+        dp[0][s] = nums[0] == s
+
+    # Iterating and filling the dp array
+    for i in range(1, rows):
+        for s in range(1, cols):
+            # Check if sum s can be obtained without nums[i] in the array
+            if dp[i - 1][s]:
+                dp[i][s] = dp[i - 1][s]
+
+            # Check if sum s can be obtained with nums[i] in the array
+            elif s >= nums[i]:
+                dp[i][s] = dp[i - 1][s - nums[i]]
+
+            # If neither of the above two conditions is true, sum s can not be
+            # obtained with nums[i] included in the array
+            else:
+                dp[i][s] = 0
+
+    # Find the largest index in the last row which is 1 and return the absolute
+    # difference between the two sums
+    for s in range(cols - 1, -1, -1):
+        if dp[rows - 1][s] == 1:
+            sum1 = s
+            sum2 = sum_array - sum1
+            return abs(sum2 - sum1)
+
+
