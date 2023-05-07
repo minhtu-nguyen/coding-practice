@@ -498,3 +498,149 @@ def minimum_partition_array_sum_difference(nums):
             return abs(sum2 - sum1)
 
 
+## Minimum Number of Refueling Stops
+'''
+You need to find the minimum number of refueling stops that a car needs to make to cover a distance, target. For simplicity, assume that the car has to travel from west to east in a straight line. There are various fuel stations on the way, that are represented as a 2-D array of stations, i.e., stations[i] = [di,fi], where di is the distance in miles of the ith gas station from the starting position, and fi is the amount of fuel in liters that it stores. Initially, the car starts with k liters of fuel. The car consumes one liter of fuel for every mile traveled. Upon reaching a gas station, the car can stop and refuel using all the petrol stored at the station. In case it cannot reach the target, the program simply returns −1.
+Naive approach: O(n * 2^n) - O(n)
+Optimized solution: O(n^2) - O(n^2)
+'''
+#Naive
+import math
+
+# This function finds the maximum distance that can be travelled 
+# by making "used" refuelling stops, considering fuel stations from index "index" onwards.
+def min_refuel_stops_helper(index, used, cur_fuel, stations):
+    # If no refuelling stops are made, return the current fuel level.
+    if used == 0:
+        return cur_fuel
+
+    # If more refuelling stops are made than the number of fuel stations remaining,
+    # return -inf (impossible to reach the target distance).
+    if used > index:
+        return -math.inf
+
+    # Consider two options:
+    # 1. Don't make a refuelling stop at the current fuel station.
+    result1 = min_refuel_stops_helper(index - 1, used, cur_fuel, stations)
+
+    # 2. Make a refuelling stop at the current fuel station.
+    result2 = min_refuel_stops_helper(index - 1, used - 1, cur_fuel, stations)
+    
+    # Return the maximum of the two options, but if the fuel at the current fuel station
+    # is not enough to reach the next fuel station, return -inf (impossible to reach the target distance).
+    result = max(result1, -math.inf if result2 < stations[index - 1][0] else result2 + stations[index - 1][1])
+    return result
+
+# This function finds the minimum number of refuelling stops needed 
+# to reach the target distance, given a starting fuel level and a list of fuel stations.
+def min_refuel_stops(target, start_fuel, stations):
+        
+    n = len(stations)
+    i = 0
+    # Initialize an array to store the maximum distance that can be travelled
+    # for each number of refuelling stops.
+    max_d = [-1 for i in range(n+1)]
+    # Find the maximum distance that can be travelled for each number of refuelling stops.
+    while i <= n:
+        max_d[i] = min_refuel_stops_helper(n, i, start_fuel, stations);
+        i += 1
+    result = -1
+    i = 0
+    # Find the minimum number of refuelling stops needed by iterating over max_d
+    # and finding the first value that is greater than or equal to the target distance.
+    while i <= n:
+        if max_d[i] >= target:
+            result = i
+            break
+        i += 1
+    return result
+
+# Optimized
+# -- Top down
+# This function finds the maximum distance that can be travelled 
+# by making "used" refuelling stops, considering fuel stations from index "index" onwards.
+def min_refuel_stops_helper(index, used, cur_fuel, stations, memo):
+    # If no refuelling stops are made, memoize and return the current fuel level.
+    if used == 0:
+        memo[index][used] = cur_fuel
+        return memo[index][used]
+
+    # If more refuelling stops are made than the number of fuel stations remaining,
+    # memoize and return -inf (impossible to reach the target distance).
+    if used > index:
+        memo[index][used] = -math.inf
+        return memo[index][used]
+
+    # if the solution already exists in the memo
+    # return the result of the solution from memo
+    if memo[index][used] != -1:
+        return memo[index][used]
+
+    # Consider two options:
+    # 1. Don't make a refuelling stop at the current fuel station.
+    result1 = min_refuel_stops_helper(index - 1, used, cur_fuel, stations, memo)
+
+    # Make a refuelling stop at the current fuel station
+    result2 = min_refuel_stops_helper(index - 1, used - 1, cur_fuel, stations, memo)
+    
+    # Memoize and return the maximum of the two options, but if the fuel at the current fuel station
+    # is not enough to reach the next fuel station, return -inf (impossible to reach the target distance).
+    memo[index][used] = max(result1, -math.inf if result2 < stations[index - 1][0] else result2 + stations[index - 1][1])
+    return memo[index][used]
+    
+# This function finds the minimum number of refuelling stops needed 
+# to reach the target distance, given a starting fuel level and a list of fuel stations.
+def min_refuel_stops(target, start_fuel, stations):
+        
+    n = len(stations)
+    # Initialize an array to store the maximum distance that can be travelled
+    # for each number of refuelling stops.
+    memo = [[-1 for i in range(n+1)] for j in range(n+1)]
+    i = 0
+    # Find the maximum distance that can be travelled for each number of refuelling stops.
+    while i <= n:
+        min_refuel_stops_helper(n, i, start_fuel, stations, memo);
+        i += 1
+    result = -1
+    i = 0
+    # Find the minimum number of refuelling stops needed by iterating over memo
+    # and finding the first value that is greater than or equal to the target distance.
+    while i <= n:
+        if memo[n][i] >= target:
+            result = i
+            break
+        i += 1
+    return result
+  
+## -- Bottom up
+def min_refuel_stops(target, start_fuel, stations):
+        n = len(stations)
+        # creating an array to store the maximum distances
+        dp = [[0] * (n + 1) for _ in range(n + 1)]
+        i = 0
+        # fill up the first column of the table with the start fuel.
+        while (i <= n):
+            dp[i][0] = start_fuel
+            i += 1
+        i = 1
+        # iterating over all the stations from i = 1 to n
+        while (i <= n):
+            j = 1
+            # checking fueling stops from j = 1 to j = i
+            while (j <= i):
+                # refuel at current station
+                if (dp[i - 1][j - 1] >= stations[i - 1][0]):
+                    dp[i][j] = max(dp[i - 1][j], dp[i - 1][j - 1] + stations[i - 1][1])
+                # not refuel at current station
+                else:
+                    dp[i][j] = dp[i - 1][j]
+                j += 1
+            i += 1
+        i = 0
+        # After visiting all the stations, find minimum `j`
+        while (i <= n):
+            if (dp[n][i] >= target) :
+                return i
+            i += 1
+        return -1
+
