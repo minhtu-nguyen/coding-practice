@@ -2171,3 +2171,71 @@ def min_fee(fee, n):
     
   return lookup_array[n]
 
+## Minimum Jumps With Fee
+'''
+You are given a chain of matrices to be multiplied. You have to find the least number of primitive multiplications needed to evaluate the result.
+Naive approach: We can easily imagine dims to be a list of matrices. Then each recursive call tries to find the optimal placement of two parentheses between these matrices. So, let’s say we have the following sequence of matrices: A1A2A3A4. Each recursive call tries to place two parentheses, so we have the following possibilities:
+- (A1)A2A3A4
+- (A1A2)A3A4
+- (A1A2A3)A4
+Therefore, we make recursive calls for all these possibilities and finally choose the best one from among them.
+O(n2^n) - O(n)
+---
+Optimized solution
+Top-down solution:  The important bit is our choice of key for memoization, which we have created by using a tuple of i and j. Since i and j can uniquely identify a subarray from dims, a tuple of these two variables fits perfectly for the key. If we had used an indexing approach to get the subarray, we wouldn’t be able to memoize our results. This is because lists cannot be used as a key in dictionaries.
+O(n^3) - O(n^2)
+Bottom-up solution: the dp table, it is a 2-D list of dimensions n×n (where � n is the length of dims), where dp[i][j], for any i, j <n , denotes the minimum number of multiplications required to multiply a chain of matrices formed between i and j. Now, we need to find a sequence in which we fill the dp table so that no value is needed before it is evaluated. We know from our previous solution that we should start from the base case of a single matrix’s multiplication. This we have covered in our initialization of dp by setting everything to 0 0 . Next, we need to handle the cases for multiplications of the chains of size 2 2 , since these will be used by all the bigger problems. After 2 2 , we will need to fill for chains of size 3 3 , and so on. The nested for loops are simply calculating the optimal answer in the same way as the previous solutions, i.e., by finding the minimum cumulative value from all the subproblems.
+O(n^3) - O(n^2)
+'''
+# Naive
+def min_multiplications(dims):
+    # Base case
+    if len(dims) <= 2:
+        return 0
+    minimum = math.inf  # Init with maximum integer value
+    for i in range(1,len(dims)-1): # Recursive calls for all the possible multiplication sequences
+        minimum = min(minimum, 
+                    min_multiplications(dims[0:i+1]) +  # solve the subproblem up to the ith matrix
+                    min_multiplications(dims[i:]) +     # solve the subproblem from the i+1th matrix to the last
+                    dims[0] * dims[i] * dims[-1])       # calculate the number of multiplications for the 
+                                                        # current pair of matrices with dimensions dims[0]xdims[i] and dims[i]xdims[-1]
+    return minimum
+
+# Optimized
+# -- Top down
+def min_multiplications_recursive(dims, i, j):
+    # Base case
+    if j-i <= 2:
+        return 0
+    minimum = math.inf # Init with maximum integer value
+    for k in range(i+1, j-1): # Recursive calls for all the possible multiplication sequences
+        minimum = min(minimum, min_multiplications_recursive(dims, i, k+1) + # solve the subproblem from ith up to the kth matrix
+        min_multiplications_recursive(dims, k, j) +                          # solve the subproblem from the k+1th matrix to the jth matrix
+        dims[i] * dims[k] * dims[j-1])                                       # calculate the number of multiplications for the 
+                                                                             # current pair of matrices with dimensions dims[i]xdims[k] and dims[k]xdims[j-1]
+    return minimum
+
+def min_multiplications(dims):
+    return min_multiplications_recursive(dims, 0, len(dims))
+
+# -- Bottom up
+def min_multiplications_recursive(dims, i, j, memo):
+    # Base case
+    if j-i <= 2:
+        return 0
+    if (i,j) in memo:
+        return memo[(i,j)]
+    minimum = math.inf # Init with maximum integer value
+    for k in range(i+1, j-1): # Recursive calls for all the possible multiplication sequences
+        minimum = min(minimum, min_multiplications_recursive(dims, i, k+1, memo) + # solve the subproblem from ith up to the kth matrix
+        min_multiplications_recursive(dims, k, j, memo) +                          # solve the subproblem from the k+1th matrix to the jth matrix
+        dims[i] * dims[k] * dims[j-1])                                             # calculate the number of multiplications for the 
+                                                                                   # current pair of matrices with dimensions dims[0]xdims[i] and dims[i]xdims[-1]
+    memo[(i,j)] = minimum # Storing the minimum value to the memo
+    return minimum
+
+def min_multiplications(dims):
+    memo = {}
+    return min_multiplications_recursive(dims, 0, len(dims), memo)
+
+## 
