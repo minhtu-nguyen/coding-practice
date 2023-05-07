@@ -781,4 +781,118 @@ def can_partition_array(nums):
     # Return the answer
     return dp[nums_len][target_sum]
 
+## Count Square Submatrices
+'''
+Given a matrix containing only ones and zeros, count the total number of square submatrices that contain only ones.
+If the matrix is empty, then return 0.
+Naive approach: We iterate over the entire matrix and at each cell, we check if the value is 0 or 1. If the value is 1, we call the helper function which returns the count of square submatrices with all ones starting from the current cell. In the helper function, we perform the following tasks:
+If the value of the current cell is 1, the helper function is called recursively for its right, bottom and bottom-right cells. We then take the minimum of the returned values and add 1. Taking the minimum value ensures that we are only considering square submatrices and 1 is added to count the cell itself as it is also a 1×1 square submatrix.
+If the value of the current cell is 0, we return 0 as there is no possible square submatrice with all ones starting from this cell. Similarly, if the indices are out range, we return 0.
+O(m * n * 3^mn)
+Optimised solution
+Top-down solution: O(m * n) - O(m * n)
+Bottom-up solution: We create a lookup table of size m×n and copy the first row and column of the input matrix to the lookup table. We iterate over the remaining matrix, starting from matrix[1][1], and find the number of squares ending at the current cell and store them in the lookup table. To find the number of squares ending at the current cell, we can use the following recurrence relation:
+- If matrix[i][j] == 0, then there is no possible square so we skip this iteration.
+- If matrix[i][j] == 1, then we compare the size of the squares lookup_table[i-1][j-1], lookup_table[i-1][j], and lookup_table[i][j-1] and take the minimum of all three values and then, add 1 to it.
+Finally, we calculate the sum of the lookup table which is equal to the number of square submatrices with all 1’s.
+O(m * n) - O(m * n)
+'''
+# Naive
+def count_squares(matrix):
+    m = len(matrix)
+    n = len(matrix[0])
+    res = 0
+
+    # iterate over the entire matrix
+    for i in range(m):
+        for j in range(n):
+            # if the value of the cell is 1, call the helper function
+            if matrix[i][j] == 1:
+                res += count_squares_rec(matrix, i, j, m, n)
+    
+    return res
+
+# helper function
+def count_squares_rec(matrix, i, j, m, n):
+    # if the indices are out of range or the value of the cell is 0, return 0
+    if i >= m or j >= n or matrix[i][j] == 0:
+        return 0
+    
+    # call the function recursively for the right, bottom and bottom right cells
+    right = count_squares_rec(matrix, i, j+1, m, n)
+    bottom = count_squares_rec(matrix, i+1, j, m, n)
+    bottom_right = count_squares_rec(matrix, i+1, j+1, m, n)
+
+    # return 1 plus the minimum of the three recursive calls
+    return 1 + min(right, bottom, bottom_right)
+
+# Optimized 
+# -- Top down
+def count_squares(matrix):
+    m = len(matrix)
+    n = len(matrix[0])
+
+    # lookup table to store the results of our subproblems
+    lookup_table = lookup_table = [[-1 for x in range(n)] for x in range(m)]
+    res = 0
+
+    # iterate over the entire matrix
+    for i in range(m):
+        for j in range(n):
+            # if the value of the cell is 1 and the lookup table does not have
+            # the result stored alreayd, call the helper function
+            if matrix[i][j] == 1 and lookup_table[i][j] == -1:
+                res += count_squares_rec(matrix, i, j, m, n, lookup_table)
+            elif lookup_table[i][j] != -1:
+                res += lookup_table[i][j]
+    
+    return res
+
+# helper function
+def count_squares_rec(matrix, i, j, m, n, lookup_table):
+    # if the indices are out of range or the value of the cell is 0, return 0
+    if i >= m or j >= n or matrix[i][j] == 0:
+        return 0
+    
+    # call the function recursively for the right, bottom and bottom right cells
+    # if the result is not already stored in the lookup table
+    if lookup_table[i][j] == -1:
+        lookup_table[i][j] = 1 + min(count_squares_rec(matrix, i, j+1, m, n, lookup_table), count_squares_rec(matrix, i+1, j, m, n, lookup_table), count_squares_rec(matrix, i+1, j+1, m, n, lookup_table))
+    
+    return lookup_table[i][j]
+
+# -- Bottom up
+def count_squares(matrix):
+	# if the matrix is empty, return 0
+	if len(matrix) == 0 or len(matrix[0]) == 0:
+		return 0
+	
+	# create lookup table to store number of squares
+	lookup_table = [[0 for x in range(len(matrix[0]))] for x in range(len(matrix))]
+	result = 0
+
+	# copy first row and column of input matrix to lookup table
+	for i in range(len(matrix)):
+	    lookup_table[i][0] = matrix[i][0]
+	for i in range(len(matrix[0])):
+	    lookup_table[0][i] = matrix[0][i]
+
+	# iterate over the matrix and store the count od squares in lookup_table
+	for i in range(1, len(matrix)):
+		for j in range(1, len(matrix[0])):
+			# If matrix[i][j] is equal to 0
+			if (matrix[i][j] == 0):
+				continue
+
+			# there is at least one square submatrix at this location, hence the + 1
+			# in addition, find the minimum number of square submatrices 
+			# whose bottom-right corner is one of the neighbours of this location.
+			lookup_table[i][j] = 1 + min(lookup_table[i - 1][j], lookup_table[i][j - 1], lookup_table[i - 1][j - 1])
+	
+	# sum up the values in the lookup_table to get the count of square submatrices
+	for i in range(0, len(lookup_table)):
+		for j in range(0, len(lookup_table[0])):
+			result += lookup_table[i][j]
+	
+	return result
 
