@@ -739,7 +739,7 @@ def can_partition_array(nums):
     return is_subarray_sum(nums, 0, target_sum)
   
   # -- Bottom up
-  def can_partition_array(nums):
+def can_partition_array(nums):
     array_sum = sum(nums)
 
     # if 'array_sum' is an odd number, we can't have 
@@ -863,36 +863,130 @@ def count_squares_rec(matrix, i, j, m, n, lookup_table):
 
 # -- Bottom up
 def count_squares(matrix):
-	# if the matrix is empty, return 0
-	if len(matrix) == 0 or len(matrix[0]) == 0:
-		return 0
-	
-	# create lookup table to store number of squares
-	lookup_table = [[0 for x in range(len(matrix[0]))] for x in range(len(matrix))]
-	result = 0
+    # if the matrix is empty, return 0
+    if len(matrix) == 0 or len(matrix[0]) == 0:
+      return 0
 
-	# copy first row and column of input matrix to lookup table
-	for i in range(len(matrix)):
-	    lookup_table[i][0] = matrix[i][0]
-	for i in range(len(matrix[0])):
-	    lookup_table[0][i] = matrix[0][i]
+    # create lookup table to store number of squares
+    lookup_table = [[0 for x in range(len(matrix[0]))] for x in range(len(matrix))]
+    result = 0
 
-	# iterate over the matrix and store the count od squares in lookup_table
-	for i in range(1, len(matrix)):
-		for j in range(1, len(matrix[0])):
-			# If matrix[i][j] is equal to 0
-			if (matrix[i][j] == 0):
-				continue
+    # copy first row and column of input matrix to lookup table
+    for i in range(len(matrix)):
+        lookup_table[i][0] = matrix[i][0]
+    for i in range(len(matrix[0])):
+        lookup_table[0][i] = matrix[0][i]
 
-			# there is at least one square submatrix at this location, hence the + 1
-			# in addition, find the minimum number of square submatrices 
-			# whose bottom-right corner is one of the neighbours of this location.
-			lookup_table[i][j] = 1 + min(lookup_table[i - 1][j], lookup_table[i][j - 1], lookup_table[i - 1][j - 1])
-	
-	# sum up the values in the lookup_table to get the count of square submatrices
-	for i in range(0, len(lookup_table)):
-		for j in range(0, len(lookup_table[0])):
-			result += lookup_table[i][j]
-	
-	return result
+    # iterate over the matrix and store the count od squares in lookup_table
+    for i in range(1, len(matrix)):
+      for j in range(1, len(matrix[0])):
+        # If matrix[i][j] is equal to 0
+        if (matrix[i][j] == 0):
+          continue
 
+        # there is at least one square submatrix at this location, hence the + 1
+        # in addition, find the minimum number of square submatrices 
+        # whose bottom-right corner is one of the neighbours of this location.
+        lookup_table[i][j] = 1 + min(lookup_table[i - 1][j], lookup_table[i][j - 1], lookup_table[i - 1][j - 1])
+
+    # sum up the values in the lookup_table to get the count of square submatrices
+    for i in range(0, len(lookup_table)):
+      for j in range(0, len(lookup_table[0])):
+        result += lookup_table[i][j]
+
+    return result
+
+### *** Unbounded Knapsack
+## Unbounded Knapsack 
+'''
+Suppose you have a list of weights and corresponding values for n items. Each item will have a weight and a certain value associated with it. You have a knapsack that can carry items up to a specific maximum weight, known as the capacity of the knapsack.
+You want to maximize the sum of values of the items in your knapsack while ensuring that the sum of the weights of the items remains less than or equal to the knapsack’s capacity. If all the combinations exceed the given knapsack’s capacity, return 0.
+Naive approach: O(2^n) - O(n)
+---
+Optimized solution
+Top-down solution: O(n * W) - O(n * W)
+Bottom-up solution:  O(n * W) - O(n * W)
+'''
+# Naive
+def unbounded_knapsack_rec(weights, values, n, capacity):
+    # Base case
+    if(n == 0):
+        return (capacity//weights[0]) * values[0]
+    
+    # Check if the weight of the nth item is less than capacity 
+    # If it is, we have two choices
+    # 1) Include the item 
+    # 2) Don't include the item
+    if(weights[n] <= capacity):
+        taken = values[n] + unbounded_knapsack_rec(weights,values,n,capacity-weights[n])
+        not_taken = 0 + unbounded_knapsack_rec(weights, values, n-1, capacity)
+        
+        # As we want to maximize the profit, we take maximum of the two options
+        return max(taken, not_taken)
+    
+    # If weight of the nth item is greater than the capacity
+    # Don't include the item
+    else:
+        return unbounded_knapsack_rec(weights, values, n-1, capacity)
+    
+def unbounded_knapsack(weights, values, n, capacity):
+    return unbounded_knapsack_rec(weights, values, n-1, capacity)
+
+# Optimized
+# -- Top down
+def unbounded_knapsack_rec(weights, values, n, capacity, dp):
+    # Base case
+    if(n == 0):
+        return (capacity//weights[0]) * values[0]
+    
+    # If we have solved it earlier, then return the result from memory
+    if dp[n][capacity] != -1:
+        return dp[n][capacity]
+
+    # Check if the weight of the nth item is less than capacity 
+    # If it is, we have two choices
+    # 1) Include the item 
+    # 2) Don't include the item
+    if(weights[n] <= capacity):
+        taken = values[n] + unbounded_knapsack_rec(weights, values, n, capacity-weights[n], dp)
+        not_taken = 0 + unbounded_knapsack_rec(weights, values, n-1, capacity, dp)
+        # As we want to maximize the profit, we take maximum of the two values
+        dp[n][capacity] = max(taken, not_taken)
+    
+    # If weight of the nth item is greater than the capacity
+    # Don't include the item
+    else:
+        dp[n][capacity] = unbounded_knapsack_rec(weights, values, n-1, capacity, dp)
+        
+    return dp[n][capacity]
+    
+def unbounded_knapsack(weights, values, n, capacity):
+    dp = [[-1 for i in range(capacity + 1)] for j in range(n + 1)]
+    return unbounded_knapsack_rec(weights, values, n-1, capacity, dp)
+
+# -- Bottom up
+def unbounded_knapsack(weights, values, n, capacity):
+    dp = [[0 for i in range(capacity + 1)] for j in range(n + 1)]
+    
+    # Base case
+    for i in range(weights[0], capacity+1):
+        dp[0][i] = (i//weights[0]) * values[0]
+    
+    for i in range(1,n):
+        for j in range(0,capacity+1):
+
+            # Check if the weight of the nth item is less than capacity 
+            # If it is, we have two choices
+            # 1) Include the item 
+            # 2) Don't include the item
+            if (weights[i] <= j):
+                taken = values[i]+ dp[i][j-weights[i]]
+                not_taken = 0 + dp[i-1][j]
+                dp[i][j] = max(taken, not_taken)
+                
+            # If weight of the nth item is greater than the capacity
+            # Don't include the item
+            else:
+                dp[i][j] = dp[i-1][j]
+ 
+    return dp[n-1][capacity]
