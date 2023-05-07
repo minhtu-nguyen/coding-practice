@@ -3216,3 +3216,3438 @@ if __name__ == "__main__":
     else:
         print("Not found")
 
+### *** Sorts
+## Bead Sort
+"""
+Bead sort only works for sequences of non-negative integers.
+https://en.wikipedia.org/wiki/Bead_sort
+"""
+
+
+def bead_sort(sequence: list) -> list:
+    """
+    >>> bead_sort([6, 11, 12, 4, 1, 5])
+    [1, 4, 5, 6, 11, 12]
+
+    >>> bead_sort([9, 8, 7, 6, 5, 4 ,3, 2, 1])
+    [1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+    >>> bead_sort([5, 0, 4, 3])
+    [0, 3, 4, 5]
+
+    >>> bead_sort([8, 2, 1])
+    [1, 2, 8]
+
+    >>> bead_sort([1, .9, 0.0, 0, -1, -.9])
+    Traceback (most recent call last):
+        ...
+    TypeError: Sequence must be list of non-negative integers
+
+    >>> bead_sort("Hello world")
+    Traceback (most recent call last):
+        ...
+    TypeError: Sequence must be list of non-negative integers
+    """
+    if any(not isinstance(x, int) or x < 0 for x in sequence):
+        raise TypeError("Sequence must be list of non-negative integers")
+    for _ in range(len(sequence)):
+        for i, (rod_upper, rod_lower) in enumerate(zip(sequence, sequence[1:])):
+            if rod_upper > rod_lower:
+                sequence[i] -= rod_upper - rod_lower
+                sequence[i + 1] += rod_upper - rod_lower
+    return sequence
+
+
+if __name__ == "__main__":
+    assert bead_sort([5, 4, 3, 2, 1]) == [1, 2, 3, 4, 5]
+    assert bead_sort([7, 9, 4, 3, 5]) == [3, 4, 5, 7, 9]
+
+## Bitonic Sort
+"""
+Python program for Bitonic Sort.
+
+Note that this program works only when size of input is a power of 2.
+"""
+from __future__ import annotations
+
+
+def comp_and_swap(array: list[int], index1: int, index2: int, direction: int) -> None:
+    """Compare the value at given index1 and index2 of the array and swap them as per
+    the given direction.
+
+    The parameter direction indicates the sorting direction, ASCENDING(1) or
+    DESCENDING(0); if (a[i] > a[j]) agrees with the direction, then a[i] and a[j] are
+    interchanged.
+
+    >>> arr = [12, 42, -21, 1]
+    >>> comp_and_swap(arr, 1, 2, 1)
+    >>> arr
+    [12, -21, 42, 1]
+
+    >>> comp_and_swap(arr, 1, 2, 0)
+    >>> arr
+    [12, 42, -21, 1]
+
+    >>> comp_and_swap(arr, 0, 3, 1)
+    >>> arr
+    [1, 42, -21, 12]
+
+    >>> comp_and_swap(arr, 0, 3, 0)
+    >>> arr
+    [12, 42, -21, 1]
+    """
+    if (direction == 1 and array[index1] > array[index2]) or (
+        direction == 0 and array[index1] < array[index2]
+    ):
+        array[index1], array[index2] = array[index2], array[index1]
+
+
+def bitonic_merge(array: list[int], low: int, length: int, direction: int) -> None:
+    """
+    It recursively sorts a bitonic sequence in ascending order, if direction = 1, and in
+    descending if direction = 0.
+    The sequence to be sorted starts at index position low, the parameter length is the
+    number of elements to be sorted.
+
+    >>> arr = [12, 42, -21, 1]
+    >>> bitonic_merge(arr, 0, 4, 1)
+    >>> arr
+    [-21, 1, 12, 42]
+
+    >>> bitonic_merge(arr, 0, 4, 0)
+    >>> arr
+    [42, 12, 1, -21]
+    """
+    if length > 1:
+        middle = int(length / 2)
+        for i in range(low, low + middle):
+            comp_and_swap(array, i, i + middle, direction)
+        bitonic_merge(array, low, middle, direction)
+        bitonic_merge(array, low + middle, middle, direction)
+
+
+def bitonic_sort(array: list[int], low: int, length: int, direction: int) -> None:
+    """
+    This function first produces a bitonic sequence by recursively sorting its two
+    halves in opposite sorting orders, and then calls bitonic_merge to make them in the
+    same order.
+
+    >>> arr = [12, 34, 92, -23, 0, -121, -167, 145]
+    >>> bitonic_sort(arr, 0, 8, 1)
+    >>> arr
+    [-167, -121, -23, 0, 12, 34, 92, 145]
+
+    >>> bitonic_sort(arr, 0, 8, 0)
+    >>> arr
+    [145, 92, 34, 12, 0, -23, -121, -167]
+    """
+    if length > 1:
+        middle = int(length / 2)
+        bitonic_sort(array, low, middle, 1)
+        bitonic_sort(array, low + middle, middle, 0)
+        bitonic_merge(array, low, length, direction)
+
+
+if __name__ == "__main__":
+    user_input = input("Enter numbers separated by a comma:\n").strip()
+    unsorted = [int(item.strip()) for item in user_input.split(",")]
+
+    bitonic_sort(unsorted, 0, len(unsorted), 1)
+    print("\nSorted array in ascending order is: ", end="")
+    print(*unsorted, sep=", ")
+
+    bitonic_merge(unsorted, 0, len(unsorted), 0)
+    print("Sorted array in descending order is: ", end="")
+    print(*unsorted, sep=", ")
+
+## Bogo Sort
+"""
+This is a pure Python implementation of the bogosort algorithm,
+also known as permutation sort, stupid sort, slowsort, shotgun sort, or monkey sort.
+Bogosort generates random permutations until it guesses the correct one.
+
+More info on: https://en.wikipedia.org/wiki/Bogosort
+
+For doctests run following command:
+python -m doctest -v bogo_sort.py
+or
+python3 -m doctest -v bogo_sort.py
+For manual testing run:
+python bogo_sort.py
+"""
+
+import random
+
+
+def bogo_sort(collection):
+    """Pure implementation of the bogosort algorithm in Python
+    :param collection: some mutable ordered collection with heterogeneous
+    comparable items inside
+    :return: the same collection ordered by ascending
+    Examples:
+    >>> bogo_sort([0, 5, 3, 2, 2])
+    [0, 2, 2, 3, 5]
+    >>> bogo_sort([])
+    []
+    >>> bogo_sort([-2, -5, -45])
+    [-45, -5, -2]
+    """
+
+    def is_sorted(collection):
+        for i in range(len(collection) - 1):
+            if collection[i] > collection[i + 1]:
+                return False
+        return True
+
+    while not is_sorted(collection):
+        random.shuffle(collection)
+    return collection
+
+
+if __name__ == "__main__":
+    user_input = input("Enter numbers separated by a comma:\n").strip()
+    unsorted = [int(item) for item in user_input.split(",")]
+    print(bogo_sort(unsorted))
+
+## Bubble Sort
+def bubble_sort(collection):
+    """Pure implementation of bubble sort algorithm in Python
+
+    :param collection: some mutable ordered collection with heterogeneous
+    comparable items inside
+    :return: the same collection ordered by ascending
+
+    Examples:
+    >>> bubble_sort([0, 5, 2, 3, 2])
+    [0, 2, 2, 3, 5]
+    >>> bubble_sort([0, 5, 2, 3, 2]) == sorted([0, 5, 2, 3, 2])
+    True
+    >>> bubble_sort([]) == sorted([])
+    True
+    >>> bubble_sort([-2, -45, -5]) == sorted([-2, -45, -5])
+    True
+    >>> bubble_sort([-23, 0, 6, -4, 34]) == sorted([-23, 0, 6, -4, 34])
+    True
+    >>> bubble_sort(['d', 'a', 'b', 'e', 'c']) == sorted(['d', 'a', 'b', 'e', 'c'])
+    True
+    >>> import random
+    >>> collection = random.sample(range(-50, 50), 100)
+    >>> bubble_sort(collection) == sorted(collection)
+    True
+    >>> import string
+    >>> collection = random.choices(string.ascii_letters + string.digits, k=100)
+    >>> bubble_sort(collection) == sorted(collection)
+    True
+    """
+    length = len(collection)
+    for i in range(length - 1):
+        swapped = False
+        for j in range(length - 1 - i):
+            if collection[j] > collection[j + 1]:
+                swapped = True
+                collection[j], collection[j + 1] = collection[j + 1], collection[j]
+        if not swapped:
+            break  # Stop iteration if the collection is sorted.
+    return collection
+
+
+if __name__ == "__main__":
+    import doctest
+    import time
+
+    doctest.testmod()
+
+    user_input = input("Enter numbers separated by a comma:").strip()
+    unsorted = [int(item) for item in user_input.split(",")]
+    start = time.process_time()
+    print(*bubble_sort(unsorted), sep=",")
+    print(f"Processing time: {(time.process_time() - start)%1e9 + 7}")
+
+## Bucket Sort
+#!/usr/bin/env python3
+"""
+Illustrate how to implement bucket sort algorithm.
+
+Author: OMKAR PATHAK
+This program will illustrate how to implement bucket sort algorithm
+
+Wikipedia says: Bucket sort, or bin sort, is a sorting algorithm that works
+by distributing the elements of an array into a number of buckets.
+Each bucket is then sorted individually, either using a different sorting
+algorithm, or by recursively applying the bucket sorting algorithm. It is a
+distribution sort, and is a cousin of radix sort in the most to least
+significant digit flavour.
+Bucket sort is a generalization of pigeonhole sort. Bucket sort can be
+implemented with comparisons and therefore can also be considered a
+comparison sort algorithm. The computational complexity estimates involve the
+number of buckets.
+
+Time Complexity of Solution:
+Worst case scenario occurs when all the elements are placed in a single bucket.
+The overall performance would then be dominated by the algorithm used to sort each
+bucket. In this case, O(n log n), because of TimSort
+
+Average Case O(n + (n^2)/k + k), where k is the number of buckets
+
+If k = O(n), time complexity is O(n)
+
+Source: https://en.wikipedia.org/wiki/Bucket_sort
+"""
+from __future__ import annotations
+
+
+def bucket_sort(my_list: list) -> list:
+    """
+    >>> data = [-1, 2, -5, 0]
+    >>> bucket_sort(data) == sorted(data)
+    True
+    >>> data = [9, 8, 7, 6, -12]
+    >>> bucket_sort(data) == sorted(data)
+    True
+    >>> data = [.4, 1.2, .1, .2, -.9]
+    >>> bucket_sort(data) == sorted(data)
+    True
+    >>> bucket_sort([]) == sorted([])
+    True
+    >>> import random
+    >>> collection = random.sample(range(-50, 50), 50)
+    >>> bucket_sort(collection) == sorted(collection)
+    True
+    """
+    if len(my_list) == 0:
+        return []
+    min_value, max_value = min(my_list), max(my_list)
+    bucket_count = int(max_value - min_value) + 1
+    buckets: list[list] = [[] for _ in range(bucket_count)]
+
+    for i in my_list:
+        buckets[int(i - min_value)].append(i)
+
+    return [v for bucket in buckets for v in sorted(bucket)]
+
+
+if __name__ == "__main__":
+    from doctest import testmod
+
+    testmod()
+    assert bucket_sort([4, 5, 3, 2, 1]) == [1, 2, 3, 4, 5]
+    assert bucket_sort([0, 1, -10, 15, 2, -2]) == [-10, -2, 0, 1, 2, 15]
+
+## Circle Sort
+"""
+This is a Python implementation of the circle sort algorithm
+
+For doctests run following command:
+python3 -m doctest -v circle_sort.py
+
+For manual testing run:
+python3 circle_sort.py
+"""
+
+
+def circle_sort(collection: list) -> list:
+    """A pure Python implementation of circle sort algorithm
+
+    :param collection: a mutable collection of comparable items in any order
+    :return: the same collection in ascending order
+
+    Examples:
+    >>> circle_sort([0, 5, 3, 2, 2])
+    [0, 2, 2, 3, 5]
+    >>> circle_sort([])
+    []
+    >>> circle_sort([-2, 5, 0, -45])
+    [-45, -2, 0, 5]
+    >>> collections = ([], [0, 5, 3, 2, 2], [-2, 5, 0, -45])
+    >>> all(sorted(collection) == circle_sort(collection) for collection in collections)
+    True
+    """
+
+    if len(collection) < 2:
+        return collection
+
+    def circle_sort_util(collection: list, low: int, high: int) -> bool:
+        """
+        >>> arr = [5,4,3,2,1]
+        >>> circle_sort_util(lst, 0, 2)
+        True
+        >>> arr
+        [3, 4, 5, 2, 1]
+        """
+
+        swapped = False
+
+        if low == high:
+            return swapped
+
+        left = low
+        right = high
+
+        while left < right:
+            if collection[left] > collection[right]:
+                collection[left], collection[right] = (
+                    collection[right],
+                    collection[left],
+                )
+                swapped = True
+
+            left += 1
+            right -= 1
+
+        if left == right and collection[left] > collection[right + 1]:
+            collection[left], collection[right + 1] = (
+                collection[right + 1],
+                collection[left],
+            )
+
+            swapped = True
+
+        mid = low + int((high - low) / 2)
+        left_swap = circle_sort_util(collection, low, mid)
+        right_swap = circle_sort_util(collection, mid + 1, high)
+
+        return swapped or left_swap or right_swap
+
+    is_not_sorted = True
+
+    while is_not_sorted is True:
+        is_not_sorted = circle_sort_util(collection, 0, len(collection) - 1)
+
+    return collection
+
+
+if __name__ == "__main__":
+    user_input = input("Enter numbers separated by a comma:\n").strip()
+    unsorted = [int(item) for item in user_input.split(",")]
+    print(circle_sort(unsorted))
+
+## Cocktail Shaker Sort
+""" https://en.wikipedia.org/wiki/Cocktail_shaker_sort """
+
+
+def cocktail_shaker_sort(unsorted: list) -> list:
+    """
+    Pure implementation of the cocktail shaker sort algorithm in Python.
+    >>> cocktail_shaker_sort([4, 5, 2, 1, 2])
+    [1, 2, 2, 4, 5]
+
+    >>> cocktail_shaker_sort([-4, 5, 0, 1, 2, 11])
+    [-4, 0, 1, 2, 5, 11]
+
+    >>> cocktail_shaker_sort([0.1, -2.4, 4.4, 2.2])
+    [-2.4, 0.1, 2.2, 4.4]
+
+    >>> cocktail_shaker_sort([1, 2, 3, 4, 5])
+    [1, 2, 3, 4, 5]
+
+    >>> cocktail_shaker_sort([-4, -5, -24, -7, -11])
+    [-24, -11, -7, -5, -4]
+    """
+    for i in range(len(unsorted) - 1, 0, -1):
+        swapped = False
+
+        for j in range(i, 0, -1):
+            if unsorted[j] < unsorted[j - 1]:
+                unsorted[j], unsorted[j - 1] = unsorted[j - 1], unsorted[j]
+                swapped = True
+
+        for j in range(i):
+            if unsorted[j] > unsorted[j + 1]:
+                unsorted[j], unsorted[j + 1] = unsorted[j + 1], unsorted[j]
+                swapped = True
+
+        if not swapped:
+            break
+    return unsorted
+
+
+if __name__ == "__main__":
+    import doctest
+
+    doctest.testmod()
+    user_input = input("Enter numbers separated by a comma:\n").strip()
+    unsorted = [int(item) for item in user_input.split(",")]
+    print(f"{cocktail_shaker_sort(unsorted) = }")
+
+## Comb Sort
+"""
+This is pure Python implementation of comb sort algorithm.
+Comb sort is a relatively simple sorting algorithm originally designed by Wlodzimierz
+Dobosiewicz in 1980.  It was rediscovered by Stephen Lacey and Richard Box in 1991.
+Comb sort improves on bubble sort algorithm.
+In bubble sort, distance (or gap) between two compared elements is always one.
+Comb sort improvement is that gap can be much more than 1, in order to prevent slowing
+down by small values
+at the end of a list.
+
+More info on: https://en.wikipedia.org/wiki/Comb_sort
+
+For doctests run following command:
+python -m doctest -v comb_sort.py
+or
+python3 -m doctest -v comb_sort.py
+
+For manual testing run:
+python comb_sort.py
+"""
+
+
+def comb_sort(data: list) -> list:
+    """Pure implementation of comb sort algorithm in Python
+    :param data: mutable collection with comparable items
+    :return: the same collection in ascending order
+    Examples:
+    >>> comb_sort([0, 5, 3, 2, 2])
+    [0, 2, 2, 3, 5]
+    >>> comb_sort([])
+    []
+    >>> comb_sort([99, 45, -7, 8, 2, 0, -15, 3])
+    [-15, -7, 0, 2, 3, 8, 45, 99]
+    """
+    shrink_factor = 1.3
+    gap = len(data)
+    completed = False
+
+    while not completed:
+        # Update the gap value for a next comb
+        gap = int(gap / shrink_factor)
+        if gap <= 1:
+            completed = True
+
+        index = 0
+        while index + gap < len(data):
+            if data[index] > data[index + gap]:
+                # Swap values
+                data[index], data[index + gap] = data[index + gap], data[index]
+                completed = False
+            index += 1
+
+    return data
+
+
+if __name__ == "__main__":
+    import doctest
+
+    doctest.testmod()
+
+    user_input = input("Enter numbers separated by a comma:\n").strip()
+    unsorted = [int(item) for item in user_input.split(",")]
+    print(comb_sort(unsorted))
+
+## Counting Sort
+"""
+This is pure Python implementation of counting sort algorithm
+For doctests run following command:
+python -m doctest -v counting_sort.py
+or
+python3 -m doctest -v counting_sort.py
+For manual testing run:
+python counting_sort.py
+"""
+
+
+def counting_sort(collection):
+    """Pure implementation of counting sort algorithm in Python
+    :param collection: some mutable ordered collection with heterogeneous
+    comparable items inside
+    :return: the same collection ordered by ascending
+    Examples:
+    >>> counting_sort([0, 5, 3, 2, 2])
+    [0, 2, 2, 3, 5]
+    >>> counting_sort([])
+    []
+    >>> counting_sort([-2, -5, -45])
+    [-45, -5, -2]
+    """
+    # if the collection is empty, returns empty
+    if collection == []:
+        return []
+
+    # get some information about the collection
+    coll_len = len(collection)
+    coll_max = max(collection)
+    coll_min = min(collection)
+
+    # create the counting array
+    counting_arr_length = coll_max + 1 - coll_min
+    counting_arr = [0] * counting_arr_length
+
+    # count how much a number appears in the collection
+    for number in collection:
+        counting_arr[number - coll_min] += 1
+
+    # sum each position with it's predecessors. now, counting_arr[i] tells
+    # us how many elements <= i has in the collection
+    for i in range(1, counting_arr_length):
+        counting_arr[i] = counting_arr[i] + counting_arr[i - 1]
+
+    # create the output collection
+    ordered = [0] * coll_len
+
+    # place the elements in the output, respecting the original order (stable
+    # sort) from end to begin, updating counting_arr
+    for i in reversed(range(0, coll_len)):
+        ordered[counting_arr[collection[i] - coll_min] - 1] = collection[i]
+        counting_arr[collection[i] - coll_min] -= 1
+
+    return ordered
+
+
+def counting_sort_string(string):
+    """
+    >>> counting_sort_string("thisisthestring")
+    'eghhiiinrsssttt'
+    """
+    return "".join([chr(i) for i in counting_sort([ord(c) for c in string])])
+
+
+if __name__ == "__main__":
+    # Test string sort
+    assert counting_sort_string("thisisthestring") == "eghhiiinrsssttt"
+
+    user_input = input("Enter numbers separated by a comma:\n").strip()
+    unsorted = [int(item) for item in user_input.split(",")]
+    print(counting_sort(unsorted))
+
+## Cycle Sort
+"""
+Code contributed by Honey Sharma
+Source: https://en.wikipedia.org/wiki/Cycle_sort
+"""
+
+
+def cycle_sort(array: list) -> list:
+    """
+    >>> cycle_sort([4, 3, 2, 1])
+    [1, 2, 3, 4]
+
+    >>> cycle_sort([-4, 20, 0, -50, 100, -1])
+    [-50, -4, -1, 0, 20, 100]
+
+    >>> cycle_sort([-.1, -.2, 1.3, -.8])
+    [-0.8, -0.2, -0.1, 1.3]
+
+    >>> cycle_sort([])
+    []
+    """
+    array_len = len(array)
+    for cycle_start in range(0, array_len - 1):
+        item = array[cycle_start]
+
+        pos = cycle_start
+        for i in range(cycle_start + 1, array_len):
+            if array[i] < item:
+                pos += 1
+
+        if pos == cycle_start:
+            continue
+
+        while item == array[pos]:
+            pos += 1
+
+        array[pos], item = item, array[pos]
+        while pos != cycle_start:
+            pos = cycle_start
+            for i in range(cycle_start + 1, array_len):
+                if array[i] < item:
+                    pos += 1
+
+            while item == array[pos]:
+                pos += 1
+
+            array[pos], item = item, array[pos]
+
+    return array
+
+
+if __name__ == "__main__":
+    assert cycle_sort([4, 5, 3, 2, 1]) == [1, 2, 3, 4, 5]
+    assert cycle_sort([0, 1, -10, 15, 2, -2]) == [-10, -2, 0, 1, 2, 15]
+
+## Double Sort
+def double_sort(lst):
+    """This sorting algorithm sorts an array using the principle of bubble sort,
+    but does it both from left to right and right to left.
+    Hence, it's called "Double sort"
+    :param collection: mutable ordered sequence of elements
+    :return: the same collection in ascending order
+    Examples:
+    >>> double_sort([-1 ,-2 ,-3 ,-4 ,-5 ,-6 ,-7])
+    [-7, -6, -5, -4, -3, -2, -1]
+    >>> double_sort([])
+    []
+    >>> double_sort([-1 ,-2 ,-3 ,-4 ,-5 ,-6])
+    [-6, -5, -4, -3, -2, -1]
+    >>> double_sort([-3, 10, 16, -42, 29]) == sorted([-3, 10, 16, -42, 29])
+    True
+    """
+    no_of_elements = len(lst)
+    for _ in range(
+        0, int(((no_of_elements - 1) / 2) + 1)
+    ):  # we don't need to traverse to end of list as
+        for j in range(0, no_of_elements - 1):
+            if (
+                lst[j + 1] < lst[j]
+            ):  # applying bubble sort algorithm from left to right (or forwards)
+                temp = lst[j + 1]
+                lst[j + 1] = lst[j]
+                lst[j] = temp
+            if (
+                lst[no_of_elements - 1 - j] < lst[no_of_elements - 2 - j]
+            ):  # applying bubble sort algorithm from right to left (or backwards)
+                temp = lst[no_of_elements - 1 - j]
+                lst[no_of_elements - 1 - j] = lst[no_of_elements - 2 - j]
+                lst[no_of_elements - 2 - j] = temp
+    return lst
+
+
+if __name__ == "__main__":
+    print("enter the list to be sorted")
+    lst = [int(x) for x in input().split()]  # inputing elements of the list in one line
+    sorted_lst = double_sort(lst)
+    print("the sorted list is")
+    print(sorted_lst)
+
+## Dutch National Flag Sort
+"""
+A pure implementation of Dutch national flag (DNF) sort algorithm in Python.
+Dutch National Flag algorithm is an algorithm originally designed by Edsger Dijkstra.
+It is the most optimal sort for 3 unique values (eg. 0, 1, 2) in a sequence.  DNF can
+sort a sequence of n size with [0 <= a[i] <= 2] at guaranteed O(n) complexity in a
+single pass.
+
+The flag of the Netherlands consists of three colors: white, red, and blue.
+The task is to randomly arrange balls of white, red, and blue in such a way that balls
+of the same color are placed together.  DNF sorts a sequence of 0, 1, and 2's in linear
+time that does not consume any extra space.  This algorithm can be implemented only on
+a sequence that contains three unique elements.
+
+1) Time complexity is O(n).
+2) Space complexity is O(1).
+
+More info on: https://en.wikipedia.org/wiki/Dutch_national_flag_problem
+
+For doctests run following command:
+python3 -m doctest -v dutch_national_flag_sort.py
+
+For manual testing run:
+python dnf_sort.py
+"""
+
+
+# Python program to sort a sequence containing only 0, 1 and 2 in a single pass.
+red = 0  # The first color of the flag.
+white = 1  # The second color of the flag.
+blue = 2  # The third color of the flag.
+colors = (red, white, blue)
+
+
+def dutch_national_flag_sort(sequence: list) -> list:
+    """
+    A pure Python implementation of Dutch National Flag sort algorithm.
+    :param data: 3 unique integer values (e.g., 0, 1, 2) in an sequence
+    :return: The same collection in ascending order
+
+    >>> dutch_national_flag_sort([])
+    []
+    >>> dutch_national_flag_sort([0])
+    [0]
+    >>> dutch_national_flag_sort([2, 1, 0, 0, 1, 2])
+    [0, 0, 1, 1, 2, 2]
+    >>> dutch_national_flag_sort([0, 1, 1, 0, 1, 2, 1, 2, 0, 0, 0, 1])
+    [0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 2, 2]
+    >>> dutch_national_flag_sort("abacab")
+    Traceback (most recent call last):
+      ...
+    ValueError: The elements inside the sequence must contains only (0, 1, 2) values
+    >>> dutch_national_flag_sort("Abacab")
+    Traceback (most recent call last):
+      ...
+    ValueError: The elements inside the sequence must contains only (0, 1, 2) values
+    >>> dutch_national_flag_sort([3, 2, 3, 1, 3, 0, 3])
+    Traceback (most recent call last):
+      ...
+    ValueError: The elements inside the sequence must contains only (0, 1, 2) values
+    >>> dutch_national_flag_sort([-1, 2, -1, 1, -1, 0, -1])
+    Traceback (most recent call last):
+      ...
+    ValueError: The elements inside the sequence must contains only (0, 1, 2) values
+    >>> dutch_national_flag_sort([1.1, 2, 1.1, 1, 1.1, 0, 1.1])
+    Traceback (most recent call last):
+      ...
+    ValueError: The elements inside the sequence must contains only (0, 1, 2) values
+    """
+    if not sequence:
+        return []
+    if len(sequence) == 1:
+        return list(sequence)
+    low = 0
+    high = len(sequence) - 1
+    mid = 0
+    while mid <= high:
+        if sequence[mid] == colors[0]:
+            sequence[low], sequence[mid] = sequence[mid], sequence[low]
+            low += 1
+            mid += 1
+        elif sequence[mid] == colors[1]:
+            mid += 1
+        elif sequence[mid] == colors[2]:
+            sequence[mid], sequence[high] = sequence[high], sequence[mid]
+            high -= 1
+        else:
+            raise ValueError(
+                f"The elements inside the sequence must contains only {colors} values"
+            )
+    return sequence
+
+
+if __name__ == "__main__":
+    import doctest
+
+    doctest.testmod()
+
+    user_input = input("Enter numbers separated by commas:\n").strip()
+    unsorted = [int(item.strip()) for item in user_input.split(",")]
+    print(f"{dutch_national_flag_sort(unsorted)}")
+
+## Exchange Sort
+def exchange_sort(numbers: list[int]) -> list[int]:
+    """
+    Uses exchange sort to sort a list of numbers.
+    Source: https://en.wikipedia.org/wiki/Sorting_algorithm#Exchange_sort
+    >>> exchange_sort([5, 4, 3, 2, 1])
+    [1, 2, 3, 4, 5]
+    >>> exchange_sort([-1, -2, -3])
+    [-3, -2, -1]
+    >>> exchange_sort([1, 2, 3, 4, 5])
+    [1, 2, 3, 4, 5]
+    >>> exchange_sort([0, 10, -2, 5, 3])
+    [-2, 0, 3, 5, 10]
+    >>> exchange_sort([])
+    []
+    """
+    numbers_length = len(numbers)
+    for i in range(numbers_length):
+        for j in range(i + 1, numbers_length):
+            if numbers[j] < numbers[i]:
+                numbers[i], numbers[j] = numbers[j], numbers[i]
+    return numbers
+
+
+if __name__ == "__main__":
+    user_input = input("Enter numbers separated by a comma:\n").strip()
+    unsorted = [int(item) for item in user_input.split(",")]
+    print(exchange_sort(unsorted))
+
+## External Sort
+#!/usr/bin/env python
+
+#
+# Sort large text files in a minimum amount of memory
+#
+import argparse
+import os
+
+
+class FileSplitter:
+    BLOCK_FILENAME_FORMAT = "block_{0}.dat"
+
+    def __init__(self, filename):
+        self.filename = filename
+        self.block_filenames = []
+
+    def write_block(self, data, block_number):
+        filename = self.BLOCK_FILENAME_FORMAT.format(block_number)
+        with open(filename, "w") as file:
+            file.write(data)
+        self.block_filenames.append(filename)
+
+    def get_block_filenames(self):
+        return self.block_filenames
+
+    def split(self, block_size, sort_key=None):
+        i = 0
+        with open(self.filename) as file:
+            while True:
+                lines = file.readlines(block_size)
+
+                if lines == []:
+                    break
+
+                if sort_key is None:
+                    lines.sort()
+                else:
+                    lines.sort(key=sort_key)
+
+                self.write_block("".join(lines), i)
+                i += 1
+
+    def cleanup(self):
+        map(os.remove, self.block_filenames)
+
+
+class NWayMerge:
+    def select(self, choices):
+        min_index = -1
+        min_str = None
+
+        for i in range(len(choices)):
+            if min_str is None or choices[i] < min_str:
+                min_index = i
+
+        return min_index
+
+
+class FilesArray:
+    def __init__(self, files):
+        self.files = files
+        self.empty = set()
+        self.num_buffers = len(files)
+        self.buffers = {i: None for i in range(self.num_buffers)}
+
+    def get_dict(self):
+        return {
+            i: self.buffers[i] for i in range(self.num_buffers) if i not in self.empty
+        }
+
+    def refresh(self):
+        for i in range(self.num_buffers):
+            if self.buffers[i] is None and i not in self.empty:
+                self.buffers[i] = self.files[i].readline()
+
+                if self.buffers[i] == "":
+                    self.empty.add(i)
+                    self.files[i].close()
+
+        if len(self.empty) == self.num_buffers:
+            return False
+
+        return True
+
+    def unshift(self, index):
+        value = self.buffers[index]
+        self.buffers[index] = None
+
+        return value
+
+
+class FileMerger:
+    def __init__(self, merge_strategy):
+        self.merge_strategy = merge_strategy
+
+    def merge(self, filenames, outfilename, buffer_size):
+        buffers = FilesArray(self.get_file_handles(filenames, buffer_size))
+        with open(outfilename, "w", buffer_size) as outfile:
+            while buffers.refresh():
+                min_index = self.merge_strategy.select(buffers.get_dict())
+                outfile.write(buffers.unshift(min_index))
+
+    def get_file_handles(self, filenames, buffer_size):
+        files = {}
+
+        for i in range(len(filenames)):
+            files[i] = open(filenames[i], "r", buffer_size)  # noqa: UP015
+
+        return files
+
+
+class ExternalSort:
+    def __init__(self, block_size):
+        self.block_size = block_size
+
+    def sort(self, filename, sort_key=None):
+        num_blocks = self.get_number_blocks(filename, self.block_size)
+        splitter = FileSplitter(filename)
+        splitter.split(self.block_size, sort_key)
+
+        merger = FileMerger(NWayMerge())
+        buffer_size = self.block_size / (num_blocks + 1)
+        merger.merge(splitter.get_block_filenames(), filename + ".out", buffer_size)
+
+        splitter.cleanup()
+
+    def get_number_blocks(self, filename, block_size):
+        return (os.stat(filename).st_size / block_size) + 1
+
+
+def parse_memory(string):
+    if string[-1].lower() == "k":
+        return int(string[:-1]) * 1024
+    elif string[-1].lower() == "m":
+        return int(string[:-1]) * 1024 * 1024
+    elif string[-1].lower() == "g":
+        return int(string[:-1]) * 1024 * 1024 * 1024
+    else:
+        return int(string)
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "-m", "--mem", help="amount of memory to use for sorting", default="100M"
+    )
+    parser.add_argument(
+        "filename", metavar="<filename>", nargs=1, help="name of file to sort"
+    )
+    args = parser.parse_args()
+
+    sorter = ExternalSort(parse_memory(args.mem))
+    sorter.sort(args.filename[0])
+
+
+if __name__ == "__main__":
+    main()
+
+## Gnome Sort
+"""
+Gnome Sort Algorithm (A.K.A. Stupid Sort)
+
+This algorithm iterates over a list comparing an element with the previous one.
+If order is not respected, it swaps element backward until order is respected with
+previous element.  It resumes the initial iteration from element new position.
+
+For doctests run following command:
+python3 -m doctest -v gnome_sort.py
+
+For manual testing run:
+python3 gnome_sort.py
+"""
+
+
+def gnome_sort(lst: list) -> list:
+    """
+    Pure implementation of the gnome sort algorithm in Python
+
+    Take some mutable ordered collection with heterogeneous comparable items inside as
+    arguments, return the same collection ordered by ascending.
+
+    Examples:
+    >>> gnome_sort([0, 5, 3, 2, 2])
+    [0, 2, 2, 3, 5]
+
+    >>> gnome_sort([])
+    []
+
+    >>> gnome_sort([-2, -5, -45])
+    [-45, -5, -2]
+
+    >>> "".join(gnome_sort(list(set("Gnomes are stupid!"))))
+    ' !Gadeimnoprstu'
+    """
+    if len(lst) <= 1:
+        return lst
+
+    i = 1
+
+    while i < len(lst):
+        if lst[i - 1] <= lst[i]:
+            i += 1
+        else:
+            lst[i - 1], lst[i] = lst[i], lst[i - 1]
+            i -= 1
+            if i == 0:
+                i = 1
+
+    return lst
+
+
+if __name__ == "__main__":
+    user_input = input("Enter numbers separated by a comma:\n").strip()
+    unsorted = [int(item) for item in user_input.split(",")]
+    print(gnome_sort(unsorted))
+
+## Heap Sort
+"""
+This is a pure Python implementation of the heap sort algorithm.
+
+For doctests run following command:
+python -m doctest -v heap_sort.py
+or
+python3 -m doctest -v heap_sort.py
+
+For manual testing run:
+python heap_sort.py
+"""
+
+
+def heapify(unsorted, index, heap_size):
+    largest = index
+    left_index = 2 * index + 1
+    right_index = 2 * index + 2
+    if left_index < heap_size and unsorted[left_index] > unsorted[largest]:
+        largest = left_index
+
+    if right_index < heap_size and unsorted[right_index] > unsorted[largest]:
+        largest = right_index
+
+    if largest != index:
+        unsorted[largest], unsorted[index] = unsorted[index], unsorted[largest]
+        heapify(unsorted, largest, heap_size)
+
+
+def heap_sort(unsorted):
+    """
+    Pure implementation of the heap sort algorithm in Python
+    :param collection: some mutable ordered collection with heterogeneous
+    comparable items inside
+    :return: the same collection ordered by ascending
+
+    Examples:
+    >>> heap_sort([0, 5, 3, 2, 2])
+    [0, 2, 2, 3, 5]
+
+    >>> heap_sort([])
+    []
+
+    >>> heap_sort([-2, -5, -45])
+    [-45, -5, -2]
+    """
+    n = len(unsorted)
+    for i in range(n // 2 - 1, -1, -1):
+        heapify(unsorted, i, n)
+    for i in range(n - 1, 0, -1):
+        unsorted[0], unsorted[i] = unsorted[i], unsorted[0]
+        heapify(unsorted, 0, i)
+    return unsorted
+
+
+if __name__ == "__main__":
+    user_input = input("Enter numbers separated by a comma:\n").strip()
+    unsorted = [int(item) for item in user_input.split(",")]
+    print(heap_sort(unsorted))
+
+## Insertion Sort
+"""
+A pure Python implementation of the insertion sort algorithm
+
+This algorithm sorts a collection by comparing adjacent elements.
+When it finds that order is not respected, it moves the element compared
+backward until the order is correct.  It then goes back directly to the
+element's initial position resuming forward comparison.
+
+For doctests run following command:
+python3 -m doctest -v insertion_sort.py
+
+For manual testing run:
+python3 insertion_sort.py
+"""
+
+
+def insertion_sort(collection: list) -> list:
+    """A pure Python implementation of the insertion sort algorithm
+
+    :param collection: some mutable ordered collection with heterogeneous
+    comparable items inside
+    :return: the same collection ordered by ascending
+
+    Examples:
+    >>> insertion_sort([0, 5, 3, 2, 2])
+    [0, 2, 2, 3, 5]
+    >>> insertion_sort([]) == sorted([])
+    True
+    >>> insertion_sort([-2, -5, -45]) == sorted([-2, -5, -45])
+    True
+    >>> insertion_sort(['d', 'a', 'b', 'e', 'c']) == sorted(['d', 'a', 'b', 'e', 'c'])
+    True
+    >>> import random
+    >>> collection = random.sample(range(-50, 50), 100)
+    >>> insertion_sort(collection) == sorted(collection)
+    True
+    >>> import string
+    >>> collection = random.choices(string.ascii_letters + string.digits, k=100)
+    >>> insertion_sort(collection) == sorted(collection)
+    True
+    """
+
+    for insert_index, insert_value in enumerate(collection[1:]):
+        temp_index = insert_index
+        while insert_index >= 0 and insert_value < collection[insert_index]:
+            collection[insert_index + 1] = collection[insert_index]
+            insert_index -= 1
+        if insert_index != temp_index:
+            collection[insert_index + 1] = insert_value
+    return collection
+
+
+if __name__ == "__main__":
+    from doctest import testmod
+
+    testmod()
+
+    user_input = input("Enter numbers separated by a comma:\n").strip()
+    unsorted = [int(item) for item in user_input.split(",")]
+    print(f"{insertion_sort(unsorted) = }")
+
+## Intro Sort
+"""
+Introspective Sort is hybrid sort (Quick Sort + Heap Sort + Insertion Sort)
+if the size of the list is under 16, use insertion sort
+https://en.wikipedia.org/wiki/Introsort
+"""
+import math
+
+
+def insertion_sort(array: list, start: int = 0, end: int = 0) -> list:
+    """
+    >>> array = [4, 2, 6, 8, 1, 7, 8, 22, 14, 56, 27, 79, 23, 45, 14, 12]
+
+    >>> insertion_sort(array, 0, len(array))
+    [1, 2, 4, 6, 7, 8, 8, 12, 14, 14, 22, 23, 27, 45, 56, 79]
+    """
+    end = end or len(array)
+    for i in range(start, end):
+        temp_index = i
+        temp_index_value = array[i]
+        while temp_index != start and temp_index_value < array[temp_index - 1]:
+            array[temp_index] = array[temp_index - 1]
+            temp_index -= 1
+        array[temp_index] = temp_index_value
+    return array
+
+
+def heapify(array: list, index: int, heap_size: int) -> None:  # Max Heap
+    """
+    >>> array = [4, 2, 6, 8, 1, 7, 8, 22, 14, 56, 27, 79, 23, 45, 14, 12]
+
+    >>> heapify(array, len(array) // 2 ,len(array))
+    """
+    largest = index
+    left_index = 2 * index + 1  # Left Node
+    right_index = 2 * index + 2  # Right Node
+
+    if left_index < heap_size and array[largest] < array[left_index]:
+        largest = left_index
+
+    if right_index < heap_size and array[largest] < array[right_index]:
+        largest = right_index
+
+    if largest != index:
+        array[index], array[largest] = array[largest], array[index]
+        heapify(array, largest, heap_size)
+
+
+def heap_sort(array: list) -> list:
+    """
+    >>> array = [4, 2, 6, 8, 1, 7, 8, 22, 14, 56, 27, 79, 23, 45, 14, 12]
+
+    >>> heap_sort(array)
+    [1, 2, 4, 6, 7, 8, 8, 12, 14, 14, 22, 23, 27, 45, 56, 79]
+    """
+    n = len(array)
+
+    for i in range(n // 2, -1, -1):
+        heapify(array, i, n)
+
+    for i in range(n - 1, 0, -1):
+        array[i], array[0] = array[0], array[i]
+        heapify(array, 0, i)
+
+    return array
+
+
+def median_of_3(
+    array: list, first_index: int, middle_index: int, last_index: int
+) -> int:
+    """
+    >>> array = [4, 2, 6, 8, 1, 7, 8, 22, 14, 56, 27, 79, 23, 45, 14, 12]
+
+    >>> median_of_3(array, 0, 0 + ((len(array) - 0) // 2) + 1, len(array) - 1)
+    12
+    """
+    if (array[first_index] > array[middle_index]) != (
+        array[first_index] > array[last_index]
+    ):
+        return array[first_index]
+    elif (array[middle_index] > array[first_index]) != (
+        array[middle_index] > array[last_index]
+    ):
+        return array[middle_index]
+    else:
+        return array[last_index]
+
+
+def partition(array: list, low: int, high: int, pivot: int) -> int:
+    """
+    >>> array = [4, 2, 6, 8, 1, 7, 8, 22, 14, 56, 27, 79, 23, 45, 14, 12]
+
+    >>> partition(array, 0, len(array), 12)
+    8
+    """
+    i = low
+    j = high
+    while True:
+        while array[i] < pivot:
+            i += 1
+        j -= 1
+        while pivot < array[j]:
+            j -= 1
+        if i >= j:
+            return i
+        array[i], array[j] = array[j], array[i]
+        i += 1
+
+
+def sort(array: list) -> list:
+    """
+    :param collection: some mutable ordered collection with heterogeneous
+    comparable items inside
+    :return: the same collection ordered by ascending
+
+    Examples:
+    >>> sort([4, 2, 6, 8, 1, 7, 8, 22, 14, 56, 27, 79, 23, 45, 14, 12])
+    [1, 2, 4, 6, 7, 8, 8, 12, 14, 14, 22, 23, 27, 45, 56, 79]
+
+    >>> sort([-1, -5, -3, -13, -44])
+    [-44, -13, -5, -3, -1]
+
+    >>> sort([])
+    []
+
+    >>> sort([5])
+    [5]
+
+    >>> sort([-3, 0, -7, 6, 23, -34])
+    [-34, -7, -3, 0, 6, 23]
+
+    >>> sort([1.7, 1.0, 3.3, 2.1, 0.3 ])
+    [0.3, 1.0, 1.7, 2.1, 3.3]
+
+    >>> sort(['d', 'a', 'b', 'e', 'c'])
+    ['a', 'b', 'c', 'd', 'e']
+    """
+    if len(array) == 0:
+        return array
+    max_depth = 2 * math.ceil(math.log2(len(array)))
+    size_threshold = 16
+    return intro_sort(array, 0, len(array), size_threshold, max_depth)
+
+
+def intro_sort(
+    array: list, start: int, end: int, size_threshold: int, max_depth: int
+) -> list:
+    """
+    >>> array = [4, 2, 6, 8, 1, 7, 8, 22, 14, 56, 27, 79, 23, 45, 14, 12]
+
+    >>> max_depth = 2 * math.ceil(math.log2(len(array)))
+
+    >>> intro_sort(array, 0, len(array), 16, max_depth)
+    [1, 2, 4, 6, 7, 8, 8, 12, 14, 14, 22, 23, 27, 45, 56, 79]
+    """
+    while end - start > size_threshold:
+        if max_depth == 0:
+            return heap_sort(array)
+        max_depth -= 1
+        pivot = median_of_3(array, start, start + ((end - start) // 2) + 1, end - 1)
+        p = partition(array, start, end, pivot)
+        intro_sort(array, p, end, size_threshold, max_depth)
+        end = p
+    return insertion_sort(array, start, end)
+
+
+if __name__ == "__main__":
+    import doctest
+
+    doctest.testmod()
+
+    user_input = input("Enter numbers separated by a comma : ").strip()
+    unsorted = [float(item) for item in user_input.split(",")]
+    print(sort(unsorted))
+
+## Iterative Merge Sort
+"""
+Implementation of iterative merge sort in Python
+Author: Aman Gupta
+
+For doctests run following command:
+python3 -m doctest -v iterative_merge_sort.py
+
+For manual testing run:
+python3 iterative_merge_sort.py
+"""
+
+from __future__ import annotations
+
+
+def merge(input_list: list, low: int, mid: int, high: int) -> list:
+    """
+    sorting left-half and right-half individually
+    then merging them into result
+    """
+    result = []
+    left, right = input_list[low:mid], input_list[mid : high + 1]
+    while left and right:
+        result.append((left if left[0] <= right[0] else right).pop(0))
+    input_list[low : high + 1] = result + left + right
+    return input_list
+
+
+# iteration over the unsorted list
+def iter_merge_sort(input_list: list) -> list:
+    """
+    Return a sorted copy of the input list
+
+    >>> iter_merge_sort([5, 9, 8, 7, 1, 2, 7])
+    [1, 2, 5, 7, 7, 8, 9]
+    >>> iter_merge_sort([1])
+    [1]
+    >>> iter_merge_sort([2, 1])
+    [1, 2]
+    >>> iter_merge_sort([2, 1, 3])
+    [1, 2, 3]
+    >>> iter_merge_sort([4, 3, 2, 1])
+    [1, 2, 3, 4]
+    >>> iter_merge_sort([5, 4, 3, 2, 1])
+    [1, 2, 3, 4, 5]
+    >>> iter_merge_sort(['c', 'b', 'a'])
+    ['a', 'b', 'c']
+    >>> iter_merge_sort([0.3, 0.2, 0.1])
+    [0.1, 0.2, 0.3]
+    >>> iter_merge_sort(['dep', 'dang', 'trai'])
+    ['dang', 'dep', 'trai']
+    >>> iter_merge_sort([6])
+    [6]
+    >>> iter_merge_sort([])
+    []
+    >>> iter_merge_sort([-2, -9, -1, -4])
+    [-9, -4, -2, -1]
+    >>> iter_merge_sort([1.1, 1, 0.0, -1, -1.1])
+    [-1.1, -1, 0.0, 1, 1.1]
+    >>> iter_merge_sort(['c', 'b', 'a'])
+    ['a', 'b', 'c']
+    >>> iter_merge_sort('cba')
+    ['a', 'b', 'c']
+    """
+    if len(input_list) <= 1:
+        return input_list
+    input_list = list(input_list)
+
+    # iteration for two-way merging
+    p = 2
+    while p <= len(input_list):
+        # getting low, high and middle value for merge-sort of single list
+        for i in range(0, len(input_list), p):
+            low = i
+            high = i + p - 1
+            mid = (low + high + 1) // 2
+            input_list = merge(input_list, low, mid, high)
+        # final merge of last two parts
+        if p * 2 >= len(input_list):
+            mid = i
+            input_list = merge(input_list, 0, mid, len(input_list) - 1)
+            break
+        p *= 2
+
+    return input_list
+
+
+if __name__ == "__main__":
+    user_input = input("Enter numbers separated by a comma:\n").strip()
+    if user_input == "":
+        unsorted = []
+    else:
+        unsorted = [int(item.strip()) for item in user_input.split(",")]
+    print(iter_merge_sort(unsorted))
+
+## Merge Insertion Sort
+"""
+This is a pure Python implementation of the merge-insertion sort algorithm
+Source: https://en.wikipedia.org/wiki/Merge-insertion_sort
+
+For doctests run following command:
+python3 -m doctest -v merge_insertion_sort.py
+or
+python -m doctest -v merge_insertion_sort.py
+
+For manual testing run:
+python3 merge_insertion_sort.py
+"""
+
+from __future__ import annotations
+
+
+def binary_search_insertion(sorted_list, item):
+    """
+    >>> binary_search_insertion([1, 2, 7, 9, 10], 4)
+    [1, 2, 4, 7, 9, 10]
+    """
+    left = 0
+    right = len(sorted_list) - 1
+    while left <= right:
+        middle = (left + right) // 2
+        if left == right:
+            if sorted_list[middle] < item:
+                left = middle + 1
+            break
+        elif sorted_list[middle] < item:
+            left = middle + 1
+        else:
+            right = middle - 1
+    sorted_list.insert(left, item)
+    return sorted_list
+
+
+def merge(left, right):
+    """
+    >>> merge([[1, 6], [9, 10]], [[2, 3], [4, 5], [7, 8]])
+    [[1, 6], [2, 3], [4, 5], [7, 8], [9, 10]]
+    """
+    result = []
+    while left and right:
+        if left[0][0] < right[0][0]:
+            result.append(left.pop(0))
+        else:
+            result.append(right.pop(0))
+    return result + left + right
+
+
+def sortlist_2d(list_2d):
+    """
+    >>> sortlist_2d([[9, 10], [1, 6], [7, 8], [2, 3], [4, 5]])
+    [[1, 6], [2, 3], [4, 5], [7, 8], [9, 10]]
+    """
+    length = len(list_2d)
+    if length <= 1:
+        return list_2d
+    middle = length // 2
+    return merge(sortlist_2d(list_2d[:middle]), sortlist_2d(list_2d[middle:]))
+
+
+def merge_insertion_sort(collection: list[int]) -> list[int]:
+    """Pure implementation of merge-insertion sort algorithm in Python
+
+    :param collection: some mutable ordered collection with heterogeneous
+    comparable items inside
+    :return: the same collection ordered by ascending
+
+    Examples:
+    >>> merge_insertion_sort([0, 5, 3, 2, 2])
+    [0, 2, 2, 3, 5]
+
+    >>> merge_insertion_sort([99])
+    [99]
+
+    >>> merge_insertion_sort([-2, -5, -45])
+    [-45, -5, -2]
+
+    Testing with all permutations on range(0,5):
+    >>> import itertools
+    >>> permutations = list(itertools.permutations([0, 1, 2, 3, 4]))
+    >>> all(merge_insertion_sort(p) == [0, 1, 2, 3, 4] for p in permutations)
+    True
+    """
+
+    if len(collection) <= 1:
+        return collection
+
+    """
+    Group the items into two pairs, and leave one element if there is a last odd item.
+
+    Example: [999, 100, 75, 40, 10000]
+                -> [999, 100], [75, 40]. Leave 10000.
+    """
+    two_paired_list = []
+    has_last_odd_item = False
+    for i in range(0, len(collection), 2):
+        if i == len(collection) - 1:
+            has_last_odd_item = True
+        else:
+            """
+            Sort two-pairs in each groups.
+
+            Example: [999, 100], [75, 40]
+                        -> [100, 999], [40, 75]
+            """
+            if collection[i] < collection[i + 1]:
+                two_paired_list.append([collection[i], collection[i + 1]])
+            else:
+                two_paired_list.append([collection[i + 1], collection[i]])
+
+    """
+    Sort two_paired_list.
+
+    Example: [100, 999], [40, 75]
+                -> [40, 75], [100, 999]
+    """
+    sorted_list_2d = sortlist_2d(two_paired_list)
+
+    """
+    40 < 100 is sure because it has already been sorted.
+    Generate the sorted_list of them so that you can avoid unnecessary comparison.
+
+    Example:
+           group0 group1
+           40     100
+           75     999
+        ->
+           group0 group1
+           [40,   100]
+           75     999
+    """
+    result = [i[0] for i in sorted_list_2d]
+
+    """
+    100 < 999 is sure because it has already been sorted.
+    Put 999 in last of the sorted_list so that you can avoid unnecessary comparison.
+
+    Example:
+           group0 group1
+           [40,   100]
+           75     999
+        ->
+           group0 group1
+           [40,   100,   999]
+           75
+    """
+    result.append(sorted_list_2d[-1][1])
+
+    """
+    Insert the last odd item left if there is.
+
+    Example:
+           group0 group1
+           [40,   100,   999]
+           75
+        ->
+           group0 group1
+           [40,   100,   999,   10000]
+           75
+    """
+    if has_last_odd_item:
+        pivot = collection[-1]
+        result = binary_search_insertion(result, pivot)
+
+    """
+    Insert the remaining items.
+    In this case, 40 < 75 is sure because it has already been sorted.
+    Therefore, you only need to insert 75 into [100, 999, 10000],
+    so that you can avoid unnecessary comparison.
+
+    Example:
+           group0 group1
+           [40,   100,   999,   10000]
+            ^ You don't need to compare with this as 40 < 75 is already sure.
+           75
+        ->
+           [40,   75,    100,   999,   10000]
+    """
+    is_last_odd_item_inserted_before_this_index = False
+    for i in range(len(sorted_list_2d) - 1):
+        if result[i] == collection[-1] and has_last_odd_item:
+            is_last_odd_item_inserted_before_this_index = True
+        pivot = sorted_list_2d[i][1]
+        # If last_odd_item is inserted before the item's index,
+        # you should forward index one more.
+        if is_last_odd_item_inserted_before_this_index:
+            result = result[: i + 2] + binary_search_insertion(result[i + 2 :], pivot)
+        else:
+            result = result[: i + 1] + binary_search_insertion(result[i + 1 :], pivot)
+
+    return result
+
+
+if __name__ == "__main__":
+    user_input = input("Enter numbers separated by a comma:\n").strip()
+    unsorted = [int(item) for item in user_input.split(",")]
+    print(merge_insertion_sort(unsorted))
+
+## Merge Sort
+"""
+This is a pure Python implementation of the merge sort algorithm.
+
+For doctests run following command:
+python -m doctest -v merge_sort.py
+or
+python3 -m doctest -v merge_sort.py
+For manual testing run:
+python merge_sort.py
+"""
+
+
+def merge_sort(collection: list) -> list:
+    """
+    :param collection: some mutable ordered collection with heterogeneous
+    comparable items inside
+    :return: the same collection ordered by ascending
+    Examples:
+    >>> merge_sort([0, 5, 3, 2, 2])
+    [0, 2, 2, 3, 5]
+    >>> merge_sort([])
+    []
+    >>> merge_sort([-2, -5, -45])
+    [-45, -5, -2]
+    """
+
+    def merge(left: list, right: list) -> list:
+        """
+        Merge left and right.
+
+        :param left: left collection
+        :param right: right collection
+        :return: merge result
+        """
+
+        def _merge():
+            while left and right:
+                yield (left if left[0] <= right[0] else right).pop(0)
+            yield from left
+            yield from right
+
+        return list(_merge())
+
+    if len(collection) <= 1:
+        return collection
+    mid = len(collection) // 2
+    return merge(merge_sort(collection[:mid]), merge_sort(collection[mid:]))
+
+
+if __name__ == "__main__":
+    import doctest
+
+    doctest.testmod()
+    user_input = input("Enter numbers separated by a comma:\n").strip()
+    unsorted = [int(item) for item in user_input.split(",")]
+    print(*merge_sort(unsorted), sep=",")
+
+## Msd Radix Sort
+"""
+Python implementation of the MSD radix sort algorithm.
+It used the binary representation of the integers to sort
+them.
+https://en.wikipedia.org/wiki/Radix_sort
+"""
+from __future__ import annotations
+
+
+def msd_radix_sort(list_of_ints: list[int]) -> list[int]:
+    """
+    Implementation of the MSD radix sort algorithm. Only works
+    with positive integers
+    :param list_of_ints: A list of integers
+    :return: Returns the sorted list
+    >>> msd_radix_sort([40, 12, 1, 100, 4])
+    [1, 4, 12, 40, 100]
+    >>> msd_radix_sort([])
+    []
+    >>> msd_radix_sort([123, 345, 123, 80])
+    [80, 123, 123, 345]
+    >>> msd_radix_sort([1209, 834598, 1, 540402, 45])
+    [1, 45, 1209, 540402, 834598]
+    >>> msd_radix_sort([-1, 34, 45])
+    Traceback (most recent call last):
+        ...
+    ValueError: All numbers must be positive
+    """
+    if not list_of_ints:
+        return []
+
+    if min(list_of_ints) < 0:
+        raise ValueError("All numbers must be positive")
+
+    most_bits = max(len(bin(x)[2:]) for x in list_of_ints)
+    return _msd_radix_sort(list_of_ints, most_bits)
+
+
+def _msd_radix_sort(list_of_ints: list[int], bit_position: int) -> list[int]:
+    """
+    Sort the given list based on the bit at bit_position. Numbers with a
+    0 at that position will be at the start of the list, numbers with a
+    1 at the end.
+    :param list_of_ints: A list of integers
+    :param bit_position: the position of the bit that gets compared
+    :return: Returns a partially sorted list
+    >>> _msd_radix_sort([45, 2, 32], 1)
+    [2, 32, 45]
+    >>> _msd_radix_sort([10, 4, 12], 2)
+    [4, 12, 10]
+    """
+    if bit_position == 0 or len(list_of_ints) in [0, 1]:
+        return list_of_ints
+
+    zeros = []
+    ones = []
+    # Split numbers based on bit at bit_position from the right
+    for number in list_of_ints:
+        if (number >> (bit_position - 1)) & 1:
+            # number has a one at bit bit_position
+            ones.append(number)
+        else:
+            # number has a zero at bit bit_position
+            zeros.append(number)
+
+    # recursively split both lists further
+    zeros = _msd_radix_sort(zeros, bit_position - 1)
+    ones = _msd_radix_sort(ones, bit_position - 1)
+
+    # recombine lists
+    res = zeros
+    res.extend(ones)
+
+    return res
+
+
+def msd_radix_sort_inplace(list_of_ints: list[int]):
+    """
+    Inplace implementation of the MSD radix sort algorithm.
+    Sorts based on the binary representation of the integers.
+    >>> lst = [1, 345, 23, 89, 0, 3]
+    >>> msd_radix_sort_inplace(lst)
+    >>> lst == sorted(lst)
+    True
+    >>> lst = [1, 43, 0, 0, 0, 24, 3, 3]
+    >>> msd_radix_sort_inplace(lst)
+    >>> lst == sorted(lst)
+    True
+    >>> lst = []
+    >>> msd_radix_sort_inplace(lst)
+    >>> lst == []
+    True
+    >>> lst = [-1, 34, 23, 4, -42]
+    >>> msd_radix_sort_inplace(lst)
+    Traceback (most recent call last):
+        ...
+    ValueError: All numbers must be positive
+    """
+
+    length = len(list_of_ints)
+    if not list_of_ints or length == 1:
+        return
+
+    if min(list_of_ints) < 0:
+        raise ValueError("All numbers must be positive")
+
+    most_bits = max(len(bin(x)[2:]) for x in list_of_ints)
+    _msd_radix_sort_inplace(list_of_ints, most_bits, 0, length)
+
+
+def _msd_radix_sort_inplace(
+    list_of_ints: list[int], bit_position: int, begin_index: int, end_index: int
+):
+    """
+    Sort the given list based on the bit at bit_position. Numbers with a
+    0 at that position will be at the start of the list, numbers with a
+    1 at the end.
+    >>> lst = [45, 2, 32, 24, 534, 2932]
+    >>> _msd_radix_sort_inplace(lst, 1, 0, 3)
+    >>> lst == [32, 2, 45, 24, 534, 2932]
+    True
+    >>> lst = [0, 2, 1, 3, 12, 10, 4, 90, 54, 2323, 756]
+    >>> _msd_radix_sort_inplace(lst, 2, 4, 7)
+    >>> lst == [0, 2, 1, 3, 12, 4, 10, 90, 54, 2323, 756]
+    True
+    """
+    if bit_position == 0 or end_index - begin_index <= 1:
+        return
+
+    bit_position -= 1
+
+    i = begin_index
+    j = end_index - 1
+    while i <= j:
+        changed = False
+        if not (list_of_ints[i] >> bit_position) & 1:
+            # found zero at the beginning
+            i += 1
+            changed = True
+        if (list_of_ints[j] >> bit_position) & 1:
+            # found one at the end
+            j -= 1
+            changed = True
+
+        if changed:
+            continue
+
+        list_of_ints[i], list_of_ints[j] = list_of_ints[j], list_of_ints[i]
+        j -= 1
+        if j != i:
+            i += 1
+
+    _msd_radix_sort_inplace(list_of_ints, bit_position, begin_index, i)
+    _msd_radix_sort_inplace(list_of_ints, bit_position, i, end_index)
+
+
+if __name__ == "__main__":
+    import doctest
+
+    doctest.testmod()
+
+## Natural Sort
+from __future__ import annotations
+
+import re
+
+
+def natural_sort(input_list: list[str]) -> list[str]:
+    """
+    Sort the given list of strings in the way that humans expect.
+
+    The normal Python sort algorithm sorts lexicographically,
+    so you might not get the results that you expect...
+
+    >>> example1 = ['2 ft 7 in', '1 ft 5 in', '10 ft 2 in', '2 ft 11 in', '7 ft 6 in']
+    >>> sorted(example1)
+    ['1 ft 5 in', '10 ft 2 in', '2 ft 11 in', '2 ft 7 in', '7 ft 6 in']
+    >>> # The natural sort algorithm sort based on meaning and not computer code point.
+    >>> natural_sort(example1)
+    ['1 ft 5 in', '2 ft 7 in', '2 ft 11 in', '7 ft 6 in', '10 ft 2 in']
+
+    >>> example2 = ['Elm11', 'Elm12', 'Elm2', 'elm0', 'elm1', 'elm10', 'elm13', 'elm9']
+    >>> sorted(example2)
+    ['Elm11', 'Elm12', 'Elm2', 'elm0', 'elm1', 'elm10', 'elm13', 'elm9']
+    >>> natural_sort(example2)
+    ['elm0', 'elm1', 'Elm2', 'elm9', 'elm10', 'Elm11', 'Elm12', 'elm13']
+    """
+
+    def alphanum_key(key):
+        return [int(s) if s.isdigit() else s.lower() for s in re.split("([0-9]+)", key)]
+
+    return sorted(input_list, key=alphanum_key)
+
+
+if __name__ == "__main__":
+    import doctest
+
+    doctest.testmod()
+
+## Odd Even Sort
+"""
+Odd even sort implementation.
+
+https://en.wikipedia.org/wiki/Odd%E2%80%93even_sort
+"""
+
+
+def odd_even_sort(input_list: list) -> list:
+    """
+    Sort input with odd even sort.
+
+    This algorithm uses the same idea of bubblesort,
+    but by first dividing in two phase (odd and even).
+    Originally developed for use on parallel processors
+    with local interconnections.
+    :param collection: mutable ordered sequence of elements
+    :return: same collection in ascending order
+    Examples:
+    >>> odd_even_sort([5 , 4 ,3 ,2 ,1])
+    [1, 2, 3, 4, 5]
+    >>> odd_even_sort([])
+    []
+    >>> odd_even_sort([-10 ,-1 ,10 ,2])
+    [-10, -1, 2, 10]
+    >>> odd_even_sort([1 ,2 ,3 ,4])
+    [1, 2, 3, 4]
+    """
+    is_sorted = False
+    while is_sorted is False:  # Until all the indices are traversed keep looping
+        is_sorted = True
+        for i in range(0, len(input_list) - 1, 2):  # iterating over all even indices
+            if input_list[i] > input_list[i + 1]:
+                input_list[i], input_list[i + 1] = input_list[i + 1], input_list[i]
+                # swapping if elements not in order
+                is_sorted = False
+
+        for i in range(1, len(input_list) - 1, 2):  # iterating over all odd indices
+            if input_list[i] > input_list[i + 1]:
+                input_list[i], input_list[i + 1] = input_list[i + 1], input_list[i]
+                # swapping if elements not in order
+                is_sorted = False
+    return input_list
+
+
+if __name__ == "__main__":
+    print("Enter list to be sorted")
+    input_list = [int(x) for x in input().split()]
+    # inputing elements of the list in one line
+    sorted_list = odd_even_sort(input_list)
+    print("The sorted list is")
+    print(sorted_list)
+
+## Odd Even Transposition Parallel
+"""
+This is an implementation of odd-even transposition sort.
+
+It works by performing a series of parallel swaps between odd and even pairs of
+variables in the list.
+
+This implementation represents each variable in the list with a process and
+each process communicates with its neighboring processes in the list to perform
+comparisons.
+They are synchronized with locks and message passing but other forms of
+synchronization could be used.
+"""
+from multiprocessing import Lock, Pipe, Process
+
+# lock used to ensure that two processes do not access a pipe at the same time
+process_lock = Lock()
+
+"""
+The function run by the processes that sorts the list
+
+position = the position in the list the process represents, used to know which
+            neighbor we pass our value to
+value = the initial value at list[position]
+LSend, RSend = the pipes we use to send to our left and right neighbors
+LRcv, RRcv = the pipes we use to receive from our left and right neighbors
+resultPipe = the pipe used to send results back to main
+"""
+
+
+def oe_process(position, value, l_send, r_send, lr_cv, rr_cv, result_pipe):
+    global process_lock
+
+    # we perform n swaps since after n swaps we know we are sorted
+    # we *could* stop early if we are sorted already, but it takes as long to
+    # find out we are sorted as it does to sort the list with this algorithm
+    for i in range(0, 10):
+        if (i + position) % 2 == 0 and r_send is not None:
+            # send your value to your right neighbor
+            process_lock.acquire()
+            r_send[1].send(value)
+            process_lock.release()
+
+            # receive your right neighbor's value
+            process_lock.acquire()
+            temp = rr_cv[0].recv()
+            process_lock.release()
+
+            # take the lower value since you are on the left
+            value = min(value, temp)
+        elif (i + position) % 2 != 0 and l_send is not None:
+            # send your value to your left neighbor
+            process_lock.acquire()
+            l_send[1].send(value)
+            process_lock.release()
+
+            # receive your left neighbor's value
+            process_lock.acquire()
+            temp = lr_cv[0].recv()
+            process_lock.release()
+
+            # take the higher value since you are on the right
+            value = max(value, temp)
+    # after all swaps are performed, send the values back to main
+    result_pipe[1].send(value)
+
+
+"""
+the function which creates the processes that perform the parallel swaps
+
+arr = the list to be sorted
+"""
+
+
+def odd_even_transposition(arr):
+    process_array_ = []
+    result_pipe = []
+    # initialize the list of pipes where the values will be retrieved
+    for _ in arr:
+        result_pipe.append(Pipe())
+    # creates the processes
+    # the first and last process only have one neighbor so they are made outside
+    # of the loop
+    temp_rs = Pipe()
+    temp_rr = Pipe()
+    process_array_.append(
+        Process(
+            target=oe_process,
+            args=(0, arr[0], None, temp_rs, None, temp_rr, result_pipe[0]),
+        )
+    )
+    temp_lr = temp_rs
+    temp_ls = temp_rr
+
+    for i in range(1, len(arr) - 1):
+        temp_rs = Pipe()
+        temp_rr = Pipe()
+        process_array_.append(
+            Process(
+                target=oe_process,
+                args=(i, arr[i], temp_ls, temp_rs, temp_lr, temp_rr, result_pipe[i]),
+            )
+        )
+        temp_lr = temp_rs
+        temp_ls = temp_rr
+
+    process_array_.append(
+        Process(
+            target=oe_process,
+            args=(
+                len(arr) - 1,
+                arr[len(arr) - 1],
+                temp_ls,
+                None,
+                temp_lr,
+                None,
+                result_pipe[len(arr) - 1],
+            ),
+        )
+    )
+
+    # start the processes
+    for p in process_array_:
+        p.start()
+
+    # wait for the processes to end and write their values to the list
+    for p in range(0, len(result_pipe)):
+        arr[p] = result_pipe[p][0].recv()
+        process_array_[p].join()
+    return arr
+
+
+# creates a reverse sorted list and sorts it
+def main():
+    arr = list(range(10, 0, -1))
+    print("Initial List")
+    print(*arr)
+    arr = odd_even_transposition(arr)
+    print("Sorted List\n")
+    print(*arr)
+
+
+if __name__ == "__main__":
+    main()
+
+## Odd Even Transposition Single Threaded
+"""
+Source: https://en.wikipedia.org/wiki/Odd%E2%80%93even_sort
+
+This is a non-parallelized implementation of odd-even transposition sort.
+
+Normally the swaps in each set happen simultaneously, without that the algorithm
+is no better than bubble sort.
+"""
+
+
+def odd_even_transposition(arr: list) -> list:
+    """
+    >>> odd_even_transposition([5, 4, 3, 2, 1])
+    [1, 2, 3, 4, 5]
+
+    >>> odd_even_transposition([13, 11, 18, 0, -1])
+    [-1, 0, 11, 13, 18]
+
+    >>> odd_even_transposition([-.1, 1.1, .1, -2.9])
+    [-2.9, -0.1, 0.1, 1.1]
+    """
+    arr_size = len(arr)
+    for _ in range(arr_size):
+        for i in range(_ % 2, arr_size - 1, 2):
+            if arr[i + 1] < arr[i]:
+                arr[i], arr[i + 1] = arr[i + 1], arr[i]
+
+    return arr
+
+
+if __name__ == "__main__":
+    arr = list(range(10, 0, -1))
+    print(f"Original: {arr}. Sorted: {odd_even_transposition(arr)}")
+
+## Pancake Sort
+"""
+This is a pure Python implementation of the pancake sort algorithm
+For doctests run following command:
+python3 -m doctest -v pancake_sort.py
+or
+python -m doctest -v pancake_sort.py
+For manual testing run:
+python pancake_sort.py
+"""
+
+
+def pancake_sort(arr):
+    """Sort Array with Pancake Sort.
+    :param arr: Collection containing comparable items
+    :return: Collection ordered in ascending order of items
+    Examples:
+    >>> pancake_sort([0, 5, 3, 2, 2])
+    [0, 2, 2, 3, 5]
+    >>> pancake_sort([])
+    []
+    >>> pancake_sort([-2, -5, -45])
+    [-45, -5, -2]
+    """
+    cur = len(arr)
+    while cur > 1:
+        # Find the maximum number in arr
+        mi = arr.index(max(arr[0:cur]))
+        # Reverse from 0 to mi
+        arr = arr[mi::-1] + arr[mi + 1 : len(arr)]
+        # Reverse whole list
+        arr = arr[cur - 1 :: -1] + arr[cur : len(arr)]
+        cur -= 1
+    return arr
+
+
+if __name__ == "__main__":
+    user_input = input("Enter numbers separated by a comma:\n").strip()
+    unsorted = [int(item) for item in user_input.split(",")]
+    print(pancake_sort(unsorted))
+
+## Patience Sort
+from __future__ import annotations
+
+from bisect import bisect_left
+from functools import total_ordering
+from heapq import merge
+
+"""
+A pure Python implementation of the patience sort algorithm
+
+For more information: https://en.wikipedia.org/wiki/Patience_sorting
+
+This algorithm is based on the card game patience
+
+For doctests run following command:
+python3 -m doctest -v patience_sort.py
+
+For manual testing run:
+python3 patience_sort.py
+"""
+
+
+@total_ordering
+class Stack(list):
+    def __lt__(self, other):
+        return self[-1] < other[-1]
+
+    def __eq__(self, other):
+        return self[-1] == other[-1]
+
+
+def patience_sort(collection: list) -> list:
+    """A pure implementation of patience sort algorithm in Python
+
+    :param collection: some mutable ordered collection with heterogeneous
+    comparable items inside
+    :return: the same collection ordered by ascending
+
+    Examples:
+    >>> patience_sort([1, 9, 5, 21, 17, 6])
+    [1, 5, 6, 9, 17, 21]
+
+    >>> patience_sort([])
+    []
+
+    >>> patience_sort([-3, -17, -48])
+    [-48, -17, -3]
+    """
+    stacks: list[Stack] = []
+    # sort into stacks
+    for element in collection:
+        new_stacks = Stack([element])
+        i = bisect_left(stacks, new_stacks)
+        if i != len(stacks):
+            stacks[i].append(element)
+        else:
+            stacks.append(new_stacks)
+
+    # use a heap-based merge to merge stack efficiently
+    collection[:] = merge(*(reversed(stack) for stack in stacks))
+    return collection
+
+
+if __name__ == "__main__":
+    user_input = input("Enter numbers separated by a comma:\n").strip()
+    unsorted = [int(item) for item in user_input.split(",")]
+    print(patience_sort(unsorted))
+  
+## Pigeon Sort
+"""
+    This is an implementation of Pigeon Hole Sort.
+    For doctests run following command:
+
+    python3 -m doctest -v pigeon_sort.py
+    or
+    python -m doctest -v pigeon_sort.py
+
+    For manual testing run:
+    python pigeon_sort.py
+"""
+from __future__ import annotations
+
+
+def pigeon_sort(array: list[int]) -> list[int]:
+    """
+    Implementation of pigeon hole sort algorithm
+    :param array: Collection of comparable items
+    :return: Collection sorted in ascending order
+    >>> pigeon_sort([0, 5, 3, 2, 2])
+    [0, 2, 2, 3, 5]
+    >>> pigeon_sort([])
+    []
+    >>> pigeon_sort([-2, -5, -45])
+    [-45, -5, -2]
+    """
+    if len(array) == 0:
+        return array
+
+    _min, _max = min(array), max(array)
+
+    # Compute the variables
+    holes_range = _max - _min + 1
+    holes, holes_repeat = [0] * holes_range, [0] * holes_range
+
+    # Make the sorting.
+    for i in array:
+        index = i - _min
+        holes[index] = i
+        holes_repeat[index] += 1
+
+    # Makes the array back by replacing the numbers.
+    index = 0
+    for i in range(holes_range):
+        while holes_repeat[i] > 0:
+            array[index] = holes[i]
+            index += 1
+            holes_repeat[i] -= 1
+
+    # Returns the sorted array.
+    return array
+
+
+if __name__ == "__main__":
+    import doctest
+
+    doctest.testmod()
+    user_input = input("Enter numbers separated by comma:\n")
+    unsorted = [int(x) for x in user_input.split(",")]
+    print(pigeon_sort(unsorted))
+
+## Pigeonhole Sort
+# Python program to implement Pigeonhole Sorting in python
+
+# Algorithm for the pigeonhole sorting
+
+
+def pigeonhole_sort(a):
+    """
+    >>> a = [8, 3, 2, 7, 4, 6, 8]
+    >>> b = sorted(a)  # a nondestructive sort
+    >>> pigeonhole_sort(a)  # a destructive sort
+    >>> a == b
+    True
+    """
+    # size of range of values in the list (ie, number of pigeonholes we need)
+
+    min_val = min(a)  # min() finds the minimum value
+    max_val = max(a)  # max() finds the maximum value
+
+    size = max_val - min_val + 1  # size is difference of max and min values plus one
+
+    # list of pigeonholes of size equal to the variable size
+    holes = [0] * size
+
+    # Populate the pigeonholes.
+    for x in a:
+        assert isinstance(x, int), "integers only please"
+        holes[x - min_val] += 1
+
+    # Putting the elements back into the array in an order.
+    i = 0
+    for count in range(size):
+        while holes[count] > 0:
+            holes[count] -= 1
+            a[i] = count + min_val
+            i += 1
+
+
+def main():
+    a = [8, 3, 2, 7, 4, 6, 8]
+    pigeonhole_sort(a)
+    print("Sorted order is:", " ".join(a))
+
+
+if __name__ == "__main__":
+    main()
+
+## Quick Sort
+"""
+A pure Python implementation of the quick sort algorithm
+
+For doctests run following command:
+python3 -m doctest -v quick_sort.py
+
+For manual testing run:
+python3 quick_sort.py
+"""
+from __future__ import annotations
+
+from random import randrange
+
+
+def quick_sort(collection: list) -> list:
+    """A pure Python implementation of quick sort algorithm
+
+    :param collection: a mutable collection of comparable items
+    :return: the same collection ordered by ascending
+
+    Examples:
+    >>> quick_sort([0, 5, 3, 2, 2])
+    [0, 2, 2, 3, 5]
+    >>> quick_sort([])
+    []
+    >>> quick_sort([-2, 5, 0, -45])
+    [-45, -2, 0, 5]
+    """
+    if len(collection) < 2:
+        return collection
+    pivot_index = randrange(len(collection))  # Use random element as pivot
+    pivot = collection[pivot_index]
+    greater: list[int] = []  # All elements greater than pivot
+    lesser: list[int] = []  # All elements less than or equal to pivot
+
+    for element in collection[:pivot_index]:
+        (greater if element > pivot else lesser).append(element)
+
+    for element in collection[pivot_index + 1 :]:
+        (greater if element > pivot else lesser).append(element)
+
+    return [*quick_sort(lesser), pivot, *quick_sort(greater)]
+
+
+if __name__ == "__main__":
+    user_input = input("Enter numbers separated by a comma:\n").strip()
+    unsorted = [int(item) for item in user_input.split(",")]
+    print(quick_sort(unsorted))
+
+## Quick Sort 3 Partition
+def quick_sort_3partition(sorting: list, left: int, right: int) -> None:
+    if right <= left:
+        return
+    a = i = left
+    b = right
+    pivot = sorting[left]
+    while i <= b:
+        if sorting[i] < pivot:
+            sorting[a], sorting[i] = sorting[i], sorting[a]
+            a += 1
+            i += 1
+        elif sorting[i] > pivot:
+            sorting[b], sorting[i] = sorting[i], sorting[b]
+            b -= 1
+        else:
+            i += 1
+    quick_sort_3partition(sorting, left, a - 1)
+    quick_sort_3partition(sorting, b + 1, right)
+
+
+def quick_sort_lomuto_partition(sorting: list, left: int, right: int) -> None:
+    """
+    A pure Python implementation of quick sort algorithm(in-place)
+    with Lomuto partition scheme:
+    https://en.wikipedia.org/wiki/Quicksort#Lomuto_partition_scheme
+
+    :param sorting: sort list
+    :param left: left endpoint of sorting
+    :param right: right endpoint of sorting
+    :return: None
+
+    Examples:
+    >>> nums1 = [0, 5, 3, 1, 2]
+    >>> quick_sort_lomuto_partition(nums1, 0, 4)
+    >>> nums1
+    [0, 1, 2, 3, 5]
+    >>> nums2 = []
+    >>> quick_sort_lomuto_partition(nums2, 0, 0)
+    >>> nums2
+    []
+    >>> nums3 = [-2, 5, 0, -4]
+    >>> quick_sort_lomuto_partition(nums3, 0, 3)
+    >>> nums3
+    [-4, -2, 0, 5]
+    """
+    if left < right:
+        pivot_index = lomuto_partition(sorting, left, right)
+        quick_sort_lomuto_partition(sorting, left, pivot_index - 1)
+        quick_sort_lomuto_partition(sorting, pivot_index + 1, right)
+
+
+def lomuto_partition(sorting: list, left: int, right: int) -> int:
+    """
+    Example:
+    >>> lomuto_partition([1,5,7,6], 0, 3)
+    2
+    """
+    pivot = sorting[right]
+    store_index = left
+    for i in range(left, right):
+        if sorting[i] < pivot:
+            sorting[store_index], sorting[i] = sorting[i], sorting[store_index]
+            store_index += 1
+    sorting[right], sorting[store_index] = sorting[store_index], sorting[right]
+    return store_index
+
+
+def three_way_radix_quicksort(sorting: list) -> list:
+    """
+    Three-way radix quicksort:
+    https://en.wikipedia.org/wiki/Quicksort#Three-way_radix_quicksort
+    First divide the list into three parts.
+    Then recursively sort the "less than" and "greater than" partitions.
+
+    >>> three_way_radix_quicksort([])
+    []
+    >>> three_way_radix_quicksort([1])
+    [1]
+    >>> three_way_radix_quicksort([-5, -2, 1, -2, 0, 1])
+    [-5, -2, -2, 0, 1, 1]
+    >>> three_way_radix_quicksort([1, 2, 5, 1, 2, 0, 0, 5, 2, -1])
+    [-1, 0, 0, 1, 1, 2, 2, 2, 5, 5]
+    """
+    if len(sorting) <= 1:
+        return sorting
+    return (
+        three_way_radix_quicksort([i for i in sorting if i < sorting[0]])
+        + [i for i in sorting if i == sorting[0]]
+        + three_way_radix_quicksort([i for i in sorting if i > sorting[0]])
+    )
+
+
+if __name__ == "__main__":
+    import doctest
+
+    doctest.testmod(verbose=True)
+
+    user_input = input("Enter numbers separated by a comma:\n").strip()
+    unsorted = [int(item) for item in user_input.split(",")]
+    quick_sort_3partition(unsorted, 0, len(unsorted) - 1)
+    print(unsorted)
+
+## Radix Sort
+"""
+This is a pure Python implementation of the radix sort algorithm
+
+Source: https://en.wikipedia.org/wiki/Radix_sort
+"""
+from __future__ import annotations
+
+RADIX = 10
+
+
+def radix_sort(list_of_ints: list[int]) -> list[int]:
+    """
+    Examples:
+    >>> radix_sort([0, 5, 3, 2, 2])
+    [0, 2, 2, 3, 5]
+
+    >>> radix_sort(list(range(15))) == sorted(range(15))
+    True
+    >>> radix_sort(list(range(14,-1,-1))) == sorted(range(15))
+    True
+    >>> radix_sort([1,100,10,1000]) == sorted([1,100,10,1000])
+    True
+    """
+    placement = 1
+    max_digit = max(list_of_ints)
+    while placement <= max_digit:
+        # declare and initialize empty buckets
+        buckets: list[list] = [[] for _ in range(RADIX)]
+        # split list_of_ints between the buckets
+        for i in list_of_ints:
+            tmp = int((i / placement) % RADIX)
+            buckets[tmp].append(i)
+        # put each buckets' contents into list_of_ints
+        a = 0
+        for b in range(RADIX):
+            for i in buckets[b]:
+                list_of_ints[a] = i
+                a += 1
+        # move to next
+        placement *= RADIX
+    return list_of_ints
+
+
+if __name__ == "__main__":
+    import doctest
+
+    doctest.testmod()
+
+## Random Normal Distribution Quicksort
+from random import randint
+from tempfile import TemporaryFile
+
+import numpy as np
+
+
+def _in_place_quick_sort(a, start, end):
+    count = 0
+    if start < end:
+        pivot = randint(start, end)
+        temp = a[end]
+        a[end] = a[pivot]
+        a[pivot] = temp
+
+        p, count = _in_place_partition(a, start, end)
+        count += _in_place_quick_sort(a, start, p - 1)
+        count += _in_place_quick_sort(a, p + 1, end)
+    return count
+
+
+def _in_place_partition(a, start, end):
+    count = 0
+    pivot = randint(start, end)
+    temp = a[end]
+    a[end] = a[pivot]
+    a[pivot] = temp
+    new_pivot_index = start - 1
+    for index in range(start, end):
+        count += 1
+        if a[index] < a[end]:  # check if current val is less than pivot value
+            new_pivot_index = new_pivot_index + 1
+            temp = a[new_pivot_index]
+            a[new_pivot_index] = a[index]
+            a[index] = temp
+
+    temp = a[new_pivot_index + 1]
+    a[new_pivot_index + 1] = a[end]
+    a[end] = temp
+    return new_pivot_index + 1, count
+
+
+outfile = TemporaryFile()
+p = 100  # 1000 elements are to be sorted
+
+
+mu, sigma = 0, 1  # mean and standard deviation
+X = np.random.normal(mu, sigma, p)
+np.save(outfile, X)
+print("The array is")
+print(X)
+
+
+outfile.seek(0)  # using the same array
+M = np.load(outfile)
+r = len(M) - 1
+z = _in_place_quick_sort(M, 0, r)
+
+print(
+    "No of Comparisons for 100 elements selected from a standard normal distribution"
+    "is :"
+)
+print(z)
+
+## Random Pivot Quick Sort
+"""
+Picks the random index as the pivot
+"""
+import random
+
+
+def partition(a, left_index, right_index):
+    pivot = a[left_index]
+    i = left_index + 1
+    for j in range(left_index + 1, right_index):
+        if a[j] < pivot:
+            a[j], a[i] = a[i], a[j]
+            i += 1
+    a[left_index], a[i - 1] = a[i - 1], a[left_index]
+    return i - 1
+
+
+def quick_sort_random(a, left, right):
+    if left < right:
+        pivot = random.randint(left, right - 1)
+        a[pivot], a[left] = (
+            a[left],
+            a[pivot],
+        )  # switches the pivot with the left most bound
+        pivot_index = partition(a, left, right)
+        quick_sort_random(
+            a, left, pivot_index
+        )  # recursive quicksort to the left of the pivot point
+        quick_sort_random(
+            a, pivot_index + 1, right
+        )  # recursive quicksort to the right of the pivot point
+
+
+def main():
+    user_input = input("Enter numbers separated by a comma:\n").strip()
+    arr = [int(item) for item in user_input.split(",")]
+
+    quick_sort_random(arr, 0, len(arr))
+
+    print(arr)
+
+
+if __name__ == "__main__":
+    main()
+
+## Recursive Bubble Sort
+def bubble_sort(list_data: list, length: int = 0) -> list:
+    """
+    It is similar is bubble sort but recursive.
+    :param list_data: mutable ordered sequence of elements
+    :param length: length of list data
+    :return: the same list in ascending order
+
+    >>> bubble_sort([0, 5, 2, 3, 2], 5)
+    [0, 2, 2, 3, 5]
+
+    >>> bubble_sort([], 0)
+    []
+
+    >>> bubble_sort([-2, -45, -5], 3)
+    [-45, -5, -2]
+
+    >>> bubble_sort([-23, 0, 6, -4, 34], 5)
+    [-23, -4, 0, 6, 34]
+
+    >>> bubble_sort([-23, 0, 6, -4, 34], 5) == sorted([-23, 0, 6, -4, 34])
+    True
+
+    >>> bubble_sort(['z','a','y','b','x','c'], 6)
+    ['a', 'b', 'c', 'x', 'y', 'z']
+
+    >>> bubble_sort([1.1, 3.3, 5.5, 7.7, 2.2, 4.4, 6.6])
+    [1.1, 2.2, 3.3, 4.4, 5.5, 6.6, 7.7]
+    """
+    length = length or len(list_data)
+    swapped = False
+    for i in range(length - 1):
+        if list_data[i] > list_data[i + 1]:
+            list_data[i], list_data[i + 1] = list_data[i + 1], list_data[i]
+            swapped = True
+
+    return list_data if not swapped else bubble_sort(list_data, length - 1)
+
+
+if __name__ == "__main__":
+    import doctest
+
+    doctest.testmod()
+
+## Recursive Insertion Sort
+"""
+A recursive implementation of the insertion sort algorithm
+"""
+from __future__ import annotations
+
+
+def rec_insertion_sort(collection: list, n: int):
+    """
+    Given a collection of numbers and its length, sorts the collections
+    in ascending order
+
+    :param collection: A mutable collection of comparable elements
+    :param n: The length of collections
+
+    >>> col = [1, 2, 1]
+    >>> rec_insertion_sort(col, len(col))
+    >>> col
+    [1, 1, 2]
+
+    >>> col = [2, 1, 0, -1, -2]
+    >>> rec_insertion_sort(col, len(col))
+    >>> col
+    [-2, -1, 0, 1, 2]
+
+    >>> col = [1]
+    >>> rec_insertion_sort(col, len(col))
+    >>> col
+    [1]
+    """
+    # Checks if the entire collection has been sorted
+    if len(collection) <= 1 or n <= 1:
+        return
+
+    insert_next(collection, n - 1)
+    rec_insertion_sort(collection, n - 1)
+
+
+def insert_next(collection: list, index: int):
+    """
+    Inserts the '(index-1)th' element into place
+
+    >>> col = [3, 2, 4, 2]
+    >>> insert_next(col, 1)
+    >>> col
+    [2, 3, 4, 2]
+
+    >>> col = [3, 2, 3]
+    >>> insert_next(col, 2)
+    >>> col
+    [3, 2, 3]
+
+    >>> col = []
+    >>> insert_next(col, 1)
+    >>> col
+    []
+    """
+    # Checks order between adjacent elements
+    if index >= len(collection) or collection[index - 1] <= collection[index]:
+        return
+
+    # Swaps adjacent elements since they are not in ascending order
+    collection[index - 1], collection[index] = (
+        collection[index],
+        collection[index - 1],
+    )
+
+    insert_next(collection, index + 1)
+
+
+if __name__ == "__main__":
+    numbers = input("Enter integers separated by spaces: ")
+    number_list: list[int] = [int(num) for num in numbers.split()]
+    rec_insertion_sort(number_list, len(number_list))
+    print(number_list)
+
+## Recursive Mergesort Array
+"""A merge sort which accepts an array as input and recursively
+splits an array in half and sorts and combines them.
+"""
+
+"""https://en.wikipedia.org/wiki/Merge_sort """
+
+
+def merge(arr: list[int]) -> list[int]:
+    """Return a sorted array.
+    >>> merge([10,9,8,7,6,5,4,3,2,1])
+    [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+    >>> merge([1,2,3,4,5,6,7,8,9,10])
+    [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+    >>> merge([10,22,1,2,3,9,15,23])
+    [1, 2, 3, 9, 10, 15, 22, 23]
+    >>> merge([100])
+    [100]
+    >>> merge([])
+    []
+    """
+    if len(arr) > 1:
+        middle_length = len(arr) // 2  # Finds the middle of the array
+        left_array = arr[
+            :middle_length
+        ]  # Creates an array of the elements in the first half.
+        right_array = arr[
+            middle_length:
+        ]  # Creates an array of the elements in the second half.
+        left_size = len(left_array)
+        right_size = len(right_array)
+        merge(left_array)  # Starts sorting the left.
+        merge(right_array)  # Starts sorting the right
+        left_index = 0  # Left Counter
+        right_index = 0  # Right Counter
+        index = 0  # Position Counter
+        while (
+            left_index < left_size and right_index < right_size
+        ):  # Runs until the lowers size of the left and right are sorted.
+            if left_array[left_index] < right_array[right_index]:
+                arr[index] = left_array[left_index]
+                left_index += 1
+            else:
+                arr[index] = right_array[right_index]
+                right_index += 1
+            index += 1
+        while (
+            left_index < left_size
+        ):  # Adds the left over elements in the left half of the array
+            arr[index] = left_array[left_index]
+            left_index += 1
+            index += 1
+        while (
+            right_index < right_size
+        ):  # Adds the left over elements in the right half of the array
+            arr[index] = right_array[right_index]
+            right_index += 1
+            index += 1
+    return arr
+
+
+if __name__ == "__main__":
+    import doctest
+
+    doctest.testmod()
+
+## Recursive Quick Sort
+def quick_sort(data: list) -> list:
+    """
+    >>> for data in ([2, 1, 0], [2.2, 1.1, 0], "quick_sort"):
+    ...     quick_sort(data) == sorted(data)
+    True
+    True
+    True
+    """
+    if len(data) <= 1:
+        return data
+    else:
+        return [
+            *quick_sort([e for e in data[1:] if e <= data[0]]),
+            data[0],
+            *quick_sort([e for e in data[1:] if e > data[0]]),
+        ]
+
+
+if __name__ == "__main__":
+    import doctest
+
+    doctest.testmod()
+
+## Selection Sort
+"""
+This is a pure Python implementation of the selection sort algorithm
+
+For doctests run following command:
+python -m doctest -v selection_sort.py
+or
+python3 -m doctest -v selection_sort.py
+
+For manual testing run:
+python selection_sort.py
+"""
+
+
+def selection_sort(collection):
+    """Pure implementation of the selection sort algorithm in Python
+    :param collection: some mutable ordered collection with heterogeneous
+    comparable items inside
+    :return: the same collection ordered by ascending
+
+
+    Examples:
+    >>> selection_sort([0, 5, 3, 2, 2])
+    [0, 2, 2, 3, 5]
+
+    >>> selection_sort([])
+    []
+
+    >>> selection_sort([-2, -5, -45])
+    [-45, -5, -2]
+    """
+
+    length = len(collection)
+    for i in range(length - 1):
+        least = i
+        for k in range(i + 1, length):
+            if collection[k] < collection[least]:
+                least = k
+        if least != i:
+            collection[least], collection[i] = (collection[i], collection[least])
+    return collection
+
+
+if __name__ == "__main__":
+    user_input = input("Enter numbers separated by a comma:\n").strip()
+    unsorted = [int(item) for item in user_input.split(",")]
+    print(selection_sort(unsorted))
+
+## Shell Sort
+"""
+https://en.wikipedia.org/wiki/Shellsort#Pseudocode
+"""
+
+
+def shell_sort(collection):
+    """Pure implementation of shell sort algorithm in Python
+    :param collection:  Some mutable ordered collection with heterogeneous
+    comparable items inside
+    :return:  the same collection ordered by ascending
+
+    >>> shell_sort([0, 5, 3, 2, 2])
+    [0, 2, 2, 3, 5]
+    >>> shell_sort([])
+    []
+    >>> shell_sort([-2, -5, -45])
+    [-45, -5, -2]
+    """
+    # Marcin Ciura's gap sequence
+
+    gaps = [701, 301, 132, 57, 23, 10, 4, 1]
+    for gap in gaps:
+        for i in range(gap, len(collection)):
+            insert_value = collection[i]
+            j = i
+            while j >= gap and collection[j - gap] > insert_value:
+                collection[j] = collection[j - gap]
+                j -= gap
+            if j != i:
+                collection[j] = insert_value
+    return collection
+
+
+if __name__ == "__main__":
+    from doctest import testmod
+
+    testmod()
+    user_input = input("Enter numbers separated by a comma:\n").strip()
+    unsorted = [int(item) for item in user_input.split(",")]
+    print(shell_sort(unsorted))
+
+## Shrink Shell Sort
+"""
+This function implements the shell sort algorithm
+which is slightly faster than its pure implementation.
+
+This shell sort is implemented using a gap, which
+shrinks by a certain factor each iteration. In this
+implementation, the gap is initially set to the
+length of the collection. The gap is then reduced by
+a certain factor (1.3) each iteration.
+
+For each iteration, the algorithm compares elements
+that are a certain number of positions apart
+(determined by the gap). If the element at the higher
+position is greater than the element at the lower
+position, the two elements are swapped. The process
+is repeated until the gap is equal to 1.
+
+The reason this is more efficient is that it reduces
+the number of comparisons that need to be made. By
+using a smaller gap, the list is sorted more quickly.
+"""
+
+
+def shell_sort(collection: list) -> list:
+    """Implementation of shell sort algorithm in Python
+    :param collection:  Some mutable ordered collection with heterogeneous
+    comparable items inside
+    :return:  the same collection ordered by ascending
+
+    >>> shell_sort([3, 2, 1])
+    [1, 2, 3]
+    >>> shell_sort([])
+    []
+    >>> shell_sort([1])
+    [1]
+    """
+
+    # Choose an initial gap value
+    gap = len(collection)
+
+    # Set the gap value to be decreased by a factor of 1.3
+    # after each iteration
+    shrink = 1.3
+
+    # Continue sorting until the gap is 1
+    while gap > 1:
+        # Decrease the gap value
+        gap = int(gap / shrink)
+
+        # Sort the elements using insertion sort
+        for i in range(gap, len(collection)):
+            temp = collection[i]
+            j = i
+            while j >= gap and collection[j - gap] > temp:
+                collection[j] = collection[j - gap]
+                j -= gap
+            collection[j] = temp
+
+    return collection
+
+
+if __name__ == "__main__":
+    import doctest
+
+    doctest.testmod()
+
+## Slowsort
+"""
+Slowsort is a sorting algorithm. It is of humorous nature and not useful.
+It's based on the principle of multiply and surrender,
+a tongue-in-cheek joke of divide and conquer.
+It was published in 1986 by Andrei Broder and Jorge Stolfi
+in their paper Pessimal Algorithms and Simplexity Analysis
+(a parody of optimal algorithms and complexity analysis).
+
+Source: https://en.wikipedia.org/wiki/Slowsort
+"""
+from __future__ import annotations
+
+
+def slowsort(sequence: list, start: int | None = None, end: int | None = None) -> None:
+    """
+    Sorts sequence[start..end] (both inclusive) in-place.
+    start defaults to 0 if not given.
+    end defaults to len(sequence) - 1 if not given.
+    It returns None.
+    >>> seq = [1, 6, 2, 5, 3, 4, 4, 5]; slowsort(seq); seq
+    [1, 2, 3, 4, 4, 5, 5, 6]
+    >>> seq = []; slowsort(seq); seq
+    []
+    >>> seq = [2]; slowsort(seq); seq
+    [2]
+    >>> seq = [1, 2, 3, 4]; slowsort(seq); seq
+    [1, 2, 3, 4]
+    >>> seq = [4, 3, 2, 1]; slowsort(seq); seq
+    [1, 2, 3, 4]
+    >>> seq = [9, 8, 7, 6, 5, 4, 3, 2, 1, 0]; slowsort(seq, 2, 7); seq
+    [9, 8, 2, 3, 4, 5, 6, 7, 1, 0]
+    >>> seq = [9, 8, 7, 6, 5, 4, 3, 2, 1, 0]; slowsort(seq, end = 4); seq
+    [5, 6, 7, 8, 9, 4, 3, 2, 1, 0]
+    >>> seq = [9, 8, 7, 6, 5, 4, 3, 2, 1, 0]; slowsort(seq, start = 5); seq
+    [9, 8, 7, 6, 5, 0, 1, 2, 3, 4]
+    """
+    if start is None:
+        start = 0
+
+    if end is None:
+        end = len(sequence) - 1
+
+    if start >= end:
+        return
+
+    mid = (start + end) // 2
+
+    slowsort(sequence, start, mid)
+    slowsort(sequence, mid + 1, end)
+
+    if sequence[end] < sequence[mid]:
+        sequence[end], sequence[mid] = sequence[mid], sequence[end]
+
+    slowsort(sequence, start, end - 1)
+
+
+if __name__ == "__main__":
+    from doctest import testmod
+
+    testmod()
+
+## Stooge Sort
+def stooge_sort(arr):
+    """
+    Examples:
+    >>> stooge_sort([18.1, 0, -7.1, -1, 2, 2])
+    [-7.1, -1, 0, 2, 2, 18.1]
+
+    >>> stooge_sort([])
+    []
+    """
+    stooge(arr, 0, len(arr) - 1)
+    return arr
+
+
+def stooge(arr, i, h):
+    if i >= h:
+        return
+
+    # If first element is smaller than the last then swap them
+    if arr[i] > arr[h]:
+        arr[i], arr[h] = arr[h], arr[i]
+
+    # If there are more than 2 elements in the array
+    if h - i + 1 > 2:
+        t = (int)((h - i + 1) / 3)
+
+        # Recursively sort first 2/3 elements
+        stooge(arr, i, (h - t))
+
+        # Recursively sort last 2/3 elements
+        stooge(arr, i + t, (h))
+
+        # Recursively sort first 2/3 elements
+        stooge(arr, i, (h - t))
+
+
+if __name__ == "__main__":
+    user_input = input("Enter numbers separated by a comma:\n").strip()
+    unsorted = [int(item) for item in user_input.split(",")]
+    print(stooge_sort(unsorted))
+
+## Strand Sort
+import operator
+
+
+def strand_sort(arr: list, reverse: bool = False, solution: list | None = None) -> list:
+    """
+    Strand sort implementation
+    source: https://en.wikipedia.org/wiki/Strand_sort
+
+    :param arr: Unordered input list
+    :param reverse: Descent ordering flag
+    :param solution: Ordered items container
+
+    Examples:
+    >>> strand_sort([4, 2, 5, 3, 0, 1])
+    [0, 1, 2, 3, 4, 5]
+
+    >>> strand_sort([4, 2, 5, 3, 0, 1], reverse=True)
+    [5, 4, 3, 2, 1, 0]
+    """
+    _operator = operator.lt if reverse else operator.gt
+    solution = solution or []
+
+    if not arr:
+        return solution
+
+    sublist = [arr.pop(0)]
+    for i, item in enumerate(arr):
+        if _operator(item, sublist[-1]):
+            sublist.append(item)
+            arr.pop(i)
+
+    #  merging sublist into solution list
+    if not solution:
+        solution.extend(sublist)
+    else:
+        while sublist:
+            item = sublist.pop(0)
+            for i, xx in enumerate(solution):
+                if not _operator(item, xx):
+                    solution.insert(i, item)
+                    break
+            else:
+                solution.append(item)
+
+    strand_sort(arr, reverse, solution)
+    return solution
+
+
+if __name__ == "__main__":
+    assert strand_sort([4, 3, 5, 1, 2]) == [1, 2, 3, 4, 5]
+    assert strand_sort([4, 3, 5, 1, 2], reverse=True) == [5, 4, 3, 2, 1]
+
+## Tim Sort
+def binary_search(lst, item, start, end):
+    if start == end:
+        return start if lst[start] > item else start + 1
+    if start > end:
+        return start
+
+    mid = (start + end) // 2
+    if lst[mid] < item:
+        return binary_search(lst, item, mid + 1, end)
+    elif lst[mid] > item:
+        return binary_search(lst, item, start, mid - 1)
+    else:
+        return mid
+
+
+def insertion_sort(lst):
+    length = len(lst)
+
+    for index in range(1, length):
+        value = lst[index]
+        pos = binary_search(lst, value, 0, index - 1)
+        lst = lst[:pos] + [value] + lst[pos:index] + lst[index + 1 :]
+
+    return lst
+
+
+def merge(left, right):
+    if not left:
+        return right
+
+    if not right:
+        return left
+
+    if left[0] < right[0]:
+        return [left[0], *merge(left[1:], right)]
+
+    return [right[0], *merge(left, right[1:])]
+
+
+def tim_sort(lst):
+    """
+    >>> tim_sort("Python")
+    ['P', 'h', 'n', 'o', 't', 'y']
+    >>> tim_sort((1.1, 1, 0, -1, -1.1))
+    [-1.1, -1, 0, 1, 1.1]
+    >>> tim_sort(list(reversed(list(range(7)))))
+    [0, 1, 2, 3, 4, 5, 6]
+    >>> tim_sort([3, 2, 1]) == insertion_sort([3, 2, 1])
+    True
+    >>> tim_sort([3, 2, 1]) == sorted([3, 2, 1])
+    True
+    """
+    length = len(lst)
+    runs, sorted_runs = [], []
+    new_run = [lst[0]]
+    sorted_array = []
+    i = 1
+    while i < length:
+        if lst[i] < lst[i - 1]:
+            runs.append(new_run)
+            new_run = [lst[i]]
+        else:
+            new_run.append(lst[i])
+        i += 1
+    runs.append(new_run)
+
+    for run in runs:
+        sorted_runs.append(insertion_sort(run))
+    for run in sorted_runs:
+        sorted_array = merge(sorted_array, run)
+
+    return sorted_array
+
+
+def main():
+    lst = [5, 9, 10, 3, -4, 5, 178, 92, 46, -18, 0, 7]
+    sorted_lst = tim_sort(lst)
+    print(sorted_lst)
+
+
+if __name__ == "__main__":
+    main()
+
+## Topological Sort
+"""Topological Sort."""
+
+#     a
+#    / \
+#   b  c
+#  / \
+# d  e
+edges = {"a": ["c", "b"], "b": ["d", "e"], "c": [], "d": [], "e": []}
+vertices = ["a", "b", "c", "d", "e"]
+
+
+def topological_sort(start, visited, sort):
+    """Perform topological sort on a directed acyclic graph."""
+    current = start
+    # add current to visited
+    visited.append(current)
+    neighbors = edges[current]
+    for neighbor in neighbors:
+        # if neighbor not in visited, visit
+        if neighbor not in visited:
+            sort = topological_sort(neighbor, visited, sort)
+    # if all neighbors visited add current to sort
+    sort.append(current)
+    # if all vertices haven't been visited select a new one to visit
+    if len(visited) != len(vertices):
+        for vertice in vertices:
+            if vertice not in visited:
+                sort = topological_sort(vertice, visited, sort)
+    # return sort
+    return sort
+
+
+if __name__ == "__main__":
+    sort = topological_sort("a", [], [])
+    print(sort)
+
+## Tree Sort
+"""
+Tree_sort algorithm.
+
+Build a BST and in order traverse.
+"""
+
+
+class Node:
+    # BST data structure
+    def __init__(self, val):
+        self.val = val
+        self.left = None
+        self.right = None
+
+    def insert(self, val):
+        if self.val:
+            if val < self.val:
+                if self.left is None:
+                    self.left = Node(val)
+                else:
+                    self.left.insert(val)
+            elif val > self.val:
+                if self.right is None:
+                    self.right = Node(val)
+                else:
+                    self.right.insert(val)
+        else:
+            self.val = val
+
+
+def inorder(root, res):
+    # Recursive traversal
+    if root:
+        inorder(root.left, res)
+        res.append(root.val)
+        inorder(root.right, res)
+
+
+def tree_sort(arr):
+    # Build BST
+    if len(arr) == 0:
+        return arr
+    root = Node(arr[0])
+    for i in range(1, len(arr)):
+        root.insert(arr[i])
+    # Traverse BST in order.
+    res = []
+    inorder(root, res)
+    return res
+
+
+if __name__ == "__main__":
+    print(tree_sort([10, 1, 3, 2, 9, 14, 13]))
+
+## Unknown Sort
+"""
+Python implementation of a sort algorithm.
+Best Case Scenario : O(n)
+Worst Case Scenario : O(n^2) because native Python functions:min, max and remove are
+already O(n)
+"""
+
+
+def merge_sort(collection):
+    """Pure implementation of the fastest merge sort algorithm in Python
+
+    :param collection: some mutable ordered collection with heterogeneous
+    comparable items inside
+    :return: a collection ordered by ascending
+
+    Examples:
+    >>> merge_sort([0, 5, 3, 2, 2])
+    [0, 2, 2, 3, 5]
+
+    >>> merge_sort([])
+    []
+
+    >>> merge_sort([-2, -5, -45])
+    [-45, -5, -2]
+    """
+    start, end = [], []
+    while len(collection) > 1:
+        min_one, max_one = min(collection), max(collection)
+        start.append(min_one)
+        end.append(max_one)
+        collection.remove(min_one)
+        collection.remove(max_one)
+    end.reverse()
+    return start + collection + end
+
+
+if __name__ == "__main__":
+    user_input = input("Enter numbers separated by a comma:\n").strip()
+    unsorted = [int(item) for item in user_input.split(",")]
+    print(*merge_sort(unsorted), sep=",")
+
+## Wiggle Sort
+"""
+Wiggle Sort.
+
+Given an unsorted array nums, reorder it such
+that nums[0] < nums[1] > nums[2] < nums[3]....
+For example:
+if input numbers = [3, 5, 2, 1, 6, 4]
+one possible Wiggle Sorted answer is [3, 5, 1, 6, 2, 4].
+"""
+
+
+def wiggle_sort(nums: list) -> list:
+    """
+    Python implementation of wiggle.
+    Example:
+    >>> wiggle_sort([0, 5, 3, 2, 2])
+    [0, 5, 2, 3, 2]
+    >>> wiggle_sort([])
+    []
+    >>> wiggle_sort([-2, -5, -45])
+    [-45, -2, -5]
+    >>> wiggle_sort([-2.1, -5.68, -45.11])
+    [-45.11, -2.1, -5.68]
+    """
+    for i, _ in enumerate(nums):
+        if (i % 2 == 1) == (nums[i - 1] > nums[i]):
+            nums[i - 1], nums[i] = nums[i], nums[i - 1]
+
+    return nums
+
+
+if __name__ == "__main__":
+    print("Enter the array elements:")
+    array = list(map(int, input().split()))
+    print("The unsorted array is:")
+    print(array)
+    print("Array after Wiggle sort:")
+    print(wiggle_sort(array))
