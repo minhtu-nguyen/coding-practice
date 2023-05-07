@@ -1832,3 +1832,52 @@ Bottom-up solution: we follow the algorithm as:
 - Otherwise, declare an array of size n+1 and initialize the first three Tribonacci numbers.
 - Then we compute the 3rd Tribonacci number based on the sequence formula, then the 4th, and so on, iteratively till we reach the nth Tribonacci number.
 '''
+# Naive
+def tribonacci(n):
+    # base cases
+    if n == 0:
+        return 0
+    elif n == 1 or n == 2: 
+        return 1
+    # recursive case
+    return tribonacci(n - 1) + tribonacci(n - 2) + tribonacci(n - 3)
+
+# Optimized
+# -- Top down
+def tribonacci(n):
+    cache = [0] * (n + 1)
+    return tribonacciHelper(n, cache)
+
+def tribonacciHelper(n, cache):
+    # Base cases
+    if n == 0:
+        return 0
+    if n == 1 or n == 2:
+        return 1
+    
+    # Using memoization table to get the already evaluated result
+    if cache[n] != 0:
+        return cache[n]
+    
+    cache[n] = tribonacciHelper(n - 1, cache) + \
+                tribonacciHelper(n - 2, cache) + \
+                tribonacciHelper(n - 3, cache)
+    return cache[n]
+
+# -- Bottom up
+def tribonacci(n):
+    # Base cases
+    if n == 0:
+        return 0
+    if n == 1 or n == 2:
+        return 1
+    
+    # Creating an array
+    dp = [0] * (n + 1)
+    # First three tribonacci numbers
+    dp[1], dp[2] = 1, 1
+    
+    for i in range(3, n + 1):
+        dp[i] = dp[i - 1] + dp[i - 2] + dp[i - 3]
+    
+    return dp[n]
