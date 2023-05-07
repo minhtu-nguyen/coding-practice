@@ -1299,3 +1299,90 @@ def calculate_minimum_coins(coins, rem):
         return dp[rem]
     else:
         return -1
+
+## Coin Change II
+'''
+Suppose you are given a list of coins and a certain amount of money. Each coin in the list is unique and of a different denomination. You are required to count the number of ways the provided coins can sum up to represent the given amount. If there is no possible way to represent that amount, then return 0.
+Naive approach: While making the combinations, a point to keep in mind is that we should try to avoid repeatedly counting the same combinations. For example, 10+20 cents add up to 30 cents, and so do 20+10. In the context of combinations, both these sequences are the same, and we will count them as one combination. We can achieve this by using a subset of coins every time we consider them for combinations. The first time, we can use all n coins, the second time, we can use n−1 coins, that is, by excluding the largest one, and so on. This way, it is not possible to consider the same denomination more than once.
+As a base case, we return 1 when the target amount is zero because there is only one way to represent zero irrespective of the number and kinds of coins available. Similarly, for the second base case, if at any point during our search for combinations, the remaining value needed to reach the total amount becomes less than zero, we return 0.
+O(n^c) - O(c)
+---
+Optimized solution
+Top-down solution: We store all the results in memo and then retrieve them as needed. Since we had two defining variables here, the amount, and the maximum value, we use them to uniquely identify each subproblem.
+O(cn) - O(cn)
+Bottom-up solution: Check solution
+O(cn) - O(cn)
+'''
+# Naive
+def count_ways_rec(coins, amount, maximum):
+  if amount == 0:     # base case 1
+    return 1
+  if amount < 0:      # base case 2
+    return 0
+  ways = 0
+
+  # iterate over coins
+  for coin in coins:    
+
+    # to avoid repetition of similar sequences, use coins smaller than maximum
+    if coin <= maximum and amount - coin >= 0:  
+      
+      # notice how maximum is set to the current value of coin in recursive call    
+      ways += count_ways_rec(coins, amount-coin, coin)  
+  return ways
+
+def count_ways(coins, amount):
+  return count_ways_rec(coins, amount, max(coins))
+# Optimized
+# -- Top down
+def count_ways_rec(coins, amount, maximum, memo):
+  if amount == 0:     # base case 1
+    return 1
+  if amount < 0:      # base case 2
+    return 0
+  if (amount, maximum) in memo: # checking if memoized
+    return memo[(amount, maximum)]
+  ways = 0
+  
+  # iterate over coins
+  for coin in coins:     
+
+    # to avoid repetition of similar sequences, use coins smaller than maximum
+    if coin <= maximum:     
+      
+      # notice how maximum is set to the current value of coin in recursive call
+      ways += count_ways_rec(coins, amount-coin, coin, memo)  
+  memo[(amount, maximum)] = ways #memoizing
+  return ways
+
+def count_ways(coins, amount):
+  memo = {}
+  return count_ways_rec(coins, amount, max(coins), memo)
+# -- Bottom up
+def count_ways(coins, amount):
+  if amount == 0:     # base case 1
+    return 1
+  if amount <= 0:     # base case 2
+    return 0
+
+  # create and initialize the 2-D array
+  dp = [[1 for _ in range(len(coins))] for _ in range(amount + 1)]
+
+  # iterate over the 2-D array and update the values accordingly
+  for amt in range(1, amount+1):
+    for j in range(len(coins)):
+
+      # keep the count of solutions including coins[j]
+      coin = coins[j]
+      if amt - coin >= 0: 
+        x = dp[amt - coin][j]
+      else:
+        x = 0
+        
+      # keep the count of solutions excluding coins[j]
+      if j >= 1:
+        y = dp[amt][j-1]
+      else:
+        y = 0
+      dp[amt][j] = x + y
+  return dp[amount][len(coins) - 1]
