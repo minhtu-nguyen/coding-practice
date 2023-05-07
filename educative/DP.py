@@ -1097,3 +1097,110 @@ def count_ribbon_pieces(n, sizes):
         return dp[n]
     else:
         return -1
+    
+## Rod Cutting
+'''
+You are given a rod of length n meters. You can cut the rod into smaller pieces, and each piece has a price based on its length. Your task is to earn the maximum revenue that can be obtained by cutting up the rod into smaller pieces.
+Naive approach: We will divide our problem into smaller subproblems, starting from the start of the lengths list and for each length, we will do the following steps:
+If the remaining rod length is zero or if we have traversed all of our lengths, we return 0. This represents the base case where no further cutting is possible.
+Otherwise, perform the following two steps:
+- If we can cut a piece of length lengths[curr], where curr specifies the index of the piece length we are considering from the lengths array, we’ll add its price into our earned revenue and recursively evaluate the maximum earnings from the remaining rod. Else, if we cannot cut a piece of length lengths[curr], we’ll simply move to the next step.
+- Evaluate the maximum earning without cutting a piece of current length from the rod.
+- Return the maximum earnings earned from both of the steps.
+O(2^n) - O(n)
+---
+Optimized solution
+Top-down solution: we need a 2-D table of size len(lengths)×n + 1 to store the maximum revenue earned for each rod of length n into a pieces of given lengths. We start our solution by creating a table dp and initializing it with -1 and a helper function that assists us in calculating the maximum revenue earned. If you look at the code below, you’ll see that the helper function has the following steps:
+- If the remaining rod length is zero or if we have traversed all of our lengths, we return 0.
+- If we haven’t already computed a revenue for a given rod length n and a current length at lengths[curr], we compute it as we did in the naive approach and store the result at dp[curr][n]. Here, curr specifies the index of the piece length we are considering from the lengths array.
+- Otherwise, we return the already computed result from the table by fetching it from dp[curr][n].
+The value at dp[curr][n] represents the maximum earning that can be obtained by cutting a rod of length n into pieces of length lengths[curr]. 
+O(n * k) - O(n * k)
+Bottom-up solution: Check solution 
+O(n * k) - O(n * k)
+'''
+# Naive
+def rod_cutting(lengths, prices, n):
+    if len(prices) == 0 or len(prices) != len(lengths):
+        return 0
+    return rod_cutting_rec(lengths, prices, n, 0)
+
+def rod_cutting_rec(lengths, prices, n, curr):
+    # base case
+    if n == 0 or curr == len(lengths):
+        return 0
+
+    # Cut the piece of size length[curr] 
+    revenue1 = 0
+    if lengths[curr] <= n:
+        revenue1 = prices[curr] + rod_cutting_rec(lengths, prices, n - lengths[curr], curr)
+
+    # Don't cut the piece from the rod and move to the next available length
+    revenue2 = rod_cutting_rec(lengths, prices, n, curr + 1)
+
+    # return the maxiumum of both revenues
+    return max(revenue1, revenue2)
+# Optimized
+# -- Top down
+def rod_cutting(lengths, prices, n):
+    # Base case
+    if len(prices) == 0 or len(prices) != len(lengths):
+        return 0
+
+    # Creating a lookup table of size len(lengths) x (n + 1)
+    dp = [[-1 for _ in range(n+1)] for _ in range(len(lengths))]
+    return rod_cutting_rec(lengths, prices, n, 0, dp)
+
+# Helper function
+def rod_cutting_rec(lengths, prices, n, curr, dp):
+    # base case
+    if n == 0 or curr == len(lengths):
+        return 0
+
+    # If a piece of size lengths[curr] is not already computed 
+    # for a rod of length n, compute it
+    if dp[curr][n] == -1:
+        # Cut the piece of size length[curr]
+        revenue1 = 0
+        if lengths[curr] <= n:
+            revenue1 = prices[curr] + rod_cutting_rec(lengths, prices, n - lengths[curr], curr, dp)
+
+        # Don't cut the piece from the rod and move to the next available length
+        revenue2 = rod_cutting_rec(lengths, prices, n, curr + 1, dp)
+        
+        # store the max in the lookup table
+        dp[curr][n] = max(revenue1, revenue2)
+
+    # return from the lookup table
+    return dp[curr][n]
+
+# -- Bottom up
+def rod_cutting(lengths, prices, n):
+    lengthsCount = len(lengths)
+    pricesCount = len(prices)
+    
+    # base cases
+    if n == 0 or pricesCount == 0 or pricesCount != lengthsCount:
+        return 0
+    
+    # Creating a lookup table of size len(lengths) x (n + 1)
+    dp = [[0 for _ in range(n+1)] for _ in range(lengthsCount)]
+
+    # process all rod lengths for all given lengths
+    for curr in range(lengthsCount):
+        for rod_length in range(1, n + 1):
+            # Fetch the maximum revenue obtained by selling the rod
+            # of size rod_length - lengths[curr]
+            revenue1 = revenue2 = 0
+            if lengths[curr] <= rod_length:
+                revenue1 = prices[curr] + dp[curr][rod_length - lengths[curr]]
+            
+            # Fetch the maximum revenue obtained without cutting the rod
+            if curr > 0:
+                revenue2 = dp[curr - 1][rod_length]
+            
+            # store the result in the table
+            dp[curr][rod_length] = max(revenue1, revenue2)
+
+    # maximum revenue will be at the bottom-right corner.
+    return dp[lengthsCount - 1][n]
