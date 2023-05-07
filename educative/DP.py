@@ -1618,3 +1618,92 @@ def count_ways(n):
         dp[sn] = n1 + n3 + n4
     return dp[n]
 
+## Count Ways to Score in a Game
+'''
+Suppose there is a game where a player can score either 1, 2, or 4 points in each turn. Given a total score, n, find all the possible ways in which you can score these n points.
+Naive approach: to reach a total score of n, we have the following three possibilities:
+- Number of ways to reach n−1, as we can then add 1 to reach n
+- Number of ways to reach n−2, as we can then add 2 to reach n
+- Number of ways to reach n−4, as we can then add 4 to reach n
+These all are valid ways to reach a score of n. We can now sum them up to get all the possible ways to reach a total score of n.
+O(2^n) - O(n)
+---
+Optimized solution
+Top-down solution: O(n) - O(n)
+Bottom-up solution: create and initialize the fixed array, dp, that will store our results. Then, we set dp[0] to 1, which is our base case, that is, there is only one way to reach a score of 0 by not playing any moves.
+To calculate the result for any turn, we sum up the number of ways to get a score of n−1, n−2, and n−4. This is similar to our recurrence relation.
+During the calculations, if at any point, the remaining value needed to reach n becomes negative, we will simply return 0, as there is no way to reach a negative score.
+O(n) - O(n)
+'''
+# Naive
+# Scoring options are 1, 2, and 4
+def scoring_options(n):
+    # Setting up our base cases
+
+    # We can not get a negative score, we return 0 for negative values
+    if n < 0:
+        return 0
+
+    # There is only 1 way to reach a score of 0
+    if n == 0:
+        return 1
+
+    # Recursively calculate the number of ways using the
+    # recurrence relation we saw earlier
+    return scoring_options(n - 1) + scoring_options(n - 2) + scoring_options(n - 4)
+# Optimized
+# -- Top down
+def scoring_options_rec(n, memo):
+    # We can not get a negative score, we return 0 for negative values
+    if n < 0:
+        return 0
+
+    # Check if a solution already exists in the array
+    if memo[n] != -1:
+        return memo[n]
+
+    # Else, we recursively calculate the solution for the
+    # given value and store it in our solution array
+
+    memo[n] = scoring_options_rec(n - 1, memo) + scoring_options_rec(n - 2, memo) + scoring_options_rec(n - 4, memo)
+
+    return memo[n]
+
+# Scoring options are 1, 2, and 4
+def scoring_options(n):
+
+    # Initializing our solution array
+    memo = [-1] * max(5, n + 1)
+
+    # Set up the base case, 1 way to score 0
+    memo[0] = 1
+
+    # Pass our array to the helper function
+    return scoring_options_rec(n, memo)
+
+# -- Bottom up
+# Scoring options are 1, 2, and 4
+def scoring_options(n):
+    # Initializing our solution array
+    dp = [0] * (n + 1)
+
+    # Each array index holds the number of ways to
+    # reach a score equal to the index
+    dp[0] = 1
+
+    # Variables to store scores
+    s1 = s2 = s4 = 0
+
+    # Iteratively calculate the number of ways to reach a
+    # score and store it into the solutions' array
+    for r in range(1, n+1):
+        # Return 0 if index is less than 0, otherwise
+        # set to array value
+        s1 = 0 if r - 1 < 0 else dp[r - 1]
+        s2 = 0 if r - 2 < 0 else dp[r - 2]
+        s4 = 0 if r - 4 < 0 else dp[r - 4]
+
+        # Using our recurrence relation to calculate new answers
+        dp[r] = s1 + s2 + s4
+    return dp[n]
+
