@@ -2018,3 +2018,83 @@ def house_thief(money):
     memo[i + 1] = max(money[i] + memo[i - 1], memo[i])
   return memo[stop]
 
+## Minimum Jumps to Reach the End
+'''
+Given an array nums of positive numbers, start from the first index and reach the last index with the minimum number of jumps, where a number at an index represents the maximum jump from that index.
+Naive approach: Suppose the value at the 0th index is j. We will try all the jumping combinations (0 to j). After jumping, we will recursively call the function and try all the jumping options again from that particular index on which we have jumped. jumps is initialized with math.inf, which will be updated with the minimum number of jumps required till that index. In the end, we will have the minimum number of jumps to reach the end stored in jumps.
+O(2^n) - O(n)
+---
+Optimized Solution
+Top-down solution: O(n^2) - O(n)
+Bottom-up solution: O(n^2) - O(n)
+'''
+# Naive
+def find_min_jumps(nums):
+  return find_min_jumps_recursive(nums, 0)
+
+def find_min_jumps_recursive(nums, index):
+  n = len(nums)
+  # If we have reached the last index
+  if (index >= n - 1):
+      return 0
+
+  # Initializing jumps with maximum value. It will store 
+  # the minimum jumps required to reach the current index
+  jumps = math.inf
+
+  # Checking all the possible jumps
+  for i in range(index + 1, index + nums[index] + 1):
+    # Selecting the minimum jump
+    jumps = min(jumps, find_min_jumps_recursive(nums, i) + 1)
+  
+  return jumps
+
+# Optimized
+# -- Top down
+def find_min_jumps(nums):
+  # Initializing the lookup table of nums length
+  lookup = [math.inf] * (len(nums))
+  return find_min_jumps_memo(lookup, nums, 0)
+
+def find_min_jumps_memo(lookup, nums, index):
+  n = len(nums)
+  # If we have reached the last index
+  if (index >= n - 1):
+      return 0
+
+  # If we have already solved this problem, return the result
+  if lookup[index] != math.inf:
+    return lookup[index]
+
+  # Initializing jumps with maximum value. It will store 
+  # the minimum jumps required to reach the current index
+  jumps = math.inf
+
+  # Checking all the possible jumps
+  for i in range(index + 1, index + nums[index] + 1):
+    # Selecting the minimum jump
+    jumps = min(jumps, find_min_jumps_memo(lookup, nums, i) + 1)
+  
+  # Storing the value in lookup table
+  lookup[index] = jumps
+  return lookup[index]
+
+# -- Bottom up
+def find_min_jumps(nums):
+  n = len(nums)
+  # Initializing the lookup table of nums length
+  lookup = [math.inf] * (n)
+  # Setting the 0th index to 0
+  lookup[0] = 0
+  
+  # Outer loop traversing the whole array
+  for i in range(1, n):
+    # Inner loop traversing from 0 to the ith index
+    for j in range(i):
+      # If the value is not stored in the table and index i is
+      # less than equal to the value at jth index + j index
+      if ((i <= (nums[j] + j)) and (lookup[j] != math.inf)):
+        lookup[i] = min(lookup[i], lookup[j] + 1)
+        break
+      
+  return lookup[n - 1]
