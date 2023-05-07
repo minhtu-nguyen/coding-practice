@@ -1386,3 +1386,61 @@ def count_ways(coins, amount):
         y = 0
       dp[amt][j] = x + y
   return dp[amount][len(coins) - 1]
+
+### *** Recursive Numbers
+## Fibonacci Numbers
+'''
+Fibonacci numbers are a sequence of numbers where each number is the sum of the two preceding numbers. Your task is to find the nth Fibonacci number.
+Naive approach: O(2^n) - O(n)
+---
+Optimized Solution
+Top-down solution:O(n) - O(n)
+Bottom-up solution: O(n) - O(n)
+'''
+# Naive
+def get_fibonacci(n):
+    # Base case for n = 0 and n = 1
+    if n < 2:
+        return n
+
+    # Otherwise, calculate the Fibonacci number using the recurrence relation
+    return get_fibonacci(n - 1) + get_fibonacci(n - 2)
+
+# Optimized
+# -- Top down
+def get_fibonacci_memo(n, lookup_table):
+    # Base case
+    if n < 2:
+        return n
+
+    # Check if already present
+    if lookup_table[n] != -1:
+        return lookup_table[n]
+
+    # Adding entry to table if not present
+    lookup_table[n] = get_fibonacci_memo(n - 1, lookup_table) + \
+                      get_fibonacci_memo(n - 2, lookup_table)
+    return lookup_table[n]
+
+
+def get_fibonacci(n):
+    # Initializing the lookup table of size num + 1
+    lookup_table = [-1] * (n + 1)
+    return get_fibonacci_memo(n, lookup_table)
+
+# -- Bottom up
+def get_fibonacci(n):
+    # Base case
+    if n < 2:
+        return n
+    # Initializing the lookup table
+    lookup_table = [0] * (n + 1)
+    lookup_table[0] = 0
+    lookup_table[1] = 1
+
+    for i in range(2, n + 1):
+        # Storing sum of the two preceding values
+        lookup_table[i] = lookup_table[i - 1] + lookup_table[i - 2]
+
+    return lookup_table[n]
+
