@@ -1816,3 +1816,19 @@ def find_unique_path(matrix):
 	# That is the destination.
     return matrix[rows - 1][cols - 1]
 
+## Nth Tribonacci Number
+'''
+Tribonacci numbers are a sequence of numbers where each number is the sum of the three preceding numbers. Your task is to find the nth Tribonacci number.
+Naive approach: We can solve this problem with the following steps:
+If 0th Tribonacci number is required, we will return 0, as it is one of the base cases.
+If 1st or 2nd Tribonacci number is required, we will return 1, as these are also the base cases.
+Otherwise, we’ll call the function recursively three times to compute the next number’s sum, as the Tribonacci number is the sum of the previous three numbers. We’ll repeat this process until we reach the base case.
+O(2^n) - O(n)
+---
+Optimized solution
+Top-down solution: In the recursive approach, we are calling the tribonacci function on the previous three numbers. So for a value of n, there might be multiple recursive calls for evaluating the same nth Tribonacci number. Therefore, we need an array with size n+1 to store the result of the nth Tribonacci number at the index n when we encounter it for the first time. At any later time, if we encounter the same number n, we can fetch the stored result from the array in a constant time instead of recalculating the values.
+Bottom-up solution: we follow the algorithm as:
+- If n is less than 3, the result is determined by the base cases.
+- Otherwise, declare an array of size n+1 and initialize the first three Tribonacci numbers.
+- Then we compute the 3rd Tribonacci number based on the sequence formula, then the 4th, and so on, iteratively till we reach the nth Tribonacci number.
+'''
