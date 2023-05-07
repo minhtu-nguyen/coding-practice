@@ -990,3 +990,110 @@ def unbounded_knapsack(weights, values, n, capacity):
                 dp[i][j] = dp[i-1][j]
  
     return dp[n-1][capacity]
+
+## Maximum Ribbon Cut
+'''
+Given a ribbon of length n and a set of possible sizes, cut the ribbon in sizes such that n is achieved with the maximum number of pieces.
+You have to return the maximum number of pieces that can make up n by using any combination of the available sizes. If the n can’t be made up, return -1, and if n is 0, return 0.
+Naive approach: O(2^n+k) - O(n + k)
+---
+Optimized solution
+Top-down solution: We start our solution by creating a table dp and initializing it with -1 and a helper function that assists us in calculating the number of ribbons. It has three cases as follows:
+If the remaining amount is equal to zero, we return 0.
+If the length of list size has reached 0 or index reaches the size, we return -1.
+Then we make two recursive calls for count_ribbon_pieces_helper. The first call is made only if the ribbon length at index does not exceed n by keeping index at the same position and subtracting the ribbon length at index from the total ribbon length. The returned value is incremented by 1 and stored in c1. The second recursive call is made by excluding the ribbon length by jumping index to the next position. The returned value is stored in c2. Every time, the maximum of c1 and c2 is stored in dp[index][n] so that it can be reused again next time.
+O(n*k) - O(n*k)
+Bottom-up solution: The idea is before calculating dp[i], we have to compute all maximum counts for ribbon sizes up to i. In each iteration i of the algorithm dp[i] is computed as dp[i]=max j=0...n−1 ​ (dp[i],dp[i−cj ​ ]+1)
+O(n * k) - O(n)
+'''
+# Naive
+def count_ribbon_pieces(n, sizes):
+  maximum = count_ribbon_pieces_helper(sizes, n, 0)
+  if maximum == -1:
+    return -1
+  else:
+    return maximum
+
+
+def count_ribbon_pieces_helper(sizes, n, index):
+  # base case
+  if n == 0:
+    return 0
+
+  length = len(sizes)
+  # if the length is zero or the index is greater than or equal to the length,
+  # then return -1 as the ribbon cannot be cut further.
+  if length == 0 or index >= length:
+    return -1  
+
+  # recursive call after selecting the ribbon length at the index
+  # if the ribbon length at the index exceeds the n, we shouldn't process this
+  # since ribbon length is always positive, therefore initializing c1 with -1
+  c1 = -1
+  if sizes[index] <= n:
+    maxSize = count_ribbon_pieces_helper(sizes, n - sizes[index], index)
+    if maxSize != -1:
+      c1 = maxSize + 1
+
+  # recursive call after excluding the ribbon length at the curr
+  c2 = count_ribbon_pieces_helper(sizes, n, index + 1)
+  return max(c1, c2)
+
+# Optimized
+# -- Top down
+def count_ribbon_pieces(n, sizes):
+  length = len(sizes)
+  # we created a table here
+  dp = [[-1 for _ in range(n+1)] for _ in range(length)]
+
+  result = count_ribbon_pieces_helper(sizes, n, 0, dp)
+  
+  if result == -1:
+    return -1
+  else:
+    return result
+
+
+def count_ribbon_pieces_helper(sizes, n, index, dp):
+  # base case
+  if n == 0:
+    return 0
+
+  length = len(sizes)
+  # if the length is zero or the index is greater than or equal to the length,
+  # then return -1 as the ribbon cannot be cut further.
+  if length == 0 or index >= length:
+    return -1
+
+  if dp[index][n] == -1:
+    # recursive call after selecting the ribbon length at the index
+    # if the ribbon length at the index exceeds the n, we shouldn't process this
+    # since ribbon length is always positive, therefore initializing c1 with -1
+    c1 = -1
+    if sizes[index] <= n:
+      res = count_ribbon_pieces_helper(sizes, n-sizes[index], index, dp)
+      if(res != -1):
+        # recursive call after excluding the ribbon length at the index
+        c1 = res + 1
+    
+    c2 = count_ribbon_pieces_helper(sizes, n, index+1, dp)
+    dp[index][n] = max(c1, c2)
+
+  return dp[index][n]
+
+# -- Bottom up
+def count_ribbon_pieces(n, sizes):
+    # create the array to store the results
+    dp = [-1]*(n+1)
+    dp[0] = 0
+    # calculate the results for all combinations
+    # and select the maximum
+    for i in range(1, n+1):
+      for c in sizes:
+        if i-c >= 0 and dp[i-c] != -1:
+          dp[i] = max(dp[i], 1 + dp[i-c])
+    
+    if dp[n] != -1:
+        return dp[n]
+    else:
+        return -1
