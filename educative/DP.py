@@ -644,3 +644,141 @@ def min_refuel_stops(target, start_fuel, stations):
             i += 1
         return -1
 
+
+## Equal Sum Subarrays
+'''
+For a given array nums, determine if the array can be divided into two subarrays such that the sum of both the subarrays is equal.
+Naive approach: We can solve this problem with the following two steps:
+First, we calculate the sum of the array. If the sum of the array is odd, there can’t be two subarrays with an equal sum. Therefore, we return FALSE.
+If the sum is even, we calculate Target Sum = Array Sum/2 and find a subarray of the array with a sum equal to Target Sum. The subarray can be found by either including the current element or not including it. To include the current element, we need to subtract it from the Target Sum.
+O(2^n) - O(n)
+Optimized solution
+Top-down solution: Using memoization and recursion to go further for any element in the array, we can:
+- Choose that element, in which case, the Target Sum will be updated as Target Sum = Target Sum − Nums [i].
+- If we ignore the ith element and move forward, Target Sum will remain the same.
+- If Target Sum == 0, then return TRUE.
+- If Target Sum < 0, then return FALSE.
+O(n * s) - O(n * s)
+Bottom-up solution: Check solution
+'''
+# Naive
+def can_partition_array(nums):
+    nums_len = len(nums)
+    # base case
+    if nums_len == 1:
+        return False
+    # calculate sum of array
+    array_sum = sum(nums)
+    # if array_sum is odd, it cannot be partitioned into equal sum subarrays
+    if array_sum % 2 != 0:
+        return False
+
+    # calculating the target subarray sum
+    target_sum = array_sum // 2
+    return is_subarray_sum(nums, nums_len - 1, target_sum)
+
+
+def is_subarray_sum(nums, nums_len, target_sum):
+    if target_sum == 0:  # subarray formed with required half-sum
+        return True
+    if nums_len == 0 or target_sum < 0:
+        return False
+
+    # here we will perform two operations:
+    # 1. include the current element therefore 'target_sum'
+    #    will be updated as 'target_sum - current element'
+    # or
+    # 2. exclude current element therefore no need to update 'target_sum'
+    result = (is_subarray_sum
+             (nums, nums_len - 1, target_sum - nums[nums_len - 1]) 
+                or is_subarray_sum(nums, nums_len - 1, target_sum))  
+    return result
+
+# Optimized
+# -- Top down
+def can_partition_array(nums):
+    nums_len = len(nums)
+    # base case
+    if nums_len == 1:
+        return False
+
+    # calculate sum of array
+    array_sum = sum(nums)
+    # if array_sum is odd, it cannot be partitioned into equal sum subarrays
+    if array_sum % 2 != 0:
+        return False
+
+    # calculating the target subarray sum
+    target_sum = array_sum // 2
+
+    # Creating a memo to store two things:
+    # (i) The index of array elements
+    # (ii) The target sum
+    memo = {}
+
+    def is_subarray_sum(nums, index, target_sum):
+        nums_len = len(nums)
+
+        if target_sum == 0:  # Subarray formed with required half-sum
+            return True
+        if target_sum < 0 or index == nums_len:
+            return False
+
+        # here we will perform two operations:
+        # 1. include the current element therefore target_sum
+        #    will be updated as target_sum - current element
+        # or
+        # 2. exclude current element therefore no need to update target_sum
+        if (index, target_sum) not in memo:
+            memo[index, target_sum] = is_subarray_sum(
+                nums, index + 1, target_sum - nums[index]) \
+                    or is_subarray_sum(nums, index + 1, target_sum)
+
+
+        return memo[index, target_sum]
+    return is_subarray_sum(nums, 0, target_sum)
+  
+  # -- Bottom up
+  def can_partition_array(nums):
+    array_sum = sum(nums)
+
+    # if 'array_sum' is an odd number, we can't have 
+    # two subarrays with equal sum
+    if array_sum % 2 != 0:
+        return False
+    else:
+    # We are trying to find a subarray of given numbers 
+    # that has a total sum of 's/2'.
+        target_sum = int(array_sum / 2)
+
+    nums_len = len(nums)
+    
+    # Making a 2-D table.
+    dp = [[0 for x in range(target_sum + 1)] for y in range(nums_len + 1)]
+    
+    # Intializng the first row with False and first column with True.
+    for i in range(nums_len + 1):
+        for j in range(target_sum + 1):
+            if i == 0 and j == 0:
+                dp[i][j] = True
+
+            elif j == 0:
+                dp[i][j] = True
+
+            elif i == 0:
+                dp[i][j] = False
+    
+    # Process all subarrays for all sums
+    for i in range(1, nums_len + 1):
+        for j in range(1, target_sum + 1):
+            # if we can find a subset to get the remaining sum
+            if nums[i - 1] <= j:
+                dp[i][j] = dp[i - 1][j - nums[i - 1]] or dp[i - 1][j]
+            # else we can get the sum 'j' without the number at index 'i'
+            else:
+                dp[i][j] = dp[i - 1][j]
+
+    # Return the answer
+    return dp[nums_len][target_sum]
+
+
