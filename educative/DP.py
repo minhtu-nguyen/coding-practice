@@ -1707,3 +1707,112 @@ def scoring_options(n):
         dp[r] = s1 + s2 + s4
     return dp[n]
 
+## Unique Paths to Goal
+'''
+Given a robot located at the top-left corner of an m×n matrix, determine the number of unique paths the robot can take from start to finish while avoiding all obstacles on the matrix.
+The robot can only move either down or right at any time. The robot tries to reach the bottom-right corner of the matrix.
+An obstacle is marked as 1, and an unoccupied space is marked as 0 in the matrix.
+Naive approach: Every time, we need to check if we have reached the bottom-right corner of the matrix or if the iterating index exceeds the size of the matrix. If this condition is satisfied, we just stop the iteration here. If an obstacle is present in the array, the number of unique paths will be 0 up to that obstacle. After that, we will traverse to the next cell in the row and the column finding all the possible unique paths.
+O(2^mn) - O(mn)
+---
+Optimized solution
+Top-down solution: O(mn) - O(mn)
+Bottom-up solution: Here we again create a 2-D array of the same size as the matrix given. In the bottom-up approach, we start moving through the rows and filling in the values. If an obstacle (1) is found at any place, we will set the value of that cell to 0 because we cannot reach that place, so unique paths will be 0. Starting with the base condition, we will set the values of the first row and column to 1 if no obstacles are found. Now we will start traversing row-wise, if there is no obstacle, then the answer will be the sum of the values of the top and left cells, and if there is an obstacle, we will just insert the value 0 to that cell irrespective of the values of other cells.
+O(mn) - O(1)
+'''
+# Naive
+def find_unique_path(matrix):
+  # the length of 2d matrix will be equal to the number of rows
+  rows = len(matrix)  
+
+  # The number of elements in 1st row are equal to the number of columns in 2d matrix
+  column = len(matrix[0]) 
+
+  return find_unique_path_recursive(0, 0, rows, column, matrix)
+
+# Helper function to check the boundaries and base case
+def find_unique_path_recursive(i, j, row, col, matrix):
+
+  # check the boundary constraints
+  if (i == row or j == col):
+    return 0
+
+  # check if obstacle is present or not
+  if (matrix[i][j] == 1):
+    return 0
+
+  # check the base case when the last cell is reached
+  if (i == row-1 and j == col-1):
+    return 1
+  
+  # using the recursive approach when moving to next row or next column 
+  return find_unique_path_recursive(i+1, j, row, col, matrix) + find_unique_path_recursive(i, j+1, row, col, matrix)
+
+# Optimized
+# -- Top down
+def find_unique_path(matrix):
+    # the length of 2d matrix will be equal to the number of rows
+    rows = len(matrix)  
+
+    # The number of elements in 1st row are equal to the number of columns in 2d matrix
+    column = len(matrix[0]) 
+
+    pathArray = [[-1 for index1 in range(column)]for index2 in range(rows)]
+
+    return find_unique_path_memoization(0, 0, rows, column, matrix, pathArray)
+
+# Helper function to check the boundaries and base case
+def find_unique_path_memoization(i, j, row, cols, matrix, pathArray):
+
+  # check the boundary constraints
+  if (i == row or j == cols):
+    return 0
+  
+  # check if obstacle is present or not 
+  if (matrix[i][j] == 1):
+    return 0
+  
+  # check the base case when the last cell is reached
+  if (i == row-1 and j == cols-1):
+    return 1
+    
+  if (pathArray[i][j] != -1):
+    return pathArray[i][j]
+ 
+  pathArray[i][j] = find_unique_path_memoization(i+1, j, row, cols, matrix, pathArray) + find_unique_path_memoization(i, j+1 , row, cols, matrix, pathArray)
+  return pathArray[i][j]
+
+# -- Bottom up
+def find_unique_path(matrix):
+    rows = len(matrix)
+    cols = len(matrix[0])
+
+    # If the starting cell has an obstacle, then return 0 
+    # as there would be no paths to the destination.
+    if matrix[0][0] == 1:
+        return 0
+
+    # Number of ways of reaching the starting cell = 1.
+    matrix[0][0] = 1
+
+    # Fill the values for the first column
+    for i in range(1, rows):
+        matrix[i][0] = int(matrix[i][0] == 0 and matrix[i-1][0] == 1)
+
+    # Fill the values for the first row        
+    for j in range(1, cols):
+        matrix[0][j] = int(matrix[0][j] == 0 and matrix[0][j-1] == 1)
+
+    # Start from matrix[1][1], we fill up the values.
+	# The number of ways of reaching matrix[i][j] = matrix[i - 1][j] + matrix[i][j - 1]
+    for i in range(1, rows):
+        for j in range(1, cols):
+            if matrix[i][j] == 0:
+                matrix[i][j] = matrix[i-1][j] + matrix[i][j-1]
+            else:
+                matrix[i][j] = 0
+
+    # Return value stored in rightmost bottommost cell. 
+	# That is the destination.
+    return matrix[rows - 1][cols - 1]
+
