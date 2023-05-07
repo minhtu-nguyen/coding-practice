@@ -1942,3 +1942,79 @@ def catalan(n):
       # C(j) * C(i-j-1)    
       dp[i] += (dp[j] * dp[i-j-1]) 
   return dp[n]  
+
+## House Thief Problem
+'''
+You are a professional robber, and after weeks of planning, you plan to rob some houses along a street. Each of these houses has a lot of money and valuables. Let’s say that you cannot rob houses adjacent to each other since they have security and burglar alarms installed.
+Following the above-mentioned constraint and given an integer array, money, that represents the amount of money in each house, return the maximum amount of money you can steal tonight without alerting the police.
+Naive approach: O(2^n) - O(n)
+---
+Optimized solution
+Top-down approach: O(n) - O(n) 
+Bottom-up approach: initialize an array of size one greater than the length of money with zeros. We copy the money from the first house money[0] to the memo[1] as it will serve as the maximum theft value in the first iteration. Next, we will iterate over the money array from index 1 and do the following in each iteration i:
+- Compute the maximum between memo[i] and the combined value money[i] + memo[i - 1].
+- Store the maximum on memo[i+1].
+O(n) - O(n) 
+'''
+# Naive
+def house_thief(money):
+  #Call helper function
+  return house_thief_rec(money, 0)
+
+#Helper function
+def house_thief_rec(money, ind):
+  #Stopping criteria
+  stop = len(money)
+  #Base case
+  if ind >= stop:
+    return 0
+  new_ind = ind+1
+  #returns the maximum of the following two values:
+  #1. Leaving the current house and starting from the next house
+  #2. The maximum robbery if we rob the current house along with the houses starting from the next to
+  # the next house, as we cannot rob adjacent houses
+  return max(house_thief_rec(money,new_ind), money[new_ind-1] + house_thief_rec(money, new_ind+1))
+
+# Optimized
+# -- Top down
+def house_thief(money):
+  #Stopping criteria
+  stop = len(money)
+  #Store values in memo
+  memo = [0] * stop
+  return house_thief_(memo, money, 0)
+
+#Helper function
+def house_thief_(memo, money, ind):
+  stop = len(money)
+  #Base case
+  if ind >= stop:
+    return 0
+    
+  if memo[ind] == 0:
+    new_ind = ind+1
+   #stores the maximum of the following two values at memo[ind]:
+   #1. Leaving the current house and starting from the next house
+   #2. The maximum robbery if we rob the current house along with the houses starting from the next to
+   # the next house
+    memo[ind] = max(house_thief_(memo, money, new_ind), money[new_ind-1] + house_thief_(memo, money, new_ind+1))
+  return memo[ind]
+
+# -- Bottom up
+def house_thief(money):
+  #Stopping criteria
+  stop = len(money)
+  #Base case
+  if stop == 0:
+    return 0
+
+  memo = [0] * (stop+1)
+  memo[1] = money[0]  
+  for i in range(1, stop):
+    #stores the maximum of the following two values at memo[i+1]:
+    #1. The combined sum of money in the current house alongwith 
+    #the maximum theft possible from the previous of the previous house.
+    #2. The maximum theft possible till the previous house, we should refer to memo to get this value.
+    memo[i + 1] = max(money[i] + memo[i - 1], memo[i])
+  return memo[stop]
+
