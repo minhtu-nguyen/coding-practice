@@ -1204,3 +1204,98 @@ def rod_cutting(lengths, prices, n):
 
     # maximum revenue will be at the bottom-right corner.
     return dp[lengthsCount - 1][n]
+
+## Minimum Coin Change
+'''
+You’re given an integer total and a list of integers called coins. The integers inside the coins represent the coin denominations, and total is the total amount of money.
+You have to return the minimum number of coins that can make up the total amount by using any combination of the available coins. If the amount can’t be made up, return -1. If the total amount is 0, return 0.
+Naive approach: recursively calling calculate_minimum_coins_rec and subtracting the sum, and reducing the total until it reaches zero. From these combinations, choose the one with the minimum number of coins and return that number. If the sum of any combinations is not equal to total then return -1.
+O(m^n) - O(n)
+---
+Optimized solution
+Top-down solution: We start our solution by creating a helper function that assists us in calculating the number of coins we need. It has three base cases to cover what to return if the remaining amount is:
+- Less than zero
+- Equal to zero
+- Not either of the former two cases
+In the last case, we traverse the coins array, and at each element, call the calculate_minimum_coins function, passing rem minus the value of the coin to it. We store the return value of the base cases in a variable named result. We then add 1 to the result variable and assign this value to minimum, which is initially set to infinity at the start of each path. At the end of each path traversal, we update the (rem−1)th index of the array list with minimum if it is not equal to infinity, otherwise -1. Finally, we return the value at that index.
+O(m*n) - O(m)
+Bottom-up solution:
+O(m*n) - O(m)
+'''
+# Naive
+def coin_change(coins, total): 
+    if total < 1:
+        return 0
+    return calculate_minimum_coins_rec(coins, total)
+
+def calculate_minimum_coins_rec(coins, rem):  
+    # Helper function that calculates amount left to be 
+    # calculated and tells what it's value can be.
+    if rem < 0: 
+        return -1
+    if rem == 0:
+        return 0
+    minimum = math.inf
+
+    for s in coins: 
+        # Recursive approach to keep in account every number's result 
+        result = calculate_minimum_coins_rec(coins, rem-s)
+        if result >= 0 and result < minimum:
+            minimum = 1 + result
+
+    if minimum != math.inf:
+        return minimum
+    else:
+        return -1
+# Optimized
+# -- Top down
+def coin_change(coins, total):
+    if total < 1:
+        return 0
+    return calculate_minimum_coins(coins, total, [math.inf] * total)
+
+def calculate_minimum_coins(coins, rem, array):  
+    # Helper function that calculates amount left to be calculated and 
+    # tells what it's value can be.
+    if rem < 0: 
+        return -1
+    if rem == 0:
+        return 0
+    if array[rem-1] != math.inf:
+        return array[rem-1]
+    minimum = math.inf
+
+    for s in coins: 
+        # Recursive approach to keep in account 
+        # of every number's result 
+        result = calculate_minimum_coins(coins, rem-s, array)
+        if result >= 0 and result < minimum:
+            minimum = 1 + result
+
+    if minimum !=  math.inf:
+        array[rem-1] =  minimum
+        return array[rem-1]
+    else:
+        return -1
+
+# -- Bottom up
+def coin_change(coins, total):
+    if total < 1:
+        return 0
+    return calculate_minimum_coins(coins, total)
+    
+def calculate_minimum_coins(coins, rem):  
+    # Helper function that calculates amount left to be calculated 
+    # and tells what its value can be.
+    dp = [rem+1] * (rem+1)
+    dp[0] = 0 
+
+    for i in range(1, rem+1):
+      for c in coins:
+        if i-c >= 0:
+          dp[i] = min(dp[i], 1 + dp[i-c])
+    
+    if dp[rem] != (rem+1):
+        return dp[rem]
+    else:
+        return -1
