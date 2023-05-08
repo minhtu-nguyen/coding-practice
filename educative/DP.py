@@ -2853,3 +2853,131 @@ def find_LRS(str):
 
     # Returning the longest repeating subsequence length
     return lookup_table[size][size]
+
+## Distinct Subsequence Pattern Matching
+'''
+Given two strings, str1 and str2, return the number of times str2 appears in str1 as a subsequence.
+Naive approach: we can set up the base cases and recursive cases of our algorithm.
+Base cases:
+If we have reached the end of str2, that means we have found a subsequence in str1 that contains str2. Therefore, we return 1.
+Similarly, if we have reached the end of str1, that means we have exhausted all the characters in str1 before reaching the end of str2 (else, we’d have already reached the first base case) and no subsequence containing all the characters in str2 was found. In this case, we return 0.
+Recursive cases:
+If both the characters, str1[i1] and str2[i2], are same, we make two recursive calls to the function:
+- One where we include the current match, that is, we increment both i1 and i2 by 1.
+- The second, where we ignore the current match, that is, we only increment i1.
+If the two characters, str1[i1] and str2[i2], do not match, we only increment the i1 pointer by 1.
+O(2^(m+n)) - O(m+n)
+---
+Optimized solution
+Top-down solution: O(mn) - O(mn)
+Bottom-up solution: we create a lookup table of size (m+1)×(n+1) and fill the last column with ones and the last row with zeros. The additional row and column represent empty substrings of str1 and str2 and correspond to the base cases mentioned in the naive approach. These are the smallest subproblems that we need to solve.
+We iterate over the remaining lookup table, starting from the bottom-right corner and moving to the left to fill up the last row, and then the second-last row, and so on, until we reach the top-left corner of the table. To do this, we iterate backwards through str1, starting i1 from m−1 and moving towards 0, and, for each i1, we iterate backwards through str2 using i2, going from n−1 to 0. This way, we build upon the solutions of the smaller subproblems in order to compute the solution of the overall problem.
+In each iteration, we calculate the number of distinct subsequences in str1[i1:m] that contain str2[i2:n] using the following conditional logic:
+If str1[i1] == str2[i2], we add the number of subsequences stored in lookup_table[i1+1][i2+1] (the case where we include the match) and lookup_table[i1+1][i2] (the case where we ignore the match), and store the result in lookup_table[i1][i2].
+If str1[i1] != str2[i2], the number of subsequences in str1[i1:m] containing str2[i2:n] will be lookup_table[i1+1][i2]. Therefore, this result is stored in lookup_table[i1][i2].
+Finally, the number of subsequences in str1 that contain str2 will be stored in lookup_table[0][0].
+O(mn) - O(mn)
+'''
+# Naive
+# helper recursive function
+def number_of_subsequences_rec(str1, str2, m, n, i1, i2):
+    # if we have reached the end of str1, return 1
+    if i2 == n:
+        return 1
+    
+    # if we have reached the end of str2, return 0
+    if i1 == m:
+        return 0
+    
+    # initializing result variable to store the number of subsequences
+    result = 0
+
+    # if both the characters are same
+    if str1[i1] == str2[i2]:
+        result += number_of_subsequences_rec(str1, str2, m, n, i1 + 1, i2 + 1)
+        result += number_of_subsequences_rec(str1, str2, m, n, i1 + 1, i2)     # ignoring this match
+    # if the two characters are different
+    else:
+        result += number_of_subsequences_rec(str1, str2, m, n, i1 + 1, i2)
+    
+    # return the number of subsequences
+    return result
+
+def number_of_subsequences(str1, str2):
+    # initializing variables
+    m = len(str1)
+    n = len(str2)
+
+    # calling the helper recursive function
+    num_subsequences = number_of_subsequences_rec(str1, str2, m, n, 0, 0)
+    
+    # returning the results
+    return num_subsequences
+
+# Optimized
+# -- Top down
+# helper recursive function
+def number_of_subsequences_rec(str1, str2, m, n, i1, i2, lookup_table):
+    # if we have reached the end of str1, return 1
+    if i2 == n:
+        return 1
+    
+    # if we have reached the end of str2, return 0
+    if i1 == m:
+        return 0
+    
+    # if the result is not present in the lookup table
+    if lookup_table[i1][i2] == -1:
+        # if both the characters are same
+        if str1[i1] == str2[i2]:
+            lookup_table[i1][i2] = number_of_subsequences_rec(str1, str2, m, n, i1 + 1, i2 + 1, lookup_table) 
+            lookup_table[i1][i2] += number_of_subsequences_rec(str1, str2, m, n, i1 + 1, i2, lookup_table)     # ignoring this match
+        # if the two characters are different
+        else:
+            lookup_table[i1][i2] = number_of_subsequences_rec(str1, str2, m, n, i1 + 1, i2, lookup_table)
+    
+    # return the result stored in the lookup table
+    return lookup_table[i1][i2]
+
+def number_of_subsequences(str1, str2):
+    # initializing variable
+    m = len(str1)
+    n = len(str2)
+
+    # initializing lookup table to store the results of recursive calls
+    lookup_table = [[-1 for x in range(0, len(str2))] for x in range(0, len(str1))]
+    
+    # call the recursive helper function
+    num_subsequences = number_of_subsequences_rec(str1, str2, m, n, 0, 0, lookup_table)
+    
+    # return the results
+    return num_subsequences
+
+# -- Bottom up
+# function to calculate the number of subsequences
+def number_of_subsequences(str1, str2):
+    # initializing variables
+    m = len(str1)
+    n = len(str2)
+    lookup_table = [[0 for x in range(0, n + 1)] for x in range(0, m + 1)]
+
+    # filling the last row with 0s
+    for i in range(0, n + 1):
+        lookup_table[m][i] = 0
+    
+    # filling the last column with 1s
+    for i in range(0, m + 1):
+        lookup_table[i][n] = 1
+    
+    # iterating over the lookup table starting from m-1 and n-1
+    for i1 in range(m - 1, -1, -1):
+        for i2 in range(n - 1, -1, -1):
+            # if both the characters are same
+            if str1[i1] == str2[i2]:
+                lookup_table[i1][i2] += lookup_table[i1 + 1][i2 + 1] + lookup_table[i1 + 1][i2]
+            # if the two characters are different
+            else:
+                lookup_table[i1][i2] = lookup_table[i1 + 1][i2]
+    
+    # returning the result stored in lookup_table[0][0]
+    return lookup_table[0][0]
