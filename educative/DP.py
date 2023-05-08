@@ -3295,3 +3295,86 @@ def LIS_length(nums):
             dp[curr][prev+1] = length
     return dp[0][0]
 
+## Minimum Deletions to Make a Sequence Sorted
+'''
+Given an integer array nums, the task is to remove or delete the minimum number of elements from the array so that the remaining elements form a strictly increasing sequence. This is very similar to the Longest Increasing Subsequence (LIS) problem because elements other than the longest increasing subsequence should be removed to make the sequence sorted.
+Naive approach: steps of the solution:
+Calculate the length of the longest increasing subsequence.
+Subtract that from the total length of the array.
+To compute the length of the LIS:
+Each element of the array is either a part of an increasing subsequence or it is not.
+To be part of an increasing subsequence, the current element needs to be greater than the previous element included in the subsequence.
+To find the longest increasing subsequence, we need to move from left to right, exhaustively generating all increasing subsequences, while keeping track of the longest one found at any step.
+O(2^n) - O(n)
+---
+Optimized solution
+Top-down solution: O(n^2) - O(n^2)
+Bottom-up solution: O(n^2) - O(n^2)
+'''
+# Naive
+def min_deletions(nums):
+  # subtract length of longest increasing subsequence from total length
+  minimum_deletions = len(nums) - LIS_length(nums, 0, -1) 
+  return minimum_deletions
+
+def LIS_length(nums, curr, prev):
+  # base case
+  # if 'curr' reaches the end of the array, return 0
+  if curr == len(nums):
+    return 0
+
+  # solve the first subproblem
+  length = LIS_length(nums, curr+1, prev)  # calculate the LIS length from 'curr+1', skipping the current element
+  
+  # solve the second subproblem
+  if prev < 0 or nums[prev] < nums[curr]: # if the current element is greater than the previous one in the subsequence
+    length = max(length, 1+LIS_length(nums, curr+1, curr))  # calculate the LIS length from 'curr+1', including the current element
+  return length
+
+# Optimized
+# -- Top down
+def min_deletions(nums):
+  length = len(nums)
+  # we created a table here
+  dp = [[-1]*(length+2) for i in range(length+1)]
+  # subtract length of longest increasing subsequence from total length
+  minimum_deletions = length - LIS_length(nums, 0, -1, dp)
+  return minimum_deletions
+
+def LIS_length(nums, curr, prev, dp):
+  # base case
+  # if 'curr' reaches the end of the array, return 0
+  if curr == len(nums):
+    return 0
+
+  # if subproblem has already been solved, use the stored result
+  if dp[curr][prev+1] != -1:
+    return dp[curr][prev+1]
+  
+  # solve the first subproblem 
+  length = LIS_length(nums, curr+1, prev, dp)
+  
+  # solve the second subproblem
+  if prev < 0 or nums[prev] < nums[curr]:
+    length = max(length, 1+LIS_length(nums, curr+1, curr, dp))
+  
+  dp[curr][prev+1] = length # store the result of the current subproblem
+  return dp[curr][prev+1]
+
+# -- Bottom up
+def min_deletions(nums):
+    size = len(nums)
+    # we created a table here
+    dp = [[0]*(size+1) for i in range(size+1)]
+
+    for curr in range(size-1, -1, -1):
+        for prev in range(curr-1, -2, -1):
+            length = dp[curr+1][prev+1]
+            # if 'prev' is negative or previous value is less than the next value
+            # we will take it
+            if prev < 0 or nums[prev] < nums[curr]:
+                length = max(length, 1+dp[curr+1][curr+1])
+            dp[curr][prev+1] = length
+    # subtract length of longest increasing subsequence from total length
+    minimum_deletions = size - dp[0][0]
+    return minimum_deletions
