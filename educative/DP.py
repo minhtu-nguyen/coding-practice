@@ -2171,7 +2171,7 @@ def min_fee(fee, n):
     
   return lookup_array[n]
 
-## Minimum Jumps With Fee
+## Matrix Chain Multiplication
 '''
 You are given a chain of matrices to be multiplied. You have to find the least number of primitive multiplications needed to evaluate the result.
 Naive approach: We can easily imagine dims to be a list of matrices. Then each recursive call tries to find the optimal placement of two parentheses between these matrices. So, let’s say we have the following sequence of matrices: A1A2A3A4. Each recursive call tries to place two parentheses, so we have the following possibilities:
@@ -2237,5 +2237,77 @@ def min_multiplications_recursive(dims, i, j, memo):
 def min_multiplications(dims):
     memo = {}
     return min_multiplications_recursive(dims, 0, len(dims), memo)
+
+### *** Longest Common Substring
+## Longest Common Substring
+'''
+Given two strings s1 and s2, you have to find the length of the Longest Common Substring (LCS) in both these strings.
+Let’s say we have two strings, “helloworld” and “yelloword”, there are multiple common substrings, such as “llo”, “ello”, “ellowor”, “low”, and “d”. The longest common substring is “ellowor”, with length 7.
+Naive approach: We are comparing each character one by one with the other string. There can be three possibilities for the ith character of s1 and the jth character of s2:
+- If both characters match, these could be part of a common substring, meaning we should count this character towards the length of the longest common substring.
+- ithcharacter of s1 might match with (j+1)th character of s2.
+- jth character of s2 might match with (i+1)th character of s1.
+Therefore, we take the maximum among all three of these possibilities.
+O(3^(m+n)) - O(m + n)
+---
+Optimized solution
+Top-down solution: We have three parameters, i, j, and count, that uniquely define every subproblem. Therefore, we can address each subproblem as (i, j, count) using a hashmap. The first time we encounter the subproblem (i, j, count), we compute its result and store it in memo[(i, j, count)]. 
+O(mn^2) - O(mn^2)
+Bottom-up solution: We start off by constructing a table of size m×n for tabulation, where n is the size of s1 and m is the size of s2. We call this table dp and initialize it to zeros. Now we start filling the table starting from position 1, 1. Each entry in this table tells us the count of the last characters matched between both strings up to ith and jth positions in s1 and s2 respectively. So for example, if dp[3][4] contains 2, this means the last two characters of s1 and s2 up to positions 3 and 4 match, i.e., s1[2] = s2[3] and s1[1] = s2[2]. By the end of the execution of this algorithm, we will have the length of the longest common substring in the variable max_length, since, at each step, we update max_length in case it's less than the current entry in the dp table.
+O(mn) - O(mn)
+'''
+# Naive
+def lcs_length_rec(s1, s2, i, j, count):
+  # base case of when either string has been exhausted
+  if i >= len(s1) or j >= len(s2):  
+    return count
+  # if i and j characters match, increment the count and compare the rest of the strings
+  if s1[i] == s2[j]:     
+    count = lcs_length_rec(s1, s2, i+1, j+1, count+1)
+  # compare s1[i:] with s2, s1 with s2[j:], and take max of current count and these two results
+  return max(count, lcs_length_rec(s1, s2, i+1, j, 0), lcs_length_rec(s1, s2, i, j+1, 0))
+  
+
+def lcs_length(s1, s2):
+  return lcs_length_rec(s1, s2, 0, 0, 0)
+
+# Optimized
+# -- Top down
+def lcs_length_rec(s1, s2, i, j, count, memo):
+  # base case of when either string has been exhausted
+  if i >= len(s1) or j >= len(s2):  
+    return count
+  # check if result available in memo
+  if (i,j,count) in memo:       
+    return memo[(i,j,count)]
+  c = count
+   # if i and j characters match, increment the count and compare the rest of the strings
+  if s1[i] == s2[j]:     
+    c = lcs_length_rec(s1, s2, i+1, j+1, count+1, memo)
+  # compare s1[i:] with s2, s1 with s2[j:], and take max of current count and these two results
+  # memoize the result
+  memo[(i,j,count)] = max(c, lcs_length_rec(s1, s2, i+1, j, 0, memo), lcs_length_rec(s1, s2, i, j+1, 0, memo))
+  return memo[(i,j,count)]
+
+def lcs_length(s1, s2):
+  memo = {}
+  return lcs_length_rec(s1, s2, 0, 0, 0, memo)
+
+# -- Bottom up
+def lcs_length(s1, s2):
+  n = len(s1)   # length of s1
+  m = len(s2)   # length of s2
+
+  dp = [[0 for j in range(m+1)] for i in range(n+1)]  # table for tabulation of size m x n
+  max_length = 0   # to keep track of longest substring seen 
+
+  for i in range(1, n+1):           # iterating to fill table
+    for j in range(1, m+1):
+      if s1[i-1] == s2[j-1]:    # if characters at this position match, 
+        dp[i][j] = dp[i-1][j-1] + 1 # add 1 to the previous diagonal and store it in this diagonal
+        max_length = max(max_length, dp[i][j])  # if this substring is longer, update max_length
+      else:
+        dp[i][j] = 0 # if character don't match, common substring size is 0
+  return max_length
 
 ## 
