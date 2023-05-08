@@ -3101,4 +3101,121 @@ def is_interleaving(s1, s2, s3):
 
     return lookup_table[len(s1)][len(s2)]
 
-## 
+## Word Break II
+'''
+Given a string s and a dictionary of strings word_dict, add spaces to s to break it up into a sequence of valid words from word_dict. We are required to return all possible sequences of words (sentences). The order in which the sentences are listed is not significant.
+Naive approach: steps to implement the algorithm:
+If a string s is empty, there’ll be no sentences that can be formed. So, we return the empty list.
+If s is not empty, we’ll iterate every word of the dictionary and check if s starts with the current dictionary word or not.
+- If it doesn’t start with the current dictionary word, we move on to the next word.
+- If it does, we’ll keep that word as a prefix and recursively perform the same steps for the rest of the string.
+- We’ll then concatenate the prefix and the result of the suffix computed by a recursive call.
+- If the length of the word and the length of the remaining string are the same, we append the remaining string to our sentence.
+O(w*2^n) - O(n+w)
+---
+Optimized solution 
+Top-down solution: algorithm for the implementation:
+The word_break function takes in the string s and the list of words called word_dict. This function then calls a recursive word_break_rec function.
+The recursive function takes in the string s, the word_dict list, and an empty hash map. We use this hash map to store results for each substring.
+The recursive function’s base case is when the s string is empty; this returns an empty list. Note that it’s actually an empty list of lists because that’s the return type of this function.
+In the recursive function, we run an iteration over all the prefixes of the query. If a prefix matches a word in the list, we recursively invoke the function on the postfix.
+At the end of the iteration, we store the results in the hash map called result, with each valid postfix string as the key and the list of words it can be broken up into, as the value. For instance, for the postfix “cookbook”, the corresponding hash map entry would be “cook book”.
+We return the value from result that corresponds to the original query string.
+O(n^2) - O(n)
+Bottom-up solution: algorithm for the implementation:
+Initialize an empty lookup table, dp_solutions. This table will be used to store the solutions to previously solved subproblems. The values of this table will be empty lists at the start.
+As the base case, we set the first index of dp_solutions, that is, the solution to the problem "sentences made from substring of length 0". We set this to be a list with one element, an empty string.
+Iterate over the input string, breaking it down into the possible substrings by including a single character, one at a time. Additionally, initialize an array called temp that will store the result of the current substring being checked.
+For all possible prefixes of the current substring, check if the prefix exists in the given dictionary. If it does, we know that the prefix is a valid word from the dictionary and can be used as part of the solution.
+If the prefix is present in the dictionary, check if any part of the current substring already exists in the dp_solutions array. If it does, retrieve that part from the dp_solutions array and append the prefix to it, with a space character to separate them, and add this intermediate result to the temp array.
+For each substring in the string s, repeat the process. After each iteration, save the results in the dp_solutions table.
+Return the value at the last index of the dp_solutions table as this index contains all possible sentences formed from a complete string s.
+O(n^2) - O(n)
+'''
+# Naive9
+def word_break(s, word_dict):
+    # Calling the word_break_rec function
+    return word_break_rec(s, word_dict)
+    
+# Helper Function that breaks down the string into words from subs
+def word_break_rec(s, dictionary):
+    # If s is empty string
+    if not s:
+        return []
+    
+    res = []
+    for word in dictionary:
+        # Verifying if s can be broken down further
+        if not s.startswith(word):
+            continue
+        if len(word) == len(s):
+            res.append(s)
+        else:
+            result_of_the_rest = word_break_rec(s[len(word):], dictionary)
+            for item in result_of_the_rest:
+                item = word + ' ' + item
+                res.append(item)
+    return res
+
+# Optimized
+# -- Top down
+def word_break(s, word_dict):
+    # Calling the helper function
+    return word_break_rec(s, word_dict, {})
+    
+# Helper Function that breaks down the string into words from subs
+def word_break_rec(s, dictionary, result):
+    # If s is empty string
+    if not s:
+        return []
+    
+    if s in result:
+        return result[s]
+    
+    res = []
+    for word in dictionary:
+        # Verifying if s can be broken down further
+        if not s.startswith(word):
+            continue
+        if len(word) == len(s):
+            res.append(s)
+        else:
+            result_of_the_rest = word_break_rec(s[len(word):], dictionary, result)
+            for item in result_of_the_rest:
+                item = word + ' ' + item
+                res.append(item)
+    result[s] = res
+    return res
+
+# -- Bottom up
+def word_break(s, word_dict):
+
+    # Initializing a table of size s.length + 1
+    dp_solutions = [[]] * (len(s)+1)
+
+    # Setting base case
+    dp_solutions[0] = [""]
+
+    # For each substring in the input string, repeat the process.
+    for i in range(1, len(s)+1):
+
+        # An array to store the results of the current substring being checked.
+        temp = []
+
+        # Iterate over the current substring and break it down into all possible prefixes.
+        for j in range(0, i):
+            prefix = s[j:i]
+            
+            # Check if the current prefix exists in word_dict. If it does, we know that it is a valid word
+            # and can be used as part of the solution.
+            if prefix in word_dict:
+                
+                # Check if any part of the current substring already exists in the dp_solutions array.
+                for substrings in dp_solutions[j]:
+                    # Merge the prefix with the already calculated results
+                    temp.append((substrings + " " + prefix).strip())
+
+        dp_solutions[i] = temp
+
+    # Returning all the sentences formed using a complete string s.
+    return dp_solutions[len(s)]
