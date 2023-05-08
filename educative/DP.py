@@ -3456,3 +3456,180 @@ def MSIS_length(nums):
             dp[curr][prev+1] = length
     return dp[0][0]
 
+## Longest Bitonic Subsequence
+'''
+Suppose you are given an array, nums, containing positive integers. You need to find the length of the longest bitonic subsequence in this array. A bitonic subsequence can be of the following three types:
+It can consist of numbers that are first increasing and then decreasing. For example, (2,6,9,3,2)
+It can consist of numbers that are only increasing (where the decreasing part at the end is empty). For example, (2,3,7,9).
+It can consist of numbers that are only decreasing (where the increasing part at the start is empty). For example, (15,12,5,3,2,1).
+Naive approach: how the algorithm works:
+Base case: If we’ve passed the end of the array, we return 0.
+If we’re at the first element, we have three choices:
+- Exclude the element from the subsequence by default.
+- Include the element in the subsequence and then take the maximum length of moving to either the increasing or decreasing part of the subsequence for the next element.
+- The maximum length of either, including or excluding the current element, is selected.
+If is_decreasing is FALSE, we’re in the increasing part of the subsequence. We now have three choices:
+- Exclude the element from the subsequence by default.
+- If nums[curr] > nums[prev], the element can be included to make a valid increasing subsequence; so, we include it and take the maximum length of moving to either the increasing or decreasing part of the subsequence for the next element.
+- We select the maximum length of the subsequence from either including or excluding the element from the above computations.
+Otherwise, if is_decreasing is TRUE, we’re in the decreasing part of the subsequence. We now have two choices:
+- Exclude the element from the subsequence by default.
+- If nums[curr] < nums[prev], the element can be included to make a valid decreasing subsequence; so, we take the maximum of either, including or excluding the number.
+O(3^n) - O(n)
+---
+Optimized solution
+Top-down solution:  the following three variables kept changing:
+- The current array index, curr.
+- The index of the last element in the subsequence, prev.
+- The boolean variable, is_decreasing, which indicated whether we were in the increasing or decreasing part of the subsequence.
+We will use a 3-D table with the above three indexes to uniquely identify and store a subproblem. 
+O(n^2) - O(n^2)
+Bottom-up solution: For an array, nums, with length n, we do the following for every index, i.
+- We calculate the length of the longest increasing subsequence from nums[0]…nums[i].
+- We calculate the length of the longest increasing subsequence from nums[n - 1]…nums[i].
+- We add the two lengths and subtract them by 1 to get the length of the longest bitonic subsequence at nums[i].
+Check solution for more.
+O(n^2) - O(n^2)
+'''
+# Naive
+def lbs_length_helper(nums, curr, prev, is_decreasing):
+
+    if curr == len(nums): 
+        return 0
+
+    # Base condition: If we're at the first element, we can make three choices
+    # 1. Exclude the element in the subsequence
+    # 2. Take the maximum length of including the next element in either the increasing, or decreasing part of the subsequence
+    # The maximum length of including, or excluding the element is selected
+    if prev == -1:
+        length1 = lbs_length_helper(nums, curr + 1, prev, is_decreasing)
+
+        length2 = max(1 + lbs_length_helper(nums, curr + 1, curr, is_decreasing),
+                      1 + lbs_length_helper(nums, curr + 1, curr, True))
+
+        length = max(length1, length2)
+
+        return length
+
+    # If is_decreasing is false, we are in the increasing part of the subsequence, so we can make three choices again
+    # 1. Exclude the element in the subsequence
+    # 2. If nums[curr] > nums[prev], take the maximum length of including the next element in either the increasing, or decreasing part of the subsequence
+    # The maximum length of including, or excluding the element is selected
+    if not is_decreasing:
+        length1 = lbs_length_helper(nums, curr + 1, prev, is_decreasing)
+        length2 = 0
+
+        if(nums[curr] > nums[prev]):
+            
+            length2 = max(1 + lbs_length_helper(nums, curr + 1, curr, is_decreasing),
+                          1 + lbs_length_helper(nums, curr + 1, curr, True))
+            
+        length = max(length1, length2)
+
+        return length
+        
+    # Otherwise, if is_decreasing is true, we are in the decreasing part of the subsequence, so we can make two choices
+    # 1. Exclude the element in the subsequence
+    # 2. If nums[curr] < nums[prev], take the maximum length of including, or excluding the element
+    else:
+        length = lbs_length_helper(nums, curr + 1, prev, is_decreasing)
+  
+        if(nums[curr] < nums[prev]):
+            length = max(length, 1 + lbs_length_helper(nums, curr + 1, curr, is_decreasing))
+
+        return length
+
+
+def lbs_length(nums):
+    return lbs_length_helper(nums, 0, -1, False)
+
+# Optimized
+# -- Top down
+def lbs_length_helper(nums, curr, prev, is_decreasing, dp):
+
+    if curr == len(nums): 
+        return 0
+
+    if(dp[curr][prev + 1][is_decreasing] != -1):
+        return dp[curr][prev + 1][is_decreasing]
+
+    # Base condition: If we're at the first element, we can make three choices
+    # 1. Exclude the element in the subsequence
+    # 2. Take the maximum length of including the element in either the increasing, or decreasing part of the subsequence
+    # The maximum length of including, or excluding the element is selected
+    if prev == -1:
+        length1 = lbs_length_helper(nums, curr + 1, prev, is_decreasing, dp)
+
+        length2 = max(1 + lbs_length_helper(nums, curr + 1, curr, is_decreasing, dp),
+                      1 + lbs_length_helper(nums, curr + 1, curr, True, dp))
+
+        length = max(length1, length2)
+
+        dp[curr][prev + 1][is_decreasing] = length
+        return dp[curr][prev + 1][is_decreasing]
+
+    # If is_decreasing is false, we are in the increasing part of the subsequence, so we can make three choices again
+    # 1. Exclude the element in the subsequence
+    # 2. If nums[curr] > nums[prev], take the maximum length of including the element in either the increasing, or decreasing part of the subsequence
+    # The maximum length of including, or excluding the element is selected
+    if not is_decreasing:
+        length1 = lbs_length_helper(nums, curr + 1, prev, is_decreasing, dp)
+        length2 = 0
+
+        if(nums[curr] > nums[prev]):
+            
+            length2 = max(1 + lbs_length_helper(nums, curr + 1, curr, is_decreasing, dp),
+                          1 + lbs_length_helper(nums, curr + 1, curr, True, dp))
+            
+        dp[curr][prev + 1][is_decreasing] = max(length1, length2)
+        
+    # Otherwise, if is_decreasing is true, we are in the decreasing part of the subsequence, so we can make two choices
+    # 1. Exclude the element in the subsequence
+    # 2. If nums[curr] < nums[prev], take the maximum length of including, or excluding the element
+    else:
+        length = lbs_length_helper(nums, curr + 1, prev, is_decreasing, dp)
+  
+        if(nums[curr] < nums[prev]):
+            length = max(length, 1 + lbs_length_helper(nums, curr + 1, curr, is_decreasing, dp))
+
+        dp[curr][prev + 1][is_decreasing] = length
+
+    return dp[curr][prev + 1][is_decreasing]
+
+
+def lbs_length(nums):
+
+    n = len(nums)
+    dp = [[[-1 for k in range(3)] for j in range(n + 2)] for i in range(n + 2)]
+
+    return lbs_length_helper(nums, 0, -1, False, dp)
+
+# -- Bottom up
+def lbs_length(nums):
+
+    n = len(nums)
+    lis_forward= [1] * n
+    lis_backward = [1] * n
+    result = 1
+
+    # Populating the lis_forward array
+    for i in range(n):
+        for j in range(i):
+            if(nums[i] > nums[j] and lis_forward[i] < 1 + lis_forward[j]):
+                lis_forward[i] = 1 + lis_forward[j]
+
+    # Populating the lis_backward array
+    for i in range(n - 1, -1, -1):
+        for j in range(i + 1, n, 1):
+            if(nums[i] > nums[j] and lis_backward[i] < 1 + lis_backward[j]):
+                lis_backward[i] = 1 + lis_backward[j]
+
+    # Calculating the length of the bitonic subsequence at every index and
+    # selecting the maximum one
+    for i in range(n):
+        length = lis_forward[i] + lis_backward[i] - 1
+        result = max(result, length)
+    
+
+    return result
+
