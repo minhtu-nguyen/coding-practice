@@ -3378,3 +3378,81 @@ def min_deletions(nums):
     # subtract length of longest increasing subsequence from total length
     minimum_deletions = size - dp[0][0]
     return minimum_deletions
+
+## Maximum Sum Increasing Subsequence
+'''
+Given an array of integers nums, identify the increasing subsequence whose sum is the highest among all increasing subsequences. Return the sum. Note that an increasing subsequence of an array is defined as a subsequence whose elements are sorted in strictly increasing order.
+Naive approach: all the ideas that are needed to find the solution to this problem:
+Each element of the array is either a part of an increasing subsequence or it is not.
+To be part of an increasing subsequence, the current element needs to be greater than the previous element included in the subsequence.
+To find the maximum sum increasing subsequence, we need to move from left to right, exhaustively generating all increasing subsequences, while keeping track of the one with the greatest sum found so far.
+O(2^n) - O(n)
+---
+Optimized solution
+Top-down solution: O(n^2) - O(n^2)
+Bottom-up solution: O(n^2) - O(n^2)
+'''
+# Naive
+def MSIS_length(nums):
+  sum = 0
+  return MSIS_length_rec(nums, 0, -1, sum) 
+
+def MSIS_length_rec(nums, curr, prev, sum):
+  # base case
+  # if 'curr' reaches the end of the array, return the current sum
+  if curr == len(nums):
+    return sum
+
+  # solve the first subproblem
+  max_sum = MSIS_length_rec(nums, curr+1, prev, sum)  # calculate the MSIS from 'curr+1', skipping the current element
+
+  # solve the second subproblem
+  if prev < 0 or nums[prev] < nums[curr]: # if the current element is greater than the previous one in the subsequence
+    max_sum = max(max_sum, MSIS_length_rec(nums, curr+1, curr, sum+nums[curr])) # calculate the MSIS length from 'curr+1', including the current element
+  return max_sum
+
+# Optimized
+# -- Top down
+def MSIS_length(nums):
+  length = len(nums)
+  sum = 0
+  # we created a table here
+  dp = [[-1]*(length+2) for i in range(length+1)]
+  return MSIS_length_rec(nums, 0, -1, dp, sum)
+
+def MSIS_length_rec(nums, curr, prev, dp, sum):
+  # base case
+  # if 'curr' reaches the end of the array,  return the current sum
+  if curr == len(nums):
+    return sum
+  
+  # if subproblem has alredy been solved, use the stored result
+  if dp[curr][prev+1] != -1:
+    return dp[curr][prev+1]
+
+  # solve the first subproblem
+  max_sum = MSIS_length_rec(nums, curr+1, prev, dp, sum)
+  
+  # solve the second subproblem
+  if prev < 0 or nums[prev] < nums[curr]:
+    max_sum = max(max_sum, sum+MSIS_length_rec(nums, curr+1, curr, dp, nums[curr]))
+  
+  dp[curr][prev+1] = max_sum  # store the result of the current subproblem
+  return dp[curr][prev+1]
+
+# -- Bottom up
+def MSIS_length(nums):
+    size = len(nums)
+    # we created a table here
+    dp = [[0]*(size+1) for i in range(size+1)]
+
+    for curr in range(size-1, -1, -1):
+        for prev in range(curr-1, -2, -1):
+            length = dp[curr+1][prev+1]
+            # if 'prev' is negative or previous value is less than the next value
+            # we will take it
+            if prev < 0 or nums[prev] < nums[curr]:
+                length = max(length, nums[curr]+dp[curr+1][curr+1])
+            dp[curr][prev+1] = length
+    return dp[0][0]
+
