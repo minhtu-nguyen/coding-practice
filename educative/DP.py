@@ -2768,3 +2768,88 @@ def min_edit_dist_iterative(str1, str2, m, n):
 def min_edit_dist(str1, str2):
     
     return min_edit_dist_iterative(str1, str2, len(str1), len(str2))
+
+## Longest Repeating Subsequence
+'''
+Given a string, you have to find the length of the longest subsequence that occurs at least twice and respects this constraint: the characters that are re-used in each subsequence should have distinct indexes.
+Naive approach: We will start traversing the string from the end by having two indexes. Since both the indexes point at the same character, we will decrease the second index and keep the first one as it is.
+On each recursive call, the second index will decrease until the character at the first index gets matched to the second index’s value. After this, both indexes will get decremented and make a recursive call. No match is found and the second index value reaches 0. Now, we will backtrack, and 1 will be returned.
+When the first “b” character is matched, we will start the second recursive call. This time the first index will get decremented instead, and the second one will remain the same for all the recursive calls unless “b” is matched again or the first index value becomes 0.
+This exact process will be repeated, with the first index changing and the second remaining the same.
+O(2^n) - O(n)
+---
+Optimized solution
+Top-down solution: O(n^2) - O(n^2)
+Bottom-up solution: We will use a 2-D array to store our results by computing the smaller values first and then finding the larger values using them.
+In our lookup_table, indexes p1 and p2 will store the length of the longest repeating subsequence of the substrings str[0 to p1-1] and str[0 to p2-1].
+O(n^2) - O(n^2)
+'''
+# Naive
+def find_LRS(str):
+    return find_LRS_recursive(str, len(str), len(str))
+
+
+def find_LRS_recursive(str, p1, p2):
+    # Base case if any one index has reached end
+    if (p1 == 0) or (p2 == 0):
+        return 0
+
+    # Characters are same but indexes are different
+    if (str[p1 - 1] == str[p2 - 1]) and (p1 != p2):
+        return find_LRS_recursive(str, p1 - 1, p2 - 1) + 1
+
+    # Check if the characters at both indexes don't match
+    return max(
+        find_LRS_recursive(str, p1, p2 - 1), find_LRS_recursive(str, p1 - 1, p2)
+    )
+
+# Optimized
+# -- Top down
+def find_LRS(str):
+    lookup_table = {}
+    return find_LRS_memoization(str, len(str), len(str), lookup_table)
+
+
+def find_LRS_memoization(str, p1, p2, lookup_table):
+    # Base case if any one index has reached end
+    if (p1 == 0) or (p2 == 0):
+        return 0
+
+    # Creating a key to store in map
+    key = p1, ",", p2
+    
+    # Checking if unique pair not in lookup table
+    if key not in lookup_table:
+        # Characters are same but indexes are different
+        if (str[p1 - 1] == str[p2 - 1]) and (p1 != p2):
+            lookup_table[key] = (
+                find_LRS_memoization(str, p1 - 1, p2 - 1, lookup_table) + 1
+            )
+        # Check if the characters at both indexes don't match
+        else:
+            lookup_table[key] = max(
+                find_LRS_memoization(str, p1, p2 - 1, lookup_table),
+                find_LRS_memoization(str, p1 - 1, p2, lookup_table),
+            )
+
+    # Returning value of the key from the map
+    return lookup_table[key]
+
+# -- Bottom up
+def find_LRS(str):
+    size = len(str)
+    # Create a table to hold intermediate values
+    lookup_table = [[0 for x in range(size + 1)] for y in range((size + 1))]
+
+    # Starting from second row, filling the lookup table bottom-up wise
+    for i in range(1, size + 1):
+        for k in range(1, size + 1):
+            # Characters are same but indexes are different
+            if str[i - 1] == str[k - 1] and i != k:
+                lookup_table[i][k] = lookup_table[i - 1][k - 1] + 1
+            # Check if the characters at both indexes don't match
+            else:
+                lookup_table[i][k] = max(lookup_table[i - 1][k], lookup_table[i][k - 1])
+
+    # Returning the longest repeating subsequence length
+    return lookup_table[size][size]
