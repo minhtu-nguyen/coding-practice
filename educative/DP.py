@@ -3633,3 +3633,146 @@ def lbs_length(nums):
 
     return result
 
+## Longest Alternating Subsequence
+'''
+The Longest Alternating Subsequence (LAS) is the longest subsequence from a given array, in which the subsequence elements are in alternating order. Given an integer array, nums, find the length of the LAS in this array.
+Naive approach:  for every current element in the list, we will have three options:
+- If the current element is bigger than the previous element, we include the current element and recursively process the remaining list to find the next element in descending order.
+- If the current element is smaller than the previous element, we include the current element and recursively process the remaining list to find the next element in ascending order.
+- Skip the current element and recurse through the remaining list to ensure we consider all possibilities.
+O(2^n) - O(n)
+---
+Optimized solution
+Top-down solution: Three values, the current and previous indexes and the isAsc flag, uniquely identify each subproblem. Therefore, we can store the results of all subproblems in a 3-D table, where the third dimension, of size two, will store the value of the boolean flag isAsc.
+O(n^3) - O(n^2)
+Bottom-up solution: For every index of the input array, we'll keep track of the LAS for both ascending and descending orderings till that index. To do so, we'll create a lookup table of size 2×n, where the two rows correspond to the two orderings, ascending and descending respectively, and n is the size of the input array. The table is initialized with 1s because any sequence of length one is always the LAS. Then starting from the second index of the input array, every element in the array is either greater, smaller, or equal to the previous element. Therefore, we have three possibilities:
+- If nums[current] is greater than nums[previous], it means that the current element can contribute to an ascending ordering. We can take the length of the longest descending subsequence till previous index, represented by dp[1][previous], and increment that length by 1. Apart from that, the length of the longest descending subsequence is carried forward as it is.
+- If nums[current] is less than nums[previous], it means that the current element can contribute to a descending ordering. We can consider the length of the longest ascending subsequence till previous index, represented by dp[0][previous], and increment that length by 1. Secondly, the length of the longest ascending subsequence is carried forward as it is.
+- If nums[current] and nums[previous] are equal, we don't make any change and just carry forward the previous values.
+At the end, we return the maximum of the two final values, i.e., max(dp[0][n-1], dp[1][n-1]).
+O(n) - O(n)
+'''
+# Naive
+# Helper function
+
+def LAS_rec(nums, previous, current, isAsc):
+  """
+    Recursively calculate the longest alternating ssubsequence
+    :param nums: list[int]: Sequence of integer numbers (array of integers)
+    :param previous: int: Index of the previous element 
+    :param current: int: Index of the current element 
+    :param isAsc: boolean: Indicates whether the current element is in ascending order relative to the previous
+    return: Length of longest alternating subsequence for the given subproblem
+  """
+  # Base case
+  if current == len(nums):
+	  return 0
+  count = 0
+
+  #  If the current element is bigger than the previous and flag is ascending
+  #  Increment count by 1, flip the flag and move to the next element
+  if nums[current] > nums[previous] and isAsc:
+      count = 1 + LAS_rec(nums, current, current+1, not isAsc)
+
+  #  If the current element is smaller than the previous and flag is descending
+  #  Increment count by 1, flip the flag and move to the next element
+  elif nums[current] < nums[previous] and not isAsc:
+      count = 1 +  LAS_rec(nums, current, current+1, not isAsc)
+      
+  # Iterate over the remaining sequence
+  count2 = max(count, LAS_rec(nums, previous, current+1, isAsc))
+
+  return count2
+
+
+def LAS(nums):
+  # we have to start with two recursive calls, one where we will consider that the first element is
+  # bigger than the second element and one where the first element is smaller than the second element
+  # +1 is for the zero index count, that we are skipping and starting our current index from 1
+  return max(LAS_rec(nums, 0, 1, True), LAS_rec(nums, 0, 1, False)) + 1
+
+# Optimized
+# -- Top down
+# Helper function
+def LAS_rec(nums, previous, current, isAsc, memo):
+    """
+    Recursively calculate the longest alternating subsequence
+    :param nums: list[int]: Sequence of integer numbers (array of integers)
+    :param previous: int: Index of the previous element 
+    :param current: int: Index of the current element 
+    :param isAsc: boolean: Indicates whether the current element is in ascending order relative to the previous
+    :param memo: list[list[list[int]]]: Stores the results for later use
+    return: Length of longest alternating subsequence for the given subproblem
+    """
+    # Base case
+    if current == len(nums):
+        return 0;
+
+    # If this subproblem has not already been computed:
+    if memo[previous][current][1 if isAsc else 0] == -1:
+        count = 0
+        #  If the current element is bigger than the previous and flag is ascending
+        #  Increment count by 1, flip the flag and move to the next element
+        if nums[current] > nums[previous] and isAsc:
+            count = 1 + LAS_rec(nums, current, current+1, not isAsc, memo)
+        #  If the current element is smaller than the previous and flag is descending
+        #  Increment count by 1, flip the flag and move to the next element
+        elif nums[current] < nums[previous] and not isAsc:
+            count = 1 +  LAS_rec(nums, current, current+1, not isAsc, memo)
+        # Iterate over the remaining sequence
+        memo[previous][current][1 if isAsc else 0] = max(count, LAS_rec(nums, previous, current+1, isAsc, memo))
+
+    return memo[previous][current][1 if isAsc else 0]
+
+
+def LAS(nums):
+
+    n = len(nums)
+    # 3-D Table to store the results
+    memo = [[[-1 for _ in range(2)] for _ in range(n)] for _ in range(n)]
+
+    # we have to start with two recursive calls, one where we will consider that the first element is
+    # bigger than the second element and one where the first element is smaller than the second element
+    # +1 is for the zero index count, that we are skipping and starting our current index from 1
+    return max(LAS_rec(nums, 0, 1, True, memo), LAS_rec(nums, 0, 1, False, memo)) + 1
+
+# -- Bottom up
+def LAS(nums):
+
+    n = len(nums)
+    if n == 0:
+        return 0
+      
+    # initialize dp with 1s as any sequence of length one is always the LAS
+    dp =[[1 for _ in range(n)] for _ in range(2)]
+    
+    # iterate over all elements of nums
+    for current in range(1, n):
+        previous = current-1;
+        
+        # if the current element is greater than the previous element
+        if nums[current] > nums[previous]:
+            # current element can contribute to an ascending ordering
+            # the ascending dp row value is updated by adding 1 to the length of the
+            # longest descending subsequence till previous index
+            dp[0][current] = 1 + dp[1][previous]
+            # length of the longest descending subsequence is carried forward as it is
+            dp[1][current] = dp[1][previous]
+            
+        # if the current element is less than the previous element
+        elif nums[current] < nums[previous]: 
+            # current element can contribute to a descending ordering
+            # the descending dp row value is updated by adding 1 to the length of the
+            # longest ascending subsequence till previous index
+            dp[1][current] =  1 + dp[0][previous]
+            # length of the longest ascending subsequence is carried forward as it is
+            dp[0][current] = dp[0][previous]
+            
+        # if the current and previous elements are equal
+        else:
+            # carry forward the previous values
+            dp[1][current] = dp[1][previous]
+            dp[0][current] = dp[0][previous]
+          
+    # return maximum of the two final values
+    return max(dp[1][n-1], dp[0][n-1])
