@@ -2490,3 +2490,132 @@ def shortest_common_supersequence(str1, str2):
 
     # return the last value of the lookup table
     return lookup_table[len(str1)][len(str2)]
+
+## Minimum Number of Deletions and Insertions
+'''
+Given two strings, str1 and str2, find the minimum number of deletions and insertions required to transform str1 into str2.
+Naive approach: Starting from the first character of both strings, there are three possibilities for every pair of characters being considered:
+The first characters of both the strings match, in which case, we increment the count of the matching characters by 1. We move one position ahead in both strings, and the function is called recursively on the remaining strings.
+The first characters of both the strings do not match, in which case, the following possibilities are checked on both strings:
+- A recursive call by moving one position ahead in the str1
+- A recursive call by moving one position ahead in the str2
+- Return the maximum of the matching characters found by both the calls
+If we reach the end of either of the two strings, we return 0.
+After finding the n (maximum number of the matching characters subsequence), we can find the number of deletions required on str1 to transform it into str2 by subtracting n from the length of str1. The number of insertions required on str1 to transform it into str2 can be found by subtracting n from the length of str2.
+O(2^n) - O(n)
+---
+Optimized Solution
+Top-down solution: for each character, the value of the maximum number of matching characters is stored in the lookup_table.
+If the start characters match, the value returned is stored at lookup_table[i][j].
+If the start characters don’t match, in which case, the following possibilities are checked on both strings:
+- A recursive call by moving one position ahead in the str1
+- A recursive call by moving one position ahead in the str2
+- Store the maximum of the matching characters found by both the calls in the lookup_table[i][j] and return it
+O(n^2) - O(n)
+Bottom-up solution: we build the solution bottom-up by dividing our problem into subproblems.
+We first make a 2-D table lookup_table[m+1][n+1] where m is the length of str1 and n is the length of str2. This table is initialized with 0s. We need the first row and column to be 0 for the base case. Any entry in this table given by lookup_table[i][j] is the maximum number of matching characters subsequence between str1 up till ith position and str2 up to the jth position.
+If the characters match, we store the returned values from lookup_table[i-1][j-1] in lookup_table[i][j].
+For characters that don’t match, we need to take a maximum of two subproblems:
+- Move one position ahead in str1 (the subproblem lookup_table[i-1][j])
+- Move one position ahead in str2 (the subproblem lookup_table[i][j-1])
+In the end, we have the optimal answer for the maximum number of matching characters subsequence for str1 and str2 in the last position, i.e., lookup_table[m][n].
+With this, we can easily calculate the minimum number of deletions and insertions required to transform str1 into str2
+O(n^2) - O(mn)
+'''
+# Naive
+# function to find the maximum number of matching characters subsequence
+def find_max_matching_subseq(str1, str2, i, j): 
+    # base case
+    if i == len(str1) or j == len(str2): 
+        return 0
+
+    # if current characters match, increment by 1
+    elif str1[i] == str2[j]:  
+        return 1 + find_max_matching_subseq(str1, str2, i+1, j+1)
+    
+    # else return max of either of two possibilities
+    return max(find_max_matching_subseq(str1, str2, i+1, j), find_max_matching_subseq(str1, str2, i, j+1))
+
+
+def min_del_ins(str1, str2):
+  n = find_max_matching_subseq(str1, str2, 0, 0)
+  # calculating number of deletions required from str1 to transform it into str2
+  deletions = len(str1) - n
+  # calculating number of insertions required in str1 to transform it into str2
+  insertions = len(str2) - n
+
+  return deletions,insertions
+ 
+# Optimized
+# -- Top down
+# function to find the maximum number of matching characters subsequence
+def find_max_matching_subseq(str1, str2, i, j, lookup_table): 
+
+    # base case
+    if i == len(str1) or j == len(str2): 
+        return 0
+
+    # if the subproblem has been computed before, return the value stored in lookup_table
+    elif lookup_table[i][j] != -1: 
+        return lookup_table[i][j]
+
+    # if current characters match, increment by 1
+    elif str1[i] == str2[j]:  
+        lookup_table[i][j] = 1 + find_max_matching_subseq(str1, str2, i+1, j+1, lookup_table)
+        return lookup_table[i][j]
+        
+    # else take max of either of two possibilities
+    lookup_table[i][j] = max(find_max_matching_subseq(str1, str2, i+1, j, lookup_table), find_max_matching_subseq(str1, str2, i, j+1, lookup_table))
+    return lookup_table[i][j]
+
+def min_del_ins(str1, str2):
+  # Declare a lookup_table array which stores the answer to recursive calls  
+  lookup_table = [[-1 for i in range(len(str2))] for i in range(len(str1))] 
+   
+  n = find_max_matching_subseq(str1, str2, 0, 0, lookup_table)
+  # calculating number of deletions required from str1 to transform it into str2
+  deletions = len(str1) - n
+  # calculating number of insertions required in str1 to transform it into str2
+  insertions = len(str2) - n
+  
+  return deletions,insertions
+
+# -- Bottom up
+# function to find the maximum number of matching characters subsequence
+def find_max_matching_subseq(str1, str2):
+    m = len(str1)   # length of str1
+    n = len(str2)   # length of str2
+
+    # Initializing the 2-D table
+    lookup_table = [[-1 for x in range(n+1)] for y in range(m+1)]
+
+    # Initializing the first row with 0s
+    for j in range(n+1):
+        lookup_table[0][j] = 0
+
+    # Initializing the first column with 0s
+    for i in range(m+1):
+        lookup_table[i][0] = 0
+
+    # Iterating to fill the table
+    for i in range(1, m+1):           
+        # calculate new row (based on previous row i.e. lookup_table)
+        for j in range(1, n+1):
+            # if characters at this position match, 
+            if str1[i-1] == str2[j-1]:    
+                # add 1 to the previous diagonal and store it in this diagonal
+                lookup_table[i][j] = lookup_table[i-1][j-1] + 1 
+            else:
+                # If the characters don't match, fill this entry with the max of the
+                # left and top elements
+                lookup_table[i][j] = max(lookup_table[i][j-1], lookup_table[i-1][j]) 
+    return lookup_table[m][n]
+
+def min_del_ins(str1, str2):
+  n = find_max_matching_subseq(str1, str2)
+  # calculating number of deletions required from str1 to transform it into str2
+  deletions = len(str1) - n
+  # calculating number of insertions required in str1 to transform it into str2
+  insertions = len(str2) - n
+
+  return deletions,insertions
