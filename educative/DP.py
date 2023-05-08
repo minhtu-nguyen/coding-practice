@@ -2310,4 +2310,94 @@ def lcs_length(s1, s2):
         dp[i][j] = 0 # if character don't match, common substring size is 0
   return max_length
 
+## Longest Common Subsequence
+'''
+Suppose you are given two strings. You need to find the length of the longest common subsequence between these two strings.
+A subsequence is a string formed by removing some characters from the original string, while maintaining the relative position of the remaining characters. For example, “abd” is a subsequence of “abcd”, where the removed character is “c”.
+If there is no common subsequence, then return 0.
+Naive approach: A naive approach is to compare the characters of both strings based on the following rules:
+- If the current characters of both strings match, we move one position ahead in both strings.
+- If the current characters of both strings do not match, we recursively calculate the maximum length of moving one character forward in any one of the two strings i.e., we check if moving a character forward in either the first string or the second will give us a longer subsequence.
+- If we reach the end of either of the two strings, we return 0.
+O(2^(m+n)) - O(m + n)
+---
+Optimized Solution
+Top-down solution: In the recursive approach, the following two variables kept changing:
+- The index i, used to keep track of the current character in str1.
+- The index j, used to keep track of the current character in str2.
+We will use a 2-D table, dp, with n rows and m columns to store the result at any given state.  
+O(mn) - O(mn)
+Bottom-up solution: We first make a 2-D array of size [(m+1)×(n+1)], where n is the length of str1 and m is the length of str2. This array is initialized to 0. We need the first row and column to be 0 for the base case. Any entry in this array given by dp[i][j] is the length of the longest common subsequence between str1 up to ith position and str2 up to the jth position.
+As we saw in the recursive algorithm, when the characters matched, we could simply move one position ahead in both strings and add one to the result. This is exactly what we do here as well. We add 1 to the previous diagonal result. In case we have a mismatch, we need to take the maximum of two subproblems:
+dp[i][j] = max(dp[i-1][j], dp[i][j-1]) 
+We could either move one position ahead in str1 (the subproblem dp[i-1][j]), or we could move one step ahead in str2 (the subproblem dp[i][j-1]). In the end, we have the optimal answer for str1 and str2 in the last position, i.e., dp[n][m].
+O(mn) - O(mn)
+'''
+# Naive
+# Helper function with updated signature: i is current index in str1, j is current index in str2
+def longest_common_subsequence_helper(str1, str2, i, j): 
+    # base case
+    if i == len(str1) or j == len(str2): 
+        return 0
+
+    # if current characters match, increment 1
+    elif str1[i] == str2[j]:  
+        return 1 + longest_common_subsequence_helper(str1, str2, i+1, j+1)
+    
+    # else take max of either of two possibilities
+    return max(longest_common_subsequence_helper(str1, str2, i+1, j), longest_common_subsequence_helper(str1, str2, i, j+1))
+
+def longest_common_subsequence(str1, str2):
+    return longest_common_subsequence_helper(str1, str2, 0, 0)
+# Optimized
+# -- Top down
+# Helper function with updated signature: i is current index in str1, j is current index in str2
+def longest_common_subsequence_helper(str1, str2, i, j, dp): 
+    # base case
+    if i == len(str1) or j == len(str2): 
+        return 0
+
+    elif dp[i][j] != -1:
+        return dp[i][j]
+
+    # if current characters match, increment 1
+    elif str1[i] == str2[j]:  
+        dp[i][j] = 1 + longest_common_subsequence_helper(str1, str2, i+1, j+1, dp)
+        return dp[i][j]
+    
+    # else take max of either of two possibilities
+    dp[i][j] = max(longest_common_subsequence_helper(str1, str2, i+1, j, dp), 
+                   longest_common_subsequence_helper(str1, str2, i, j+1, dp))
+    return dp[i][j]
+
+def longest_common_subsequence(str1, str2):
+    n = len(str1)
+    m = len(str2)
+    dp = [[-1 for x in range(m)] for y in range(n)]
+    return longest_common_subsequence_helper(str1, str2, 0, 0, dp)
+# -- Bottom up
+def longest_common_subsequence(str1, str2):
+    n = len(str1)   # length of str1
+    m = len(str2)   # length of str2
+
+    rows = n + 1
+    cols = m + 1
+
+    # Initializing the 2-D table, filling the first row and column with all 0s
+    dp = [[0 if (i == 0 or j == 0) else -1 for i in range(cols)] for j in range(rows)]
+
+    # Iterating to fill the table
+    for i in range(1, rows):           
+        # calculate new row (based on previous row i.e. dp)
+        for j in range(1, cols):
+            # if characters at this position match, 
+            if str1[i-1] == str2[j-1]:    
+                # add 1 to the previous diagonal and store it in this diagonal
+                dp[i][j] = dp[i-1][j-1] + 1 
+            else:
+                # If the characters don't match, fill this entry with the max of the
+                # left and top elements
+                dp[i][j] = max(dp[i][j-1], dp[i-1][j]) 
+    return dp[n][m]
+
 ## 
