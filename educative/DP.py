@@ -2619,3 +2619,152 @@ def min_del_ins(str1, str2):
   insertions = len(str2) - n
 
   return deletions,insertions
+
+## Edit Distance
+'''
+Given two strings, str1 and str2, find the minimum edit distance required to convert str1 into str2. Minimum edit distance is the minimum number of insertions, deletions, or substitutions required to transform str1 into str2.
+Naive approach: Starting from the last character of both strings, there are two possibilities for every pair of characters being considered:
+- The last characters of both the strings match, in which case, the lengths of both the strings are reduced by one, and the function is called recursively on the remaining strings.
+- The last characters of both the strings do not match, in which case, all three operations (insertion, deletion, and substitution) are carried out on the last character of the first string.
+- The minimum cost for all three operations is computed recursively and returned.
+O(3^n) - O(n)
+---
+Optimized Solution
+Top-down solution: the minimum edit distance value is stored in the lookup_table.
+If the end characters match, the value returned is stored at lookup_table[m-1][n-1]
+If the end characters don’t match, all three operations (insertion, deletion, and substitution) are carried out on the last character of the first string. The minimum cost for all three operations is then computed and stored in the lookup_table[m-1][n-1]
+O(n^2) - O(n^2)
+Bottom-up solution:  we build the solution bottom-up by dividing our problem into subproblems.
+
+We know that if the first string is empty, we perform the insert operation on all characters of the second string to make both strings similar. Therefore, the minimum number of operations will equal j. Similarly, if the second string is empty, the delete operation is performed on all elements of the first string to make it similar to the second string. So, the minimum number of operations will equal i. Since this is known, we fill the lookup_table accordingly.
+If the last characters are the same, we store the returned values from lookup_table[i-1][j-1] in lookup_table[i][j].
+For characters that don’t match, the algorithm works by performing all three operations on the last character of the first string and calculating the minimum edit distance required to convert the first string into the second string. This value is then stored in the lookup_table to avoid recalculations.
+O(n^2) - O(n^2)
+'''
+# Naive
+def min_edit_dist_rec(str1, str2, m, n):
+    
+    # If first string is empty, the only option is to
+    # insert all characters of second string into first
+    if m == 0:
+        return n
+
+    # If second string is empty, the only option is to
+    # remove all characters of first string
+    if n == 0:
+        return m
+
+    # If last characters of two strings are same, nothing
+    # much to do. Ignore last characters and get count for
+    # remaining strings.
+    if str1[m - 1] == str2[n - 1]:
+        return min_edit_dist_rec(str1, str2, m - 1, n - 1)
+
+    # If last characters are not same, consider all three
+    # operations on last character of first string, recursively
+    # compute minimum cost for all three operations and take
+    # minimum of three values.
+    # adding '1' because every operation has cost of '1'
+    return 1 + min(min_edit_dist_rec(str1, str2, m, n - 1),  # Insert
+                   min_edit_dist_rec(str1, str2, m - 1, n),  # Remove
+                   min_edit_dist_rec(str1, str2, m - 1, n - 1)  # Replace
+                   )
+
+
+def min_edit_dist(str1, str2):
+   
+    return min_edit_dist_rec(str1, str2, len(str1), len(str2))
+
+# Optimized
+# -- Top down
+def min_edit_dist_rec(str1, str2, m, n, lookup_table):
+   
+    # If first string is empty, the only option is to
+    # insert all characters of second string into first
+    if m == 0:
+        return n
+
+    # If second string is empty, the only option is to
+    # remove all characters of first string
+    if n == 0:
+        return m
+
+    # if the recursive call has been
+    # called previously, then return
+    # the stored value that was calculated
+    # previously
+    if lookup_table[m - 1][n - 1] != -1:
+        return lookup_table[m - 1][n - 1]
+
+    # If last characters of two strings are same, nothing
+    # much to do. Ignore last characters and get count for
+    # remaining strings.
+
+    # Store the returned value at lookup_table[m-1][n-1]
+    # considering 1-based indexing
+    if str1[m - 1] == str2[n - 1]:
+        lookup_table[m - 1][n - 1] = min_edit_dist_rec(str1, str2, m - 1, n - 1, lookup_table)
+        return lookup_table[m - 1][n - 1]
+
+    # If last characters are not same, consider all three
+    # operations on last character of first string, recursively
+    # compute minimum cost for all three operations and take
+    # minimum of three values.
+
+    # Store the returned value at lookup_table[m-1][n-1]
+    # considering 1-based indexing
+    # adding '1' because every operation has cost of '1'
+    lookup_table[m - 1][n - 1] = 1 + min(min_edit_dist_rec(str1, str2, m, n - 1, lookup_table),  # Insert
+                                        min_edit_dist_rec(str1, str2, m - 1, n, lookup_table),  # Remove
+                                        min_edit_dist_rec(str1, str2, m - 1, n - 1, lookup_table)  # Replace
+                                        )
+    return lookup_table[m - 1][n - 1]
+
+
+def min_edit_dist(str1, str2):
+   
+    # Declare a lookup_table array which stores
+    # the answer to recursive calls
+    lookup_table = [[-1 for i in range(len(str2))] for i in range(len(str1))]
+
+    return min_edit_dist_rec(str1, str2, len(str1), len(str2), lookup_table)
+
+# -- Bottom up
+def min_edit_dist_iterative(str1, str2, m, n):
+    
+    # Create a table to store results of sub-problems
+    lookup_table = [[-1 for i in range(n + 1)] for i in range(m + 1)]
+
+    # Fill lookup_table [][] in bottom up manner
+    for i in range(m+1):
+        # If second string is empty, only option is to
+        # remove all characters of first string
+        lookup_table[i][0] = i # Min. operations = i
+
+    for j in range(n+1):
+        # If first string is empty, only option is to
+        # insert all characters of second string
+        lookup_table[0][j] = j # Min. operations = j
+        
+    for i in range(1, m + 1):
+        for j in range(1, n + 1):
+           
+            # If last characters are same, ignore last char
+            # and recur for remaining string
+            if str1[i - 1] == str2[j - 1]:
+                lookup_table[i][j] = lookup_table[i - 1][j - 1]
+
+            # If the last character is different, consider all
+            # possibilities and find the minimum
+            # adding '1' because every operation has cost of '1'
+            else:
+                lookup_table[i][j] = 1 + min(lookup_table[i][j - 1],  # Insert
+                                             lookup_table[i - 1][j],  # Remove
+                                             lookup_table[i - 1][j - 1])  # Replace
+
+    return lookup_table[m][n]
+
+
+def min_edit_dist(str1, str2):
+    
+    return min_edit_dist_iterative(str1, str2, len(str1), len(str2))
