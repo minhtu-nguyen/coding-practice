@@ -3219,3 +3219,79 @@ def word_break(s, word_dict):
 
     # Returning all the sentences formed using a complete string s.
     return dp_solutions[len(s)]
+
+## Longest Increasing Subsequence
+'''
+The Longest Increasing Subsequence (LIS) is the longest subsequence from a given array in which the subsequence elements are sorted in strictly increasing order. Given an integer array, nums, find the length of the LIS in this array.
+Naive approach: all the ideas that are needed to find the solution to this problem:
+Each element of the array is either a part of an increasing subsequence or it is not.
+To be part of an increasing subsequence, the current element needs to be greater than the previous element included in the subsequence.
+To find the longest increasing subsequence, we need to move from left to right, exhaustively generating all increasing subsequences, while keeping track of the longest one found at any step.
+O(2^n) - O(n)
+---
+Optimized solution
+Top-down solution: O(n^2) - O(n^2)
+Bottom-up solution: O(n^2) - O(n^2)
+'''
+# Naive
+def LIS_length(nums):
+  return LIS_length_rec(nums, 0, -1) 
+
+def LIS_length_rec(nums, curr, prev):
+  # base case
+  # if 'curr' reaches the end of the array, return 0
+  if curr == len(nums):
+    return 0
+
+  # solve the first subproblem
+  length = LIS_length_rec(nums, curr+1, prev)  # calculate the LIS length from 'curr+1', skipping the current element
+  
+  # solve the second subproblem
+  if prev < 0 or nums[prev] < nums[curr]: # if the current element is greater than the previous one in the subsequence
+    length = max(length, 1+LIS_length_rec(nums, curr+1, curr))  # calculate the LIS length from 'curr+1', including the current element
+  return length
+
+# Optimized
+# -- Top down
+def LIS_length(nums):
+  length = len(nums)
+  # we created a table here
+  dp = [[-1]*(length+2) for i in range(length+1)]
+  return LIS_length_rec(nums, 0, -1, dp)
+
+def LIS_length_rec(nums, curr, prev, dp):
+  # base case
+  # if 'curr' reaches the end of the array, return 0
+  if curr == len(nums):
+    return 0
+
+  # if subproblem has already been solved, use the stored result
+  if dp[curr][prev+1] != -1:
+    return dp[curr][prev+1]
+  
+  # solve the first subproblem 
+  length = LIS_length_rec(nums, curr+1, prev, dp)
+  
+  # solve the second subproblem
+  if prev < 0 or nums[prev] < nums[curr]:
+    length = max(length, 1+LIS_length_rec(nums, curr+1, curr, dp))
+  
+  dp[curr][prev+1] = length # store the result of the current subproblem
+  return dp[curr][prev+1]
+
+# -- Bottom up
+def LIS_length(nums):
+    size = len(nums)
+    # we created a table here
+    dp = [[0]*(size+1) for i in range(size+1)]
+
+    for curr in range(size-1, -1, -1):
+        for prev in range(curr-1, -2, -1):
+            length = dp[curr+1][prev+1]
+            # if 'prev' is negative or previous value is less than the next value
+            # we will take it
+            if prev < 0 or nums[prev] < nums[curr]:
+                length = max(length, 1+dp[curr+1][curr+1])
+            dp[curr][prev+1] = length
+    return dp[0][0]
+
