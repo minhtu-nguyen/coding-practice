@@ -2981,3 +2981,124 @@ def number_of_subsequences(str1, str2):
     
     # returning the result stored in lookup_table[0][0]
     return lookup_table[0][0]
+
+## Maybe You Should Talk to Someone
+'''
+Given strings s1, s2, and s3, find whether an interleaving of s1 and s2 forms s3.
+Naive approach: The first step is to verify if the length of s3 is equal to the sum of the lengths of s1 and s2. If it isn’t, return FALSE as the output. However, that isn’t the case for the given inputs. Therefore, we can traverse these strings and engage in the matching process. While traversing, we keep track of the indexes we are at in all three strings, allowing us to check the order in which these characters appear.
+We have two options at any step:
+- If the letter at s1 index matches with the letter at s3 index, we consume both, that is, we move s1 index as well as s3 index one step forward. The matching process continues recursively for the portions of s1, s2, and s3 that we have not yet considered.
+- If the letter at s2 index matches with the letter at s3 index, we consume both, that is, we move s2 index as well as s3 index one step forward. The matching process continues recursively for the portions of s1, s2, and s3 that we have not yet considered.
+This process allows us to check all possible combinations of interleaving.
+O(2^(s+t)) - O(s+t)
+---
+Optimized solution
+Top-down solution: O(st) - O(st)
+Bottom-up solution: Check solution O(st) - O(st)
+'''
+# Naive
+def find_strings_interleaving_recursive(s1, s2, s3, s1_index, s2_index, s3_index):
+
+    # If we have reached the end of all the strings
+    if s1_index == len(s1) and s2_index == len(s2) and s3_index == len(s3):
+        return True
+
+    # If we have reached the end of 's3' but 's1' or 's2' still has some characters left
+    if s3_index == len(s3):
+        return False
+
+    # The two decisions we can make at every instance are initially set to false
+    d1 = False
+    d2 = False
+
+    # If s1 index and s3 index are pointing to the same character
+    if s1_index < len(s1) and s1[s1_index] == s3[s3_index]:
+        d1 = find_strings_interleaving_recursive(
+            s1, s2, s3, s1_index + 1, s2_index, s3_index + 1)
+
+    # If s2 index and s3 index are pointing to the same character
+    if s2_index < len(s2) and s2[s2_index] == s3[s3_index]:
+        d2 = find_strings_interleaving_recursive(
+            s1, s2, s3, s1_index, s2_index + 1, s3_index + 1)
+
+    # If either of these conditions is true, it means that s3 was indeed a product of
+    # interleaving s1 and s2.
+    return d1 or d2
+
+
+# The main function that initiates a recursive call to the helper function
+def is_interleaving(s1, s2, s3):
+    return find_strings_interleaving_recursive(s1, s2, s3, 0, 0, 0)
+
+# Optimized
+# -- Top down
+def find_strings_interleaving_memoization(s1, s2, s3, s1_index, s2_index, s3_index, table):
+
+    # If we have reached the end of all the strings
+    if s1_index == len(s1) and s2_index == len(s2) and s3_index == len(s3):
+        return True
+
+    # If we have reached the end of 's3' but 's1' or 's2' still has some characters left
+    if s3_index == len(s3):
+        return False
+
+    # Setting up the key for this subproblem
+    sub_problem = str(s1_index) + "/" + str(s2_index) + "/" + str(s3_index)
+    if sub_problem not in table: # Checking if the sub problem is already solved
+      d1 = False
+      d2 = False
+      # If s1 index and s3 index are pointing to the same character
+      if s1_index < len(s1) and s1[s1_index] == s3[s3_index]:
+          d1 = find_strings_interleaving_memoization(
+              s1, s2, s3, s1_index + 1, s2_index, s3_index + 1, table)
+
+      # If s2 index and s3 index are pointing to the same character
+      if s2_index < len(s2) and s2[s2_index] == s3[s3_index]:
+          d2 = find_strings_interleaving_memoization(
+              s1, s2, s3, s1_index, s2_index + 1, s3_index + 1, table)
+
+      table[sub_problem] = d1 or d2
+    # If either of these starting decisions result in us verifying that s3 was indeed a product of
+    # interleaving s1 and s2, than we will get True, otherwise False
+    return table.get(sub_problem)
+
+
+# The main function that initiates a recursive call to the helper function, however note that
+# this time we also add an empty hash table as one of the parameters. 
+def is_interleaving(s1, s2, s3):
+    return find_strings_interleaving_memoization(s1, s2, s3, 0, 0, 0, {})
+
+# -- Bottom up
+def is_interleaving(s1, s2, s3):
+    # For the empty pattern, we have one matching
+    if len(s1) + len(s2) != len(s3):
+        return False
+
+    # Create a table with an extra row and column to separate the base cases.
+    lookup_table = [[False for i in range(len(s2) + 1)] for i in range(len(s1) + 1)]
+
+    for s1_index in range(len(s1) + 1):
+        for s2_index in range(len(s2) + 1):
+
+            # If 's1' and 's2' are empty, then 's3' must have been empty too.
+            if s1_index == 0 and s2_index == 0:
+                lookup_table[s1_index][s2_index] = True
+            # Checking the interleaving with 's2' only
+            elif s1_index == 0 and s2[s2_index - 1] == s3[s1_index + s2_index - 1]:
+                lookup_table[s1_index][s2_index] = lookup_table[s1_index][s2_index - 1]
+            # Checking the interleaving with 's1' only
+            elif s2_index == 0 and s1[s1_index - 1] == s3[s1_index + s2_index - 1]:
+                lookup_table[s1_index][s2_index] = lookup_table[s1_index - 1][s2_index]
+            else:
+                # If the letter of 's1' and 's3' match, we take whatever is matched till s1_index-1
+                if s1_index > 0 and s1[s1_index - 1] == s3[s1_index + s2_index - 1]:
+                    lookup_table[s1_index][s2_index] = lookup_table[s1_index - 1][s2_index]
+
+                # If the letter of 's2' and 's3' match, we take whatever is matched till s2_index-1 too
+                # note the '|=', this is required when we have common letters
+                if s2_index > 0 and s2[s2_index - 1] == s3[s1_index + s2_index - 1]:
+                    lookup_table[s1_index][s2_index] |= lookup_table[s1_index][s2_index - 1]
+
+    return lookup_table[len(s1)][len(s2)]
+
+## 
