@@ -2400,4 +2400,93 @@ def longest_common_subsequence(str1, str2):
                 dp[i][j] = max(dp[i][j-1], dp[i-1][j]) 
     return dp[n][m]
 
-## 
+## Shortest Common Supersequence
+'''
+Given two strings, str1 and str2, find the length of the shortest string that has both the input strings as subsequences.
+Naive approach: The two changing parameters in our recursive function are the two indices, i1 and i2 which are incremented based on the following two conditions:
+- If the characters at i1 and i2 are a match, skip one character from both the sequences and make a recursive call for the remaining lengths.
+- If the characters do not match, call the function recursively twice by skipping one character from each string. Return the minimum result of these two calls.
+O(2^(n+m)) - O(n+m)
+---
+Optimized solution
+Top-down solution: O(mn) - O(mn)
+Bottom-up solution: We create a lookup table of size (m+1)×(n+1). We fill the 0th row with values from 0 to m and similarly the 0th column with values from 0 to n. The constants in the 0th row tell the length of the shortest common supersequence if str2 is empty. Likewise, the constants in the 0th column tell the length of the shortest common supersequence if str1 is empty. Using these pre-filled values in the lookup table we iterate through both strings in a nested for loop, starting i1 and i2 from 1, and check if any of the two conditions are TRUE:
+- If the character str1[i1-1] matched str2[i2-1], the length of the shortest common supersequence would be one plus the length of the shortest common supersequence till i1 - 1 and i2 - 1 indices in the two strings.
+- If the character str1[i1-1] does not match str2[i2-1], we consider two shortest common supersequences - one without str1[i1-1] and one without str2[i2-1]. Our required shortest common supersequence length is the shortest of these two super sequences plus one.
+O(mn) - O((m+1)*(n+1))
+'''
+# Naive
+def shortest_common_supersequence_recursive(str1, str2, i1, i2):
+    # if any of the pointers has iterated over all the characters of the string,
+    # return the remaining length of the other string 
+    if i1 == len(str1):
+        return len(str2) - i2
+    if i2 == len(str2):
+        return len(str1) - i1
+
+    # if both the characters pointed by i1 and i2 are same, increment both pointers
+    if str1[i1] == str2[i2]:
+        return 1 + shortest_common_supersequence_recursive(str1, str2, i1 + 1, i2 + 1)
+
+    # recursively call the function twice by skipping one character from each string
+    length1 = 1 + shortest_common_supersequence_recursive(str1, str2, i1, i2 + 1)
+    length2 = 1 + shortest_common_supersequence_recursive(str1, str2, i1 + 1, i2)
+
+    # return the minimum of the two lengths
+    return min(length1, length2)
+
+def shortest_common_supersequence(str1, str2):
+    return shortest_common_supersequence_recursive(str1, str2, 0, 0)
+
+# Optimized
+# -- Top down
+def shortest_common_supersequence_recursive(lookup_table, str1, str2, i1, i2):
+    # if any of the pointers has iterated over all the characters of the string,
+    # return the remaining length of the other string 
+    if i1 == len(str1):
+        return len(str2) - i2
+    if i2 == len(str2):
+        return len(str1) - i1
+
+    # check if the value for the current pointers is already present in the lookup table
+    if lookup_table[i1][i2] == 0:
+        # if both the characters pointed by i1 and i2 are same, increment both pointers
+        if str1[i1] == str2[i2]:
+            lookup_table[i1][i2] = 1 + shortest_common_supersequence_recursive(lookup_table, str1, str2, i1 + 1, i2 + 1)
+        else:
+            # recursively call the function twice by skipping one character from each string
+            length1 = 1 + shortest_common_supersequence_recursive(lookup_table, str1, str2, i1, i2 + 1)
+            length2 = 1 + shortest_common_supersequence_recursive(lookup_table, str1, str2, i1 + 1, i2)
+            lookup_table[i1][i2] = min(length1, length2)
+
+    # return the value stored in the lookup table
+    return lookup_table[i1][i2]
+
+def shortest_common_supersequence(str1, str2):
+    # lookup table to store the values of recursive calls to prevent redundancy
+    lookup_table = [[0 for x in range(len(str2))] for x in range(len(str1))]
+    return shortest_common_supersequence_recursive(lookup_table, str1, str2, 0, 0)
+
+# -- Bottom up
+def shortest_common_supersequence(str1, str2):
+    # lookup table of size (m+1)*(n+1)
+    lookup_table = [[0 for x in range(len(str2) + 1)] for x in range(len(str1) + 1)]
+
+    # filling the additional row and column with constants
+    for i in range(len(str1) + 1):
+        lookup_table[i][0] = i
+
+    for j in range(len(str2) + 1):
+        lookup_table[0][j] = j
+
+    # iterate through both the strings
+    for i1 in range(1, len(str1) + 1):
+        for i2 in range(1, len(str2) + 1):
+            # if the characters match or not
+            if str1[i1 - 1] == str2[i2 - 1]:
+                lookup_table[i1][i2] = 1 + lookup_table[i1 - 1][i2 - 1]
+            else:
+                lookup_table[i1][i2] = 1 + min(lookup_table[i1 - 1][i2], lookup_table[i1][i2 - 1])
+
+    # return the last value of the lookup table
+    return lookup_table[len(str1)][len(str2)]
