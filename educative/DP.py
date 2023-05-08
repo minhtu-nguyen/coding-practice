@@ -3776,3 +3776,124 @@ def LAS(nums):
           
     # return maximum of the two final values
     return max(dp[1][n-1], dp[0][n-1])
+
+## Building Bridges
+'''
+Two cities are to be connected via n number of bridges over a river. The north bank of the river belongs to city A, while the south bank to city B. Considering this scenario, suppose we have two arrays, north and south, consisting of positive integers. What is the maximum number of bridges if the ith point of city A is connected to the ith point of city B, keeping in view that no two bridges overlap each other? While building bridges, you can only connect the A[ith] bridge on the north bank with the B[ith] point on the south bank.
+Naive approach: we will follow these steps:
+Pair the endpoints, i.e., the ith index in the north array is paired with the ith index in the south array.
+For example, we have the following arrays:
+north=[2,5,8,10]
+south=[6,4,1,2]
+Four pairs will be made from the given arrays, which are:
+pairs=[[2,6],[5,4],[8,1],[10,2]]
+Sort the pairs in ascending order according to the south bank.
+For example, let’s sort the array above:
+pairs=[[8,1],[10,2],[5,4],[2,6]]
+After sorting, we need to find the coordinates on the north bank that are sorted in ascending or descending order to find the max number of non-overlapping bridges. To perform this step, we will recursively use LIS on the northern coordinates. The length of the LIS on the north will be the max number of non-overlapping bridges.
+From the given array above, we can see that the LIS is 2 because the only increasing subsequence in the pairs array is [[8,1],[10,2]] with length equals 2.
+O(2^n) - O(n)
+---
+Optimized solution
+Top-down solution: We will create a 2-D table of dimensions (n+1)×(n+1), where n is the size of the array, to store values as they are calculated. 
+O(n^2) - O(n^2)
+Bottom-up solution: 2-D table of size (n+1)×(n+1), where each element stores the result of a subproblem. Any position, given by the ith row and the jth column, gives us the maximum count of bridges between the north ith position and the south jth position.
+The 2-D table dp, is initialized with zeros. Next, we will start filling the table from the position (1,1) of the table. These coordinates will tell us the value of the north and south arrays. So, for example, dp[1][1] contains 2; this means that the maximum number of non-overlapping bridges from the north and south arrays is 2. A nested loop will iterate over all elements of the array and will store the maximum length at every step. At the end of all iterations, the final answer will be stored in the first element of the table.
+O(n^2) - O(n^2)
+'''
+# Naive
+# function to recursively calculate the length the longest
+# increasing subsequence from the northern sorted values
+def max_bridges_rec_count(nums, curr, prev):
+    # if 'curr' reaches the length of the array, then return 0
+    if curr == len(nums):
+        return 0
+
+    # calculate the length of the longest increasing subsequence from 'curr + 1'
+    length = max_bridges_rec_count(nums, curr + 1, prev)
+    # if previous value is negative or is less than the 
+    # current value, then we will include it
+    if prev < 0 or nums[prev] < nums[curr]:
+        length = max(length, 1 + max_bridges_rec_count(nums, curr + 1, curr))
+    return length
+
+
+# function to find the maximum number of bridges that can be built
+def max_bridges_count(north, south):
+    n = len(north)
+    # making pairs by joining the north and south arrays
+    pairs = list(zip(north, south))
+    # sorting the pairs according to the southern values
+    pairs.sort(key = lambda x:(x[1], x[0]))
+    # Since southern values are sorted, we will extract the northern values
+    memo_north = [pairs[i][0] for i in range(n)]
+
+    return max_bridges_rec_count(memo_north, 0, -1)
+
+# Optimized 
+# -- Top down
+# function to recursively calculate the length the longest
+# increasing subsequence from the northern sorted values
+def max_bridges_rec_count(nums, curr, prev, dp):
+    # if 'curr' reaches the length of the array, then return 0
+    if curr == len(nums):
+        return 0
+
+    if dp[curr][prev + 1] != -1:
+        return dp[curr][prev + 1]
+	
+    # calculate the LIS length from 'curr + 1'
+    length = max_bridges_rec_count(nums, curr + 1, prev, dp)
+    # if previous value is negative or is less than the 
+    # current value, then we will include it
+    if prev < 0 or nums[prev] < nums[curr]:
+        length = max(length, 1 + max_bridges_rec_count(nums, curr + 1, curr, dp))
+	
+    dp[curr][prev + 1] = length
+    return dp[curr][prev + 1]
+
+
+# function to find the maximum number of bridges that can be built
+def max_bridges_count(north, south):
+    n = len(north)
+    # making pairs by joining the north and south arrays
+    pairs = list(zip(north, south))
+    # sorting the pairs according to the southern values
+    pairs.sort(key = lambda x:(x[1], x[0]))
+    # Since southern values are sorted, we will extract the northern values
+    memo_north = [pairs[i][0] for i in range(n)]
+    # 2-D table for memoization of size (n x n)
+    dp = [[-1 for j in range(n + 1)] for i in range(n + 1)]
+
+    return max_bridges_rec_count(memo_north, 0, -1, dp)
+
+# -- Bottom up
+# Function to find the maximum number of bridges that can be built
+def max_bridges_count(north, south):
+    n = len(north)
+    # Making pairs by joining the north and south array
+    pairs = list(zip(north, south))
+    # sorting the pairs according to the southern values
+    pairs.sort(key = lambda x:(x[1], x[0]))
+    # Since southern values are sorted, we will extract the northern values
+    memo_north = [pairs[i][0] for i in range(n)]
+    size = len(memo_north)
+
+    # 2-D table for tabulation of size (n x n)
+    dp = [[0 for j in range(n + 1)] for i in range(n + 1)]
+    
+    for i in range(0, size + 1):
+        dp[size][i] = 0
+
+    for curr in range(size - 1, -1, -1):
+        for prev in range(i - 1, -2, -1):
+            length = dp[curr + 1][prev + 1]
+            # if previous value is negative or is less than the 
+            # current value, then we will include it
+            if prev < 0 or memo_north[prev] < memo_north[curr]:
+                length = max(length, 1 + dp[curr + 1][curr + 1])
+
+            dp[curr][prev + 1] = length
+
+    return dp[curr][prev + 1]
+
