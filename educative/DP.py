@@ -4093,3 +4093,101 @@ def longest_palindromic_subsequence(s):
                 lookup_table[start][end] = max(c1, c2)
 
     return lookup_table[0][len(s) - 1]
+
+## Longest Palindromic Substring
+'''
+Given a string s, find the length of its longest palindromic substring. The longest palindromic substring is a substring with maximum length that is also a palindrome. A phrase, word, or sequence is a palindrome that reads the same forward and backward.
+Naive approach: 
+Start two pointers from the start and end of the string.
+If the characters at the two indexes match, recursively check if the substring between these two indexes is also a palindrome. If it's a palindrome, then it's the longest palindromic substring.
+If the characters at the two indexes don't match, divide the problem into two subproblems by dropping a character from the start and end of the string. Call recursion on each subproblem to check if the strings are palindromes, and take the maximum length of the two substrings.
+O(n^3) - O(n)
+---
+Optimized solution
+Top-down solution: O(n^2) - O(n^2)
+Bottom-up solution: The algorithm iterates the input string via two pointers, start and end . The start pointer starts from the end of the string i.e., start = s.length-2 with end = start +1. Initially, it considers the substring consisting of only the last character, and the length of its longest palindromic substring is stored at dp[start][end]. In every next iteration, it performs the following checks on all possible substrings:
+If the characters at the start and end indexes match, the cell dp[start][end] is updated with the value of dp[start+1][end-1] plus 2. The cell dp[start+1][end-1] represents the length of the longest palindromic substring found between the start and end indexes of the input string.
+If the characters at the start and end indexes don't match, we consider the lengths of the longest palindromic substrings of the two strings obtained by dropping a character either from start or end. The optimal solution will be the maximum of these two values i.e., dp[start][end] = max(dp[start + 1][end], dp[start][end - 1]).
+O(n^2) - O(n^2)
+'''
+# Naive
+def find_lps_length(s):
+    return find_lps_length_recursion(s, 0, len(s)-1)
+
+def find_lps_length_recursion(s, start, end):
+    # if both pointers are pointing to the same index
+    if start==end:
+        return 1
+
+    # the characters at start and end indices match
+    if s[start]==s[end]:
+        substring_length = end - start + 1
+        
+        # if the substring length is 2 and it's also a palindrome
+        if substring_length == 2:
+            return 2
+        
+        # check whether the remaining string is a palindrome
+        if substring_length == 2 + find_lps_length_recursion(s, start+1, end-1):
+            return substring_length
+    
+    # skip one element either from the beginning or end and select the maximum resultant value
+    return max(find_lps_length_recursion(s, start+1, end), find_lps_length_recursion(s, start, end-1))
+
+# Optimized
+# -- Top down
+def find_lps_length(s):
+    length = len(s)
+    dp = [[-1 for _ in range(length)] for _ in range(length)]
+    return find_lps_length_recursion(dp, s, 0, length - 1)
+
+def find_lps_length_recursion(dp, s, start, end):
+    # if both pointers are pointing to the same index
+    if start==end:
+        return 1
+
+    if dp[start][end] == -1:    
+
+        # the characters at the start and end indexes match
+        if s[start]==s[end]:
+            substring_length = end - start + 1
+            
+            # if the substring length is 2 and it's also a palindrome
+            if substring_length == 2:
+                return 2
+            
+            # check whether the remaining string is a palindrome
+            if substring_length == 2 + find_lps_length_recursion(dp, s, start+1, end-1):
+                dp[start][end] = substring_length
+                return dp[start][end]
+        
+        # skip one element either from the beginning or end and select the maximum resultant value
+        dp[start][end] = max(find_lps_length_recursion(dp, s, start+1, end), find_lps_length_recursion(dp, s, start, end-1))
+
+    return dp[start][end]   
+# -- Bottom up
+def find_lps_length(s):
+    # initializing a lookup table of dimensions len(s) * len(s)
+    dp = [[0 for x in range(len(s))] for x in range(len(s))]
+    
+    # every string with one character is always a palindrome
+    for i in range(len(s)):
+        dp[i][i] = 1
+
+    for start in reversed(range(len(s)-1)):
+        for end in range(start + 1, len(s)):
+            # the characters at the start and end indexes match
+            if s[start] == s[end]:
+                substring_length = end - start + 1
+
+                # if the substring length is 2 or the remaining substring is a palindrome
+                if substring_length == 2 or substring_length - 2 == dp[start + 1][end - 1]:
+                    dp[start][end] = substring_length
+                else:
+                    # skip one element either from the beginning or end and select the maximum resultant value
+                    dp[start][end] = max(dp[start + 1][end], dp[start][end - 1])
+            else:
+                # skip one element either from the beginning or end and select the maximum resultant value
+                dp[start][end] = max(dp[start + 1][end], dp[start][end - 1])
+
+    return dp[0][len(s) - 1]
