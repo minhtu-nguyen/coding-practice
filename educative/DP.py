@@ -3897,3 +3897,96 @@ def max_bridges_count(north, south):
 
     return dp[curr][prev + 1]
 
+## Longest Palindromic Subsequence
+'''
+Given a string, find the length of the longest palindromic subsequence if it exists. In a palindromic subsequence, elements read the same backward and forward.
+Naive approach:  to find the longest palindromic subsequence of s, we start from the first and the end index of s, and at each recursive step, we follow the following steps:
+- If the start and end indices are the same, we are at a single character, a palindrome with length 1. Therefore, we return 1.
+- If the elements at the start and end index are the same while the indexes are different, we increase the count by 2 and make a recursive call to the rest of the string.
+- If the elements are not the same, skip the element from the start or the end, make a recursive call to both choices and choose the maximum count from both of the calls.
+o(2^n) - O(n)
+---
+Optimized solution
+Top-down solution: 
+If the start and end indexes are the same, we are at a single character, a palindrome with length 1. Therefore, we return 1.
+If the elements at the start and end index are the same while the indexes are different, we increase the count by 2 and make a recursive call to the rest of the string. The result will be stored at lookup_table[start_index][end_index].
+If the elements are not the same, skip the element from the start or the end, make a recursive call to both choices, choose the maximum count from both calls, and store it at lookup_table[start_index][end_index].
+O(n^2) - O(n^2)
+Bottom-up solution: we create a lookup table of size nxn and initialize the cells as 1 for the same start_index and end_index because the same indexes mean a palindrome character with length 1. After initializing the lookup table, we’ll use the following algorithm:
+Start looping by initializing the start_index to the end of the string and another loop by initializing end_index to start_index + 1. This is because we want to build the solution from the bottom right of the lookup table.
+In each iteration, if the element at start_index and end_index are the same, we’ll fill that position in the lookup table by adding 2 and the value at lookup_table[start_index + 1][end_index - 1].
+- We add 2 because two same characters contribute to the length of the palindrome.
+- The value at lookup_table[start_index + 1][end_index - 1] (diagonal from the current cell) has the length of the longest palindromic sequence present after the character at s[start_index].
+If the element at start_index and end_index are not the same, we’ll fill that cell in the lookup table by getting the maximum value between the cell at its left and below it.
+O(n^2) - O(n^2)
+'''
+# Naive
+def longest_palindromic_subsequence(s):
+    return longest_palindromic_subsequence_recursive(s, 0, len(s) - 1)
+
+def longest_palindromic_subsequence_recursive(s, start_index, end_index):
+    if start_index > end_index:
+        return 0
+
+    # Every sequence with one element is a palindrome of length 1
+    if start_index == end_index:
+        return 1
+
+    # Case 1: elements at the beginning and the end are the same
+    if s[start_index] == s[end_index]:
+        return 2 + longest_palindromic_subsequence_recursive(s, start_index + 1, end_index - 1)
+
+    # Case 2: skip one element either from the beginning or the end
+    c1 = longest_palindromic_subsequence_recursive(s, start_index + 1, end_index)
+    c2 = longest_palindromic_subsequence_recursive(s, start_index, end_index - 1)
+    return max(c1, c2)
+# Optimized
+# -- Top down
+def longest_palindromic_subsequence(s):
+    # Initializing a lookup table of dimensions len(s) x len(s)
+    lookup_table = [[0 for x in range(len(s))] for x in range(len(s))]
+
+    return longest_palindromic_subsequence_recursive(lookup_table, s, 0, len(s) - 1)
+
+def longest_palindromic_subsequence_recursive(lookup_table, s, start_index, end_index):
+    if start_index > end_index:
+        return 0
+
+    # Every sequence with one element is a palindrome of length 1
+    if start_index == end_index:
+        return 1
+
+    if lookup_table[start_index][end_index] == 0:
+        # case 1: elements at the beginning and the end are the same
+        if s[start_index] == s[end_index]:
+            lookup_table[start_index][end_index] = 2 + longest_palindromic_subsequence_recursive(lookup_table, s, start_index + 1, end_index - 1)
+        else:
+            # case 2: skip one element either from the beginning or the end
+            c1 = longest_palindromic_subsequence_recursive(lookup_table, s, start_index + 1, end_index)
+            c2 = longest_palindromic_subsequence_recursive(lookup_table, s, start_index, end_index - 1)
+            lookup_table[start_index][end_index] = max(c1, c2)
+
+    return lookup_table[start_index][end_index]
+# -- Bottom up
+def longest_palindromic_subsequence(s):
+    # Initializing a lookup table of dimensions len(s) x len(s)
+    lookup_table = [[0 for x in range(len(s))] for x in range(len(s))]
+
+    # Every sequence with one element is a palindrome of length 1
+    for i in range(len(s)):
+        lookup_table[i][i] = 1
+
+    for start_index in reversed(range(len(s))):
+        for end_index in range(start_index + 1, len(s)):
+            
+            # case 1: elements at the beginning and the end are the same
+            if s[start_index] == s[end_index]:
+                lookup_table[start_index][end_index] = 2 + lookup_table[start_index + 1][end_index - 1]
+            
+            # case 2: skip one element either from the beginning or the end
+            else:  
+                lookup_table[start_index][end_index] = max(lookup_table[start_index + 1][end_index],
+                                                           lookup_table[start_index][end_index - 1])
+
+    return lookup_table[0][len(s) - 1]
+
