@@ -1162,3 +1162,1487 @@ int right_bound(int[] nums, int target) {
 }
 '''
 
+### *** Data Structures
+## Heap
+class Heap:
+    def __init__(self, comparator):
+        self.arr = []
+        self.comparator = comparator
+
+    def get_parent(self, k):
+        return (k - 1) // 2
+
+    def peek(self):
+        return self.arr[0]
+
+    def push(self, v):
+        self.arr.append(v)
+        self._heapify_up(len(self.arr) - 1)
+
+    def pop(self):
+        self.arr[0] = self.arr[-1]
+        self.arr.pop()
+        self._heapify_down(0)
+
+    def _heapify_up(self, k):
+        parent = self.get_parent(k)
+        if parent == -1:
+            return
+        if not self.comparator(self.arr[parent], self.arr[k]):
+            self.arr[parent], self.arr[k] = self.arr[k], self.arr[parent]
+            self._heapify_up(parent)
+
+    def _heapify_down(self, k):
+        if k >= len(self.arr):
+            return
+        left = 2 * k + 1
+        right = 2 * k + 2
+        index = k
+        if left < len(self.arr) and not self.comparator(self.arr[index], self.arr[left]):
+            index = left
+        if right < len(self.arr) and not self.comparator(self.arr[index], self.arr[right]):
+            index = right
+        if index != k:
+            self.arr[index], self.arr[k] = self.arr[k], self.arr[index]
+            self._heapify_down(index)
+
+    def make_heap(self, arr):
+        for _, v in enumerate(arr):
+            self.arr.append(v)
+
+        index = (len(self.arr) - 1) // 2
+        for i in range(index, -1, -1):
+            self._heapify_down(i)
+
+min_heap = Heap(lambda a, b : a < b)
+max_heap = Heap(lambda a, b : a > b)
+
+arr = [4, 3, 5, 2, 1, 6, 8, 7, 9]
+min_heap.make_heap(arr)
+max_heap.make_heap(arr)
+
+print(min_heap.peek())
+print(max_heap.peek())
+
+min_heap.push(0)
+max_heap.push(10)
+
+print(min_heap.peek())
+print(max_heap.peek())
+
+min_heap.pop()
+max_heap.pop()
+
+print(min_heap.peek())
+print(max_heap.peek())
+
+## LRU
+'''
+class Node {
+    public int key, val;
+    public Node next, prev;
+    public Node(int k, int v) {
+        this.key = k;
+        this.val = v;
+    }
+}
+
+class DoubleList {  
+    // Add x at the head, time complexity O(1)
+    public void addFirst(Node x);
+
+    // Delete node x in the linked list (x is guaranteed to exist)
+    // Given a node in a doubly linked list, time complexity O(1)
+    public void remove(Node x);
+
+    // Delete and return the last node in the linked list, time complexity O(1)
+    public Node removeLast();
+
+    // Return the length of the linked list, time complexity O(1)
+    public int size();
+}
+
+class LRUCache {
+    // key -> Node(key, val)
+    private HashMap<Integer, Node> map;
+    // Node(k1, v1) <-> Node(k2, v2)...
+    private DoubleList cache;
+    // Max capacity
+    private int cap;
+
+    public LRUCache(int capacity) {
+        this.cap = capacity;
+        map = new HashMap<>();
+        cache = new DoubleList();
+    }
+
+    public int get(int key) {
+        if (!map.containsKey(key))
+            return -1;
+        int val = map.get(key).val;
+        // Using put method to bring it forward to the head
+        put(key, val);
+        return val;
+    }
+
+    public void put(int key, int val) {
+        // Initialize new node x
+        Node x = new Node(key, val);
+
+        if (map.containsKey(key)) {
+            // Delete the old node, add to the head
+            cache.remove(map.get(key));
+            cache.addFirst(x);
+            // Update the corresponding record in map
+            map.put(key, x);
+        } else {
+            if (cap == cache.size()) {
+                // Delete the last node in the linked list
+                Node last = cache.removeLast();
+                map.remove(last.key);
+            }
+            // Add to the head
+            cache.addFirst(x);
+            map.put(key, x);
+        }
+    }
+}
+'''
+
+## Binary Search Operations
+'''
+# Traverse
+void BST(TreeNode root, int target) {
+    if (root.val == target)
+        // When you find the target, your manipulation should be written here
+    if (root.val < target) 
+        BST(root.right, target);
+    if (root.val > target)
+        BST(root.left, target);
+}
+# Same Tree
+boolean isSameTree(TreeNode root1, TreeNode root2) {
+    // If they are null, they are identical obviously
+    if (root1 == null && root2 == null) return true;
+    // If one of the nodes is void, but the other is not null, they are not identical
+    if (root1 == null || root2 == null) return false;
+    // If they are all not void, but their values are not equal, they are not identical
+    if (root1.val != root2.val) return false;
+
+    // To recursively compare every pair of the node
+    return isSameTree(root1.left, root2.left)
+        && isSameTree(root1.right, root2.right);
+}
+
+# Valid BST
+boolean isValidBST(TreeNode root) {
+    return isValidBST(root, null, null);
+}
+
+boolean isValidBST(TreeNode root, TreeNode min, TreeNode max) {
+    if (root == null) return true;
+    if (min != null && root.val <= min.val) return false;
+    if (max != null && root.val >= max.val) return false;
+    return isValidBST(root.left, min, root) 
+        && isValidBST(root.right, root, max);
+}
+
+# In BST
+boolean isInBST(TreeNode root, int target) {
+    if (root == null) return false;
+    if (root.val == target)
+        return true;
+    if (root.val < target) 
+        return isInBST(root.right, target);
+    if (root.val > target)
+        return isInBST(root.left, target);
+    // The manipulations in the root node are finished, and the framework is done, great!
+}
+
+# Delete
+TreeNode deleteNode(TreeNode root, int key) {
+    if (root == null) return null;
+    if (root.val == key) {
+        // These two IF function handle the situation 1 and situation 2
+        if (root.left == null) return root.right;
+        if (root.right == null) return root.left;
+        // Deal with situation 3
+        TreeNode minNode = getMin(root.right);
+        root.val = minNode.val;
+        root.right = deleteNode(root.right, minNode.val);
+    } else if (root.val > key) {
+        root.left = deleteNode(root.left, key);
+    } else if (root.val < key) {
+        root.right = deleteNode(root.right, key);
+    }
+    return root;
+}
+
+TreeNode getMin(TreeNode node) {
+    // The left child node is the minimum
+    while (node.left != null) node = node.left;
+    return node;
+}
+'''
+
+## Monotonic Stack
+'''
+Monotonic stack is actually a stack. It just uses some ingenious logic to keep the elements in the stack orderly (monotone increasing or monotone decreasing) after each new element putting into the stack.
+Well,sounds like a heap? No, monotonic stack is not widely used. It only deals with one typical problem, which is called Next Greater Element.
+Template for monotonic queue solving problem. The for loop scans elements from the back to the front,and while we use the stack structure and enter the stack back to front, we are actually going to exit the stack front to back. The while loop is to rule out the elements between the two "tall" elements.Their existence has no meaning, because there is a "taller" element in front of them and they cannot be considered as the Next Great Number of the subsequent elements.
+The time complexity of this algorithm is not so intuitive. If you see for loop nesting with while loop, you may think that the complexity of this algorithm is O(n^2), but in fact the complexity of this algorithm is only O(n).
+vector<int> nextGreaterElement(vector<int>& nums) {
+    vector<int> ans(nums.size()); // array to store answer
+    stack<int> s;
+    for (int i = nums.size() - 1; i >= 0; i--) { // put it into the stack back to front
+        while (!s.empty() && s.top() <= nums[i]) { // determine by height
+            s.pop(); // short one go away while blocked
+        }
+        ans[i] = s.empty() ? -1 : s.top(); // the first tall behind this element
+        s.push(nums[i]); // get into the queue and wait for later height determination
+    }
+    return ans;
+}
+
+## 
+Give you an array T = [73, 74, 75, 71, 69, 72, 76, 73], which stores the weather temperature in recent days(Is it in teppanyaki? No, it's in Fahrenheit). You return an array to calculate: for each day, how many days do you have to wait for a warmer temperature;and if you can't wait for that day, fill in 0.
+vector<int> dailyTemperatures(vector<int>& T) {
+    vector<int> ans(T.size());
+    stack<int> s; // here for element index，not element
+    for (int i = T.size() - 1; i >= 0; i--) {
+        while (!s.empty() && T[s.top()] <= T[i]) {
+            s.pop();
+        }
+        ans[i] = s.empty() ? 0 : (s.top() - i); // get index spacing
+        s.push(i); // add index，not element
+    }
+    return ans;
+}
+
+## Circular Array
+After adding the ring attribute, the difficulty lies in that the meaning of Next is not only the right side of the current element, but also the left side of the current element (as shown in the above example).
+
+vector<int> nextGreaterElements(vector<int>& nums) {
+    int n = nums.size();
+    vector<int> res(n); // store result
+    stack<int> s;
+    // pretend that this array is doubled in length. Instead of constructing a new array, we can use the technique of circular array to simulate.
+    for (int i = 2 * n - 1; i >= 0; i--) {
+        while (!s.empty() && s.top() <= nums[i % n])
+            s.pop();
+        res[i % n] = s.empty() ? -1 : s.top();
+        s.push(nums[i % n]);
+    }
+    return res;
+}
+'''
+
+## Monotonic Queue
+'''
+The core idea of "monotonic queue" is similar to "monotonic stack". The push method of the monotonic queue still adds elements to the end of the queue, but deletes the previous elements smaller than the new element.
+
+class MonotonicQueue {
+    // add element n to the end of the line
+    void push(int n);
+    // returns the maximum value in the current queue
+    int max();
+    // if the head element is n, delete it
+    void pop(int n);
+}
+
+class MonotonicQueue {
+private:
+    deque<int> data;
+public:
+    void push(int n) {
+        while (!data.empty() && data.back() < n) 
+            data.pop_back();
+        data.push_back(n);
+    }
+
+    int max() { return data.front(); }
+
+    void pop(int n) {
+        if (!data.empty() && data.front() == n)
+            data.pop_front();
+    }
+};
+
+vector<int> maxSlidingWindow(vector<int>& nums, int k) {
+    MonotonicQueue window;
+    vector<int> res;
+    for (int i = 0; i < nums.size(); i++) {
+        if (i < k - 1) { // fill the first k-1 of the window first
+            window.push(nums[i]);
+        } else { // window slide forward
+            window.push(nums[i]);
+            res.push_back(window.max());
+            window.pop(nums[i - k + 1]);
+        }
+    }
+    return res;
+}
+'''
+
+## Design Twitter
+'''
+class Twitter {
+
+    /** user post a tweet */
+    public void postTweet(int userId, int tweetId) {}
+
+    /** return the list of IDs of recent tweets, 
+    from the users that the current user follows (including him/herself),
+    maximum 10 tweets with updated time sorted in descending order */
+    public List<Integer> getNewsFeed(int userId) {}
+
+    /** follower will follow the followee,
+    create the ID if it doesn't exist */
+    public void follow(int followerId, int followeeId) {}
+
+    /** follower unfollows the followee,
+    do nothing if the ID does not exist */
+    public void unfollow(int followerId, int followeeId) {}
+}
+
+
+// static int timestamp = 0
+class User {
+    private int id;
+    public Set<Integer> followed;
+    // The head of the linked list of posted tweets by the user
+    public Tweet head;
+
+    public User(int userId) {
+        followed = new HashSet<>();
+        this.id = userId;
+        this.head = null;
+        // follow the user him/herself
+        follow(id);
+    }
+
+    public void follow(int userId) {
+        followed.add(userId);
+    }
+
+    public void unfollow(int userId) {
+        // a user is not allowed to unfollow him/herself
+        if (userId != this.id)
+            followed.remove(userId);
+    }
+
+    public void post(int tweetId) {
+        Tweet twt = new Tweet(tweetId, timestamp);
+        timestamp++;
+        // insert the new tweet to the head of the linked list
+        // the closer a tweet is to the head, the larger the value of time
+        twt.next = head;
+        head = twt;
+    }
+}
+
+class Tweet {
+    private int id;
+    private int time;
+    private Tweet next;
+
+    // initialize with tweet ID and post timestamp
+    public Tweet(int id, int time) {
+        this.id = id;
+        this.time = time;
+        this.next = null;
+    }
+}
+
+class Twitter {
+    private static int timestamp = 0;
+    private static class Tweet {...}
+    private static class User {...}
+
+    // we need a mapping to associate userId and User
+    private HashMap<Integer, User> userMap = new HashMap<>();
+
+    /** user posts a tweet */
+    public void postTweet(int userId, int tweetId) {
+        // instantiate an instance if userId does not exist
+        if (!userMap.containsKey(userId))
+            userMap.put(userId, new User(userId));
+        User u = userMap.get(userId);
+        u.post(tweetId);
+    }
+
+    /** follower follows the followee */
+    public void follow(int followerId, int followeeId) {
+        // instantiate if the follower does not exist
+        if(!userMap.containsKey(followerId)){
+            User u = new User(followerId);
+            userMap.put(followerId, u);
+        }
+        // instantiate if the followee does not exist
+        if(!userMap.containsKey(followeeId)){
+            User u = new User(followeeId);
+            userMap.put(followeeId, u);
+        }
+        userMap.get(followerId).follow(followeeId);
+    }
+
+    /** follower unfollows the followee, do nothing if follower does not exists */
+    public void unfollow(int followerId, int followeeId) {
+        if (userMap.containsKey(followerId)) {
+            User flwer = userMap.get(followerId);
+            flwer.unfollow(followeeId);
+        }
+    }
+
+    /** return the list of IDs of recent tweets, 
+    from the users that the current user follows (including him/herself),
+    maximum 10 tweets with updated time sorted in descending order */
+    public List<Integer> getNewsFeed(int userId) {
+        List<Integer> res = new ArrayList<>();
+        if (!userMap.containsKey(userId)) return res;
+        // IDs of followees
+        Set<Integer> users = userMap.get(userId).followed;
+        // auto sorted by time property in descending order
+        // the size will be equivalent to users
+        PriorityQueue<Tweet> pq = 
+            new PriorityQueue<>(users.size(), (a, b)->(b.time - a.time));
+
+        // first, insert all heads of linked list into the priority queue
+        for (int id : users) {
+            Tweet twt = userMap.get(id).head;
+            if (twt == null) continue;
+            pq.add(twt);
+        }
+
+        while (!pq.isEmpty()) {
+            // return only 10 records
+            if (res.size() == 10) break;
+            // pop the tweet with the largest time (the most recent)
+            Tweet twt = pq.poll();
+            res.add(twt.id);
+            // insert the next tweet, which will be sorted automatically
+            if (twt.next != null) 
+                pq.add(twt.next);
+        }
+        return res;
+    }
+}
+'''
+
+## Reverse Part of Linked List via Recursion
+'''
+The idea is similar to reversing the whole linked list, only a few modifications needed:
+Main differences:
+Base case n == 1, if reverse only one element, then new head is itself, meanwhile remember to mark the successor node.
+In previouse solution, we set head.next directly to null, because after reversing the whole list, head becoms the last node. But now head may not be the last node after reversion, so we need mark successor (the (n+1)th node), and link it to head after reversion.
+
+ListNode successor = null; // successor node
+
+// reverse n nodes starting from head, and return new head
+ListNode reverseN(ListNode head, int n) {
+    if (n == 1) { 
+        // mark the (n + 1)th node
+        successor = head.next;
+        return head;
+    }
+    // starts from head.next, revers the first n - 1 nodes
+    ListNode last = reverseN(head.next, n - 1);
+
+    head.next.next = head;
+    // link the new head to successor
+    head.next = successor;
+    return last;
+}
+
+ListNode reverseBetween(ListNode head, int m, int n) {
+    // base case
+    if (m == 1) {
+        return reverseN(head, n);
+    }
+    head.next = reverseBetween(head.next, m - 1, n - 1);
+    return head;
+}
+'''
+
+## Queue Implement Stack/Stack implement Queue
+'''
+https://labuladong.gitbook.io/algo-en/ii.-data-structure/implementqueueusingstacksimplementstackusingqueues
+'''
+
+### *** Algo Thinking
+## Framework for Backtracking Algorithm
+'''
+Solving a backtracking problem is actually a traversal process of a decision tree. Now you only need to think about 3 terms:
+- Path: the selection that have been made.
+- Selection List: the selection you can currently make.
+- End Condition: the condition under which you reach the bottom of the decision tree, and can no longer make a selection.
+The core is the recursion in the for loop. It makes a selection before the recursive call and undoes the selection after the recursive call.
+Pseudo code:
+result = []
+def backtrack(Path, Seletion List  ):
+    if meet the End Conditon:
+        result.add(Path)
+        return
+
+    for seletion in Seletion List:
+        select
+        backtrack(Path, Seletion List)
+        deselect
+
+# full permutation
+List<List<Integer>> res = new LinkedList<>();
+
+/* The main method, enter a set of unique numbers and return their full permutations */
+List<List<Integer>> permute(int[] nums) {
+    // record Path
+    LinkedList<Integer> track = new LinkedList<>();
+    backtrack(nums, track);
+    return res;
+}
+
+// Path: recorded in track
+// Seletion List: those elements in nums that do not exist in track
+// End Condition: all elements in nums appear in track
+void backtrack(int[] nums, LinkedList<Integer> track) {
+    // trigger the End Condition
+    if (track.size() == nums.length) {
+        res.add(new LinkedList(track));
+        return;
+    }
+
+    for (int i = 0; i < nums.length; i++) {
+        // exclude illegal seletions
+        if (track.contains(nums[i]))
+            continue;
+        // select
+        track.add(nums[i]);
+        // enter the next level decision tree
+        backtrack(nums, track);
+        // deselect
+        track.removeLast();
+    }
+}
+
+# N Queen Problem
+vector<vector<string>> res;
+
+/* Enter board length n, return all legal placements */
+vector<vector<string>> solveNQueens(int n) {
+    // '.' Means empty, and 'Q' means queen, initializing the empty board.
+    vector<string> board(n, string(n, '.'));
+    backtrack(board, 0);
+    return res;
+}
+
+// Path:The rows smaller than row in the board have been successfully placed the queens
+// Seletion List: all columns in 'rowth' row are queen's seletions
+// End condition: row meets the last line of board(n)
+void backtrack(vector<string>& board, int row) {
+    // trigger the End Condition
+    if (row == board.size()) {
+        res.push_back(board);
+        return;
+    }
+
+    int n = board[row].size();
+    for (int col = 0; col < n; col++) {
+        // exclude illegal seletions
+        if (!isValid(board, row, col)) 
+            continue;
+        // select
+        board[row][col] = 'Q';
+        // enter next row decision
+        backtrack(board, row + 1);
+        // deselect
+        board[row][col] = '.';
+    }
+}
+
+/*Is it possible to place a queen on board [row] [col]? */
+bool isValid(vector<string>& board, int row, int col) {
+    int n = board.size();
+    // Check if share the same column
+    for (int i = 0; i < n; i++) {
+        if (board[i][col] == 'Q')
+            return false;
+    }
+    // Check if share the same right diagonal
+    for (int i = row - 1, j = col + 1; 
+            i >= 0 && j < n; i--, j++) {
+        if (board[i][j] == 'Q')
+            return false;
+    }
+    // Check if share the same left diagonal
+    for (int i = row - 1, j = col - 1;
+            i >= 0 && j >= 0; i--, j--) {
+        if (board[i][j] == 'Q')
+            return false;
+    }
+    return true;
+}
+'''
+
+## Binary Search
+'''
+int binary_search(int[] nums, int target) {
+    int left = 0, right = nums.length - 1; 
+    while(left <= right) {
+        int mid = left + (right - left) / 2;
+        if (nums[mid] < target) {
+            left = mid + 1;
+        } else if (nums[mid] > target) {
+            right = mid - 1; 
+        } else if(nums[mid] == target) {
+            // Return directly
+            return mid;
+        }
+    }
+    // Return directly
+    return -1;
+}
+
+int left_bound(int[] nums, int target) {
+    int left = 0, right = nums.length - 1;
+    while (left <= right) {
+        int mid = left + (right - left) / 2;
+        if (nums[mid] < target) {
+            left = mid + 1;
+        } else if (nums[mid] > target) {
+            right = mid - 1;
+        } else if (nums[mid] == target) {
+            // Don't return! Lock left border
+            right = mid - 1;
+        }
+    }
+    // Check whether left border out of bounds lastly
+    if (left >= nums.length || nums[left] != target)
+        return -1;
+    return left;
+}
+
+
+int right_bound(int[] nums, int target) {
+    int left = 0, right = nums.length - 1;
+    while (left <= right) {
+        int mid = left + (right - left) / 2;
+        if (nums[mid] < target) {
+            left = mid + 1;
+        } else if (nums[mid] > target) {
+            right = mid - 1;
+        } else if (nums[mid] == target) {
+            // Don't return! Lock right border
+            left = mid + 1;
+        }
+    }
+    // Check whether right border out of bounds lastly
+    if (right < 0 || nums[right] != target)
+        return -1;
+    return right;
+}
+'''
+
+## The Tech of Double Pointer
+'''
+I divided the double pointer technique into two categories, one is "fast and slow pointer" and the other is "left and right pointer". The former solution mainly solves the problems in the linked list, such as determining whether the linked list contains a ring; the latter mainly solves the problems in the array (or string), such as binary search.
+# First, the common algorithm of fast and slow pointers
+# Determine whether the linked list contains a ring
+boolean hasCycle(ListNode head) {
+    ListNode fast, slow;
+    fast = slow = head;
+    while (fast != null && fast.next != null) {
+        fast = fast.next.next;
+        slow = slow.next;
+
+        if (fast == slow) return true;
+    }
+    return false;
+}
+
+# Knowing that the linked list contains a ring, return to the starting position of the ring
+ListNode detectCycle(ListNode head) {
+    ListNode fast, slow;
+    fast = slow = head;
+    while (fast != null && fast.next != null) {
+        fast = fast.next.next;
+        slow = slow.next;
+        if (fast == slow) break;
+    }
+    // The above code is similar to the hasCycle function
+    slow = head;
+    while (slow != fast) {
+        fast = fast.next;
+        slow = slow.next;
+    }
+    return slow;
+}
+
+# Find the midpoint of the linked list
+while (fast != null && fast.next != null) {
+    fast = fast.next.next;
+    slow = slow.next;
+}
+// "slow" is in the middle
+return slow;
+
+# Find the k-th element from the bottom of the linked list
+ListNode slow, fast;
+slow = fast = head;
+while (k-- > 0) 
+    fast = fast.next;
+
+while (fast != null) {
+    slow = slow.next;
+    fast = fast.next;
+}
+return slow;
+
+# -- Second, the common algorithm of left and right pointer
+# Binary Search
+int binarySearch(int[] nums, int target) {
+    int left = 0; 
+    int right = nums.length - 1;
+    while(left <= right) {
+        int mid = (right + left) / 2;
+        if(nums[mid] == target)
+            return mid; 
+        else if (nums[mid] < target)
+            left = mid + 1; 
+        else if (nums[mid] > target)
+            right = mid - 1;
+    }
+    return -1;
+}
+
+# Two Sum
+int[] twoSum(int[] nums, int target) {
+    int left = 0, right = nums.length - 1;
+    while (left < right) {
+        int sum = nums[left] + nums[right];
+        if (sum == target) {
+            //The index required for the question starts at 1
+            return new int[]{left + 1, right + 1};
+        } else if (sum < target) {
+            left++; //Make "sum" bigger
+        } else if (sum > target) {
+            right--; // Make "sum" smaller
+        }
+    }
+    return new int[]{-1, -1};
+}
+
+# Reverse the array
+void reverse(int[] nums) {
+    int left = 0;
+    int right = nums.length - 1;
+    while (left < right) {
+        // swap(nums[left], nums[right])
+        int temp = nums[left];
+        nums[left] = nums[right];
+        nums[right] = temp;
+        left++; right--;
+    }
+}
+
+# Sliding window algorithm
+This may be the highest state of the double pointer technique
+'''
+
+## Key Concept of TwoSum Problems
+'''
+I think the objective of the two sum problems is to tell us how to use the hash table.
+# TwoSum I
+Given an array of integers nums, and a specific integer target. Return indices of the two numbers such that they add up to target.
+int[] twoSum(int[] nums, int target) {
+    int n = nums.length;
+    index<Integer, Integer> index = new HashMap<>();
+    // Constructing a hash table: Elements are mapped to their corresponding indices
+    for (int i = 0; i < n; i++)
+        index.put(nums[i], i);
+
+    for (int i = 0; i < n; i++) {
+        int other = target - nums[i];
+        // IF 'other' exists and it is not nums[i].
+        if (index.containsKey(other) && index.get(other) != i)
+            return new int[] {i, index.get(other)};
+    }
+
+    return new int[] {-1, -1};
+}
+
+# TwoSum II
+design a class with two functions:
+class TwoSum {
+    // Add a 'number' to data structure
+    public void add(int number);
+    // Find out whether there exist two numbers and their sum is equal to 'value'.
+    public boolean find(int value);
+}
+
+class TwoSum {
+    Set<Integer> sum = new HashSet<>();
+    List<Integer> nums = new ArrayList<>();
+
+    public void add(int number) {
+        // Recording all possible sum of two numbers
+        for (int n : nums)
+            sum.add(n + number);
+        nums.add(number);
+    }
+
+    public boolean find(int value) {
+        return sum.contains(value);
+    }
+}
+
+# if the given array in TwoSum I is ordered, how do we design the algorithm? 
+int[] twoSum(int[] nums, int target) {
+    int left = 0, right = nums.length - 1;
+    while (left < right) {
+        int sum = nums[left] + nums[right];
+        if (sum == target) {
+            return new int[]{left, right};
+        } else if (sum < target) {
+            left++; // Make sum bigger
+        } else if (sum > target) {
+            right--; // Make sum smaller
+        }
+    }
+    // If no such two numbers exists
+    return new int[]{-1, -1};
+}
+'''
+
+## Implement a Calculator
+'''
+def calculate(s: str) -> int:
+
+    def helper(s: List) -> int:
+        stack = []
+        sign = '+'
+        num = 0
+
+        while len(s) > 0:
+            c = s.pop(0)
+            if c.isdigit():
+                num = 10 * num + int(c)
+            # Meet the left parenthesis and start recursive calculation of num
+            if c == '(':
+                num = helper(s)
+
+            if (not c.isdigit() and c != ' ') or len(s) == 0:
+                if sign == '+': ...
+                elif sign == '-': ... 
+                elif sign == '*': ...
+                elif sign == '/': ...
+                num = 0
+                sign = c
+            # Return recursive result when encountering right parenthesis
+            if c == ')': break
+        return sum(stack)
+
+    return helper(list(s))
+'''
+
+## Prefix Sum Skill
+'''
+Find the number of subarrays which sums to k.
+---
+The idea of Prefix Sum goes like this: for a given array nums, create another array to store the sum of prefix for pre-processing:
+int n = nums.length;
+// array of prefix sum
+int[] preSum = new int[n + 1];
+preSum[0] = 0;
+for (int i = 0; i < n; i++)
+    preSum[i + 1] = preSum[i] + nums[i];
+
+The meaning of preSum is easy to understand. preSum[i] is the sum of nums[0..i-1]. If we want to calculate the sum of nums[i..j], we just need to perform preSum[j+1] - preSum[i] instead of traversing the whole subarray.
+--
+The idea of optimization is, to record down how many sum[j] equal to sum[i] - k such that we can update the result directly instead of having inner loop. We can utilize hash table to record both prefix sums and the frequency of each prefix sum.
+--
+int subarraySum(int[] nums, int k) {
+    int n = nums.length;
+    // map：prefix sum -> frequency
+    HashMap<Integer, Integer> 
+        preSum = new HashMap<>();
+    // base case
+    preSum.put(0, 1);
+
+    int ans = 0, sum0_i = 0;
+    for (int i = 0; i < n; i++) {
+        sum0_i += nums[i];
+        // this is the prefix sum we want to find nums[0..j]
+        int sum0_j = sum0_i - k;
+        // if it exists, we'll just update the result
+        if (preSum.containsKey(sum0_j))
+            ans += preSum.get(sum0_j);
+        // record the prefix sum nums[0..i] and its frequency
+        preSum.put(sum0_i, 
+            preSum.getOrDefault(sum0_i, 0) + 1);
+    }
+    return ans;
+}
+'''
+
+## FloodFill Algorithm
+'''
+# Framework
+An array can be further abstracted as a graph. Hence, the problem becomes about traversing a graph, similar to traversing an N-ary tree. A few lines of code are enough to resolve the problem. Here is the framework:
+// (x, y) represents the coordinate
+void fill(int x, int y) {
+    fill(x - 1, y); // up
+    fill(x + 1, y); // down
+    fill(x, y - 1); // left
+    fill(x, y + 1); // right
+}
+Using this framework, we can resolve all problems about traversing a 2D array. The concept is also called Depth First Search (DFS), or quaternary (4-ary) tree traversal. The root node is coordinate (x, y). Its four child nodes are at root's four directions.
+---
+# Pay Attention to Details
+Why is there infinite loop? Each coordinate needs to go through its 4 neighbors. Consequently, each coordinate will also be traversed 4 times by its 4 neighbors. When we visit an visited coordinate, we must guarantee to identify the situation and exit. If not, we'll go into infinite loop.
+How to avoid the case of infinite loop? The most intuitive answer is to use a boolean 2D array of the same size as image, to record whether a coordinate has been traversed or not. If visited, return immediately.
+---
+int[][] floodFill(int[][] image,
+        int sr, int sc, int newColor) {
+
+    int origColor = image[sr][sc];
+    fill(image, sr, sc, origColor, newColor);
+    return image;
+}
+
+void fill(int[][] image, int x, int y,
+        int origColor, int newColor) {
+    // OUT: out of index
+    if (!inArea(image, x, y)) return;
+    // CLASH: meet other colors, beyond the area of origColor
+    if (image[x][y] != origColor) return;
+    // VISITED: visited origColor
+    if (image[x][y] == -1) return;
+
+    // choose: mark a flag as visited
+    image[x][y] = -1;
+    fill(image, x, y + 1, origColor, newColor);
+    fill(image, x, y - 1, origColor, newColor);
+    fill(image, x - 1, y, origColor, newColor);
+    fill(image, x + 1, y, origColor, newColor);
+    // unchoose: replace the mark with newColor
+    image[x][y] = newColor;
+}
+
+boolean inArea(int[][] image, int x, int y) {
+    return x >= 0 && x < image.length
+        && y >= 0 && y < image[0].length;
+}
+'''
+
+## Interval Scheduling: Interval Merging
+'''
+In the "Interval Scheduling: Greedy Algorithm", we use greedy algorithm to solve the interval scheduling problem, which means, given a lot of intervals, finding out the maximum subset without any overlapping.
+---
+The general thought for solving interval problems is observing regular patterns after the sorting process.
+
+# intervals like [[1,3],[2,6]...]
+def merge(intervals):
+    if not intervals: return []
+    # ascending sorting by start
+    intervals.sort(key=lambda intv: intv[0])
+    res = []
+    res.append(intervals[0])
+
+    for i in range(1, len(intervals)):
+        curr = intervals[i]
+        # quote of the last element in res
+        last = res[-1]
+        if curr[0] <= last[1]:
+            # find the biggest end
+            last[1] = max(last[1], curr[1])
+        else:
+            # address next interval need to be merged
+            res.append(curr)
+    return res
+'''
+
+## Interval Scheduling: Intersections of Intervals
+'''
+How to find out interval intersection from two set of intervals efficiently.
+---
+The general thought for interval problems is sorting first. Since question states that it has been ordered, then we can use two pointers to find out the intersections.
+
+# A, B like [[0,2],[5,10]...]
+def intervalIntersection(A, B):
+    i, j = 0, 0 # double pointers
+    res = []
+    while i < len(A) and j < len(B):
+        a1, a2 = A[i][0], A[i][1]
+        b1, b2 = B[j][0], B[j][1]
+        # two intervals have intersection
+        if b2 >= a1 and a2 >= b1:
+            # compute the intersection and add it into res
+            res.append([max(a1, b1), min(a2, b2)])
+        # Pointer go forward
+        if b2 < a2: j += 1
+        else:       i += 1
+    return res
+'''
+
+## String Multiplication
+'''
+For relatively small numbers, you can calculate directly using the operators provided by a programming language. When the numbers become very big, the default data types might overflow. An alternative way is to use string to represent the numbers, perform the multiplication in the primary school way, and produce the result as string as well. 
+
+https://labuladong.gitbook.io/algo-en/iii.-algorithmic-thinking/string_multiplication
+---
+string multiply(string num1, string num2) {
+    int m = num1.size(), n = num2.size();
+    // the max number of digits in result is m + n
+    vector<int> res(m + n, 0);
+    // multiply from the rightmost digit
+    for (int i = m - 1; i >= 0; i--)
+        for (int j = n - 1; j >= 0; j--) {
+            int mul = (num1[i]-'0') * (num2[j]-'0');
+            // the corresponding index of product in res
+            int p1 = i + j, p2 = i + j + 1;
+            // add to res
+            int sum = mul + res[p2];
+            res[p2] = sum % 10;
+            res[p1] += sum / 10;
+        }
+    // the result may have prefix of 0 (which is unused)
+    int i = 0;
+    while (i < res.size() && res[i] == 0)
+        i++;
+    // transform the result into string
+    string str;
+    for (; i < res.size(); i++)
+        str.push_back('0' + res[i]);
+
+    return str.size() == 0 ? "0" : str;
+}
+'''
+
+## Pancake Sort
+'''
+To summarize, the idea is:
+- Find the largest of the n pancakes.
+- Move this largest pancake to the bottom.
+- Recursively call pancakeSort(A, n-1).
+Base case: When n == 1, there is no need to flip when sorting 1 pancake.
+So, the last question left, how do you manage to turn a piece of pancake to the end?
+In fact, it is very simple. For example, the third pancake is the largest, and we want to change it to the end, that is, to the n block. You can do this:
+- Use a spatula to turn the first 3 pieces of pancakes, so that the largest pancake turns to the top.
+- Use a spatula to flip all the first n cakes, so that the largest pancake turns to the n-th pancake, which is the last pancake.
+---
+// record the reverse operation sequence
+LinkedList<Integer> res = new LinkedList<>();
+
+List<Integer> pancakeSort(int[] cakes) {
+    sort(cakes, cakes.length);
+    return res;
+}
+
+void sort(int[] cakes, int n) {
+    // base case
+    if (n == 1) return;
+
+    // find the index of the largest pancake
+    int maxCake = 0;
+    int maxCakeIndex = 0;
+    for (int i = 0; i < n; i++)
+        if (cakes[i] > maxCake) {
+            maxCakeIndex = i;
+            maxCake = cakes[i];
+        }
+
+    // first flip, turn the largest pancake to the top
+    reverse(cakes, 0, maxCakeIndex);
+    res.add(maxCakeIndex + 1);
+    // second flip, turn the largest pancake to the bottom
+    reverse(cakes, 0, n - 1);
+    res.add(n);
+
+    // recursive
+    sort(cakes, n - 1);
+}
+
+void reverse(int[] arr, int i, int j) {
+    while (i < j) {
+        int temp = arr[i];
+        arr[i] = arr[j];
+        arr[j] = temp;
+        i++; j--;
+    }
+}
+'''
+
+## Sliding Window Algorithm
+'''
+The sliding window algorithm idea is like this:
+We start with two pointers, left and right initially pointing to the first element of the string S.
+We use the right pointer to expand the window [left, right] until we get a desirable window that contains all of the characters of T.
+Once we have a window with all the characters, we can move the left pointer ahead one by one. If the window is still a desirable one we keep on updating the minimum window size.
+If the window is not desirable any more, we repeat step 2 onwards.
+This idea actually not difficult. Move right pointer to find a valid window. When a valid window is found, move left pointer to find a smaller window (optimal solution).
+---
+int left = 0, right = 0;
+
+while (right < s.size()) {
+    window.add(s[right]);
+    right++;
+
+    while (valid) {
+        window.remove(s[left]);
+        left++;
+    }
+}
+---
+# Minimum Window Substring
+string minWindow(string s, string t) {
+    // Records the starting position and length of the shortest substring
+    int start = 0, minLen = INT_MAX;
+    int left = 0, right = 0;
+
+    unordered_map<char, int> window;
+    unordered_map<char, int> needs;
+    for (char c : t) needs[c]++;
+
+    int match = 0;
+
+    while (right < s.size()) {
+        char c1 = s[right];
+        if (needs.count(c1)) {
+            window[c1]++;
+            if (window[c1] == needs[c1]) 
+                match++;
+        }
+        right++;
+
+        while (match == needs.size()) {
+            if (right - left < minLen) {
+                // Updates the position and length of the smallest string
+                start = left;
+                minLen = right - left;
+            }
+            char c2 = s[left];
+            if (needs.count(c2)) {
+                window[c2]--;
+                if (window[c2] < needs[c2])
+                    match--;
+            }
+            left++;
+        }
+    }
+    return minLen == INT_MAX ?
+                "" : s.substr(start, minLen);
+}
+
+# Find All Anagrams in a String
+vector<int> findAnagrams(string s, string t) {
+    // Init a collection to save the result
+    vector<int> res;
+    int left = 0, right = 0;
+    // Create a map to save the Characters of the target substring.
+    unordered_map<char, int> needs;
+    unordered_map<char, int> window;
+    for (char c : t) needs[c]++;
+    // Maintain a counter to check whether match the target string.
+    int match = 0;
+
+    while (right < s.size()) {
+        char c1 = s[right];
+        if (needs.count(c1)) {
+            window[c1]++;
+            if (window[c1] == needs[c1])
+                match++;
+        }
+        right++;
+
+        while (match == needs.size()) {
+            // Update the result if find a target
+            if (right - left == t.size()) {
+                res.push_back(left);
+            }
+            char c2 = s[left];
+            if (needs.count(c2)) {
+                window[c2]--;
+                if (window[c2] < needs[c2])
+                    match--;
+            }
+            left++;
+        }
+    }
+    return res;
+}
+
+# Longest Substring Without Repeating Characters
+int lengthOfLongestSubstring(string s) {
+    int left = 0, right = 0;
+    unordered_map<char, int> window;
+    int res = 0; // Record maximum length
+
+    while (right < s.size()) {
+        char c1 = s[right];
+        window[c1]++;
+        right++;
+        // If a duplicate character appears in the window
+        // Move the left pointer
+        while (window[c1] > 1) {
+            char c2 = s[left];
+            window[c2]--;
+            left++;
+        }
+        res = max(res, right - left);
+    }
+    return res;
+}
+'''
+
+## Some Useful Bit Manipulations
+'''
+# Use OR '|' and space bar coverts English characters to lowercase
+('a' | ' ') = 'a'
+('A' | ' ') = 'a'
+
+# Use AND '&' and underline coverts English to uppercase
+('b' & '_') = 'B'
+('B' & '_') = 'B'
+
+# Use XOR '^' and space bar for English characters case exchange
+('d' ^ ' ') = 'D'
+('D' ^ ' ') = 'd'
+
+# Determine if the sign of two numbers are different
+int x = -1, y = 2;
+bool f = ((x ^ y) < 0); // true
+
+int x = 3, y = 2;
+bool f = ((x ^ y) < 0); // false
+
+# Swap Two Numbers
+int a = 1, b = 2;
+a ^= b;
+b ^= a;
+a ^= b;
+// a = 2, b = 1
+
+# Plus one
+int n = 1;
+n = -~n;
+// n = 2
+
+# Minus one
+int n = 2;
+n = ~-n;
+// n = 1
+
+# Count Hamming Weight
+int hammingWeight(uint32_t n) {
+    int res = 0;
+    while (n != 0) {
+        n = n & (n - 1);
+        res++;
+    }
+    return res;
+}
+
+# Determine if a number is an exponent of 2
+bool isPowerOfTwo(int n) {
+    if (n <= 0) return false;
+    return (n & (n - 1)) == 0;
+}
+'''
+
+## Russian Doll Envelopes Problem
+'''
+The russian doll envelopes needs to be sorted according to specific rules, and then converted into a Longest Incremental Subsequence Problem.
+
+You have a number of envelopes with widths and heights given as a pair of integers (w, h). One envelope can fit into another if and only if both the width and height of one envelope is greater than the width and height of the other envelope.
+What is the maximum number of envelopes can you Russian doll? (put one inside other)
+---
+Solution
+First sort the width w in ascending order. If you encounter the same situation withw, sort in descending order by height h. Then use all h as an array, and calculate the length of LIS on this array is the answer.
+---
+// envelopes = [[w, h], [w, h]...]
+public int maxEnvelopes(int[][] envelopes) {
+    int n = envelopes.length;
+    // sort by ascending width, and sort by descending height if the width are the same
+    Arrays.sort(envelopes, new Comparator<int[]>() 
+    {
+        public int compare(int[] a, int[] b) {
+            return a[0] == b[0] ? 
+                b[1] - a[1] : a[0] - b[0];
+        }
+    });
+    // find LIS on the height array
+    int[] height = new int[n];
+    for (int i = 0; i < n; i++)
+        height[i] = envelopes[i][1];
+
+    return lengthOfLIS(height);
+}
+
+/* returns the length of LIS in nums */
+public int lengthOfLIS(int[] nums) {
+    int piles = 0, n = nums.length;
+    int[] top = new int[n];
+    for (int i = 0; i < n; i++) {
+        // playing card to process
+        int poker = nums[i];
+        int left = 0, right = piles;
+        // position to insert for binary search
+        while (left < right) {
+            int mid = (left + right) / 2;
+            if (top[mid] >= poker)
+                right = mid;
+            else
+                left = mid + 1;
+        }
+        if (left == piles) piles++;
+        // put this playing cart on top of the pile
+        top[left] = poker;
+    }
+    // the number of cards is the LIS length
+    return piles;
+}
+'''
+## Recursion 
+'''
+void sort(Comparable[] a){    
+    int N = a.length;
+    // So complicated! It shows disrespect for sorting. I refuse to study such code.
+    for (int sz = 1; sz < N; sz = sz + sz)
+        for (int lo = 0; lo < N - sz; lo += sz + sz)
+            merge(a, lo, lo + sz - 1, Math.min(lo + sz + sz - 1, N - 1));
+}
+
+/* I prefer recursion, simple and beautiful */
+void sort(Comparable[] a, int lo, int hi) {
+    if (lo >= hi) return;
+    int mid = lo + (hi - lo) / 2;
+    sort(a, lo, mid); // soft left part
+    sort(a, mid + 1, hi); // soft right part
+    merge(a, lo, mid, hi); // merge the two sides
+}
+---
+# Divide and conquer algorithm
+Merge and sort, typical divide-and-conquer algorithm; divide-and-conquer, typical recursive structure.
+The divide-and-conquer algorithm can go in three steps: decomposition-> solve-> merge
+Decompose the original problem into sub-problems with the same structure.
+After decomposing to an easy-to-solve boundary, perform a recursive solution.
+Combine the solutions of the subproblems into the solutions of the original problem.
+'''
+
+## Backtracking Solve Subset/Permutation/Combination
+'''
+# Subset
+The first solution is using the idea of mathematical induction: if you have already known the subset of [1,2], can you derive the subset of [1,2,3]? Let's take a look of the subset of [1,2]. 
+[ [],[1],[2],[1,2] ]
+You will find such a rule:
+subset([1,2,3]) - subset([1,2])
+= [3],[1,3],[2,3],[1,2,3]
+This is a typical recursive structure: The subset of[1,2,3]can be derived by[1,2], and the subset of [1,2] can be derived by [1]. Obviously, the base case is that when the input set is an empty set, the output subset is also an empty set.
+
+vector<vector<int>> subsets(vector<int>& nums) {
+    // base case, return an empty set
+    if (nums.empty()) return {{}};
+    // take the last element
+    int n = nums.back();
+    nums.pop_back();
+    // recursively calculate all subsets of the previous elements
+    vector<vector<int>> res = subsets(nums);
+
+    int size = res.size();
+    for (int i = 0; i < size; i++) {
+        // then append to the previous result
+        res.push_back(res[i]);
+        res.back().push_back(n);
+    }
+    return res;
+}
+---
+The second general method is the backtracking algorithm
+
+vector<vector<int>> res;
+
+vector<vector<int>> subsets(vector<int>& nums) {
+    // record the path
+    vector<int> track;
+    backtrack(nums, 0, track);
+    return res;
+}
+
+void backtrack(vector<int>& nums, int start, vector<int>& track) {
+    res.push_back(track);
+    for (int i = start; i < nums.size(); i++) {
+        // select
+        track.push_back(nums[i]);
+        // backtrack
+        backtrack(nums, i + 1, track);
+        // deselect
+        track.pop_back();
+    }
+}
+---
+# Combination
+vector<vector<int>>res;
+
+vector<vector<int>> combine(int n, int k) {
+    if (k <= 0 || n <= 0) return res;
+    vector<int> track;
+    backtrack(n, k, 1, track);
+    return res;
+}
+
+void backtrack(int n, int k, int start, vector<int>& track) {
+    // reach the bottom of tree
+    if (k == track.size()) {
+        res.push_back(track);
+        return;
+    }
+    // note: i is incremented from start 
+    for (int i = start; i <= n; i++) {
+        // select
+        track.push_back(i);
+        backtrack(n, k, i + 1, track);
+        // deselect
+        track.pop_back();
+    }
+}
+---
+# Permutation
+List<List<Integer>> res = new LinkedList<>();
+
+/* main function, input a uique set of numbers and return all permutations of them */
+List<List<Integer>> permute(int[] nums) {
+    // record "path"
+    LinkedList<Integer> track = new LinkedList<>();
+    backtrack(nums, track);
+    return res;
+}
+
+void backtrack(int[] nums, LinkedList<Integer> track) {
+    // trigger the ending condition
+    if (track.size() == nums.length) {
+        res.add(new LinkedList(track));
+        return;
+    }
+
+    for (int i = 0; i < nums.length; i++) {
+        // exclud illegal selections
+        if (track.contains(nums[i]))
+            continue;
+        // select
+        track.add(nums[i]);
+        // go to the next decision tree
+        backtrack(nums, track);
+        // deselect
+        track.removeLast();
+    }
+}
+'''
+
+## Shuffle Algorithm
+'''
+https://labuladong.gitbook.io/algo-en/iii.-algorithmic-thinking/shuffle_algorithm
+'''
+
+## Several counter-intuitive Probability Problems
+'''
+https://labuladong.gitbook.io/algo-en/iii.-algorithmic-thinking/several_counter_intuitive_probability_problems
+'''

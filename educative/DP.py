@@ -3656,33 +3656,33 @@ O(n) - O(n)
 # Helper function
 
 def LAS_rec(nums, previous, current, isAsc):
-  """
-    Recursively calculate the longest alternating ssubsequence
-    :param nums: list[int]: Sequence of integer numbers (array of integers)
-    :param previous: int: Index of the previous element 
-    :param current: int: Index of the current element 
-    :param isAsc: boolean: Indicates whether the current element is in ascending order relative to the previous
-    return: Length of longest alternating subsequence for the given subproblem
-  """
-  # Base case
-  if current == len(nums):
-	  return 0
-  count = 0
+    """
+      Recursively calculate the longest alternating ssubsequence
+      :param nums: list[int]: Sequence of integer numbers (array of integers)
+      :param previous: int: Index of the previous element 
+      :param current: int: Index of the current element 
+      :param isAsc: boolean: Indicates whether the current element is in ascending order relative to the previous
+      return: Length of longest alternating subsequence for the given subproblem
+    """
+    # Base case
+    if current == len(nums):
+      return 0
+    count = 0
 
-  #  If the current element is bigger than the previous and flag is ascending
-  #  Increment count by 1, flip the flag and move to the next element
-  if nums[current] > nums[previous] and isAsc:
-      count = 1 + LAS_rec(nums, current, current+1, not isAsc)
+    #  If the current element is bigger than the previous and flag is ascending
+    #  Increment count by 1, flip the flag and move to the next element
+    if nums[current] > nums[previous] and isAsc:
+        count = 1 + LAS_rec(nums, current, current+1, not isAsc)
 
-  #  If the current element is smaller than the previous and flag is descending
-  #  Increment count by 1, flip the flag and move to the next element
-  elif nums[current] < nums[previous] and not isAsc:
-      count = 1 +  LAS_rec(nums, current, current+1, not isAsc)
-      
-  # Iterate over the remaining sequence
-  count2 = max(count, LAS_rec(nums, previous, current+1, isAsc))
+    #  If the current element is smaller than the previous and flag is descending
+    #  Increment count by 1, flip the flag and move to the next element
+    elif nums[current] < nums[previous] and not isAsc:
+        count = 1 +  LAS_rec(nums, current, current+1, not isAsc)
+        
+    # Iterate over the remaining sequence
+    count2 = max(count, LAS_rec(nums, previous, current+1, isAsc))
 
-  return count2
+    return count2
 
 
 def LAS(nums):
@@ -3748,7 +3748,7 @@ def LAS(nums):
     
     # iterate over all elements of nums
     for current in range(1, n):
-        previous = current-1;
+        previous = current-1
         
         # if the current element is greater than the previous element
         if nums[current] > nums[previous]:
