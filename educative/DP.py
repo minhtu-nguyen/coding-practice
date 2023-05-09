@@ -4344,3 +4344,176 @@ def count_palindromic_substring(str1):
         ps_count += 1
 
   return ps_count
+
+## Palindromic Partitioning
+'''
+Suppose you are given a string, s. You need to perform the minimum number of cuts to divide the string into substrings, such that all the resulting substrings are palindromes.
+Naive approach: 
+Base case: If we have reached the end of the substring, or the current substring is a palindrome, we return 0.
+Otherwise, we run a loop from k = 0 to k = s.length - 1. On each iteration, we place a cut after the kth index of the string and divide it into two halves. Since we’ve placed one cut, the resulting cost of placing more cuts follows the following recurrence relation, where we now re-evaluate these resulting two halves:
+totalCuts = 1 + min_cuts(s, i, k) + min_cuts(s, k + 1, j)
+After an iteration for a value of k is complete, i.e., we have found the total number of cuts that can be placed for a value of k, we take the minimum of the current value of result and totalCuts and store this in result.
+We repeat the above process for all values of k. When the loop ends, result stores the minimum number of cuts, and we return result.
+O(2^n) - O(n)
+---
+Optimized solution
+Top-down solution: In the recursive approach, the following two variables kept changing:
+The start index of the substring, i.
+The end index of the substring, j.
+We will use a 2-D table, dp, with i rows and j columns to store the result, i.e., the total number of cuts for the substring, s[i]…s[j].
+In addition, we will use a second 2-D table, palindrome_table, with i rows and j columns to store whether the current substring, s[i]…s[j], is a palindrome or not.
+O(n^3) - O(n^2)
+Bottom-up solution: 
+We will create a 1-D array, dp, of size n. This array will have the following properties:
+Each entry, dp[i], stores the minimum number of cuts required in the substring, s[i]…s[n].
+The array will initially store the value of inf for all of its entries.
+We will also create a 2-D table, palindrome_table, of size (n×n), which stores whether each substring is a palindrome or not. The table will be filled with 1s and 0s in the following way:
+If the substring, s[i]…s[j], is a palindrome, palindrome_table[i][j] will be 1.
+Otherwise, if s[i]…s[j], is not a palindrome, palindrome_table[i][j] will be 0.
+We will traverse the indexes, i, of s from right to left and fill the dp array in the following manner:
+If palindrome_table[i][n - 1] is 1, this means s[i]…s[n - 1] is a palindrome, so we fill dp[i] with 0 since no cuts are required.
+if palindrome_table[i][n - 1] == 1:
+   dp[i] = 0
+Otherwise, we will look for a palindrome in the remaining substring s[i]…s[n - 2]. We traverse the indexes, j, of this substring from right to left in the following manner:
+We check whether palindrome_table[i][j] is 1. If it is, s[j]…s[n - 1] is a palindrome. So we update dp[i] with the minimum of its current value and 1 + dp[j + 1]:
+if palindrome_table[i][j] == 1:
+   dp[i] = min(dp[i], 1 + dp[j + 1])
+After the outer loop has ended, dp[0] will contain the minimum cuts required on the entire string, so we return dp[0].
+O(n^2) - O(n^2)
+'''
+# Naive
+# Function to check if the current substring is a palindrome or not
+def is_palindrome(s, i, j):
+    while i < j:
+        if s[i] != s[j]:
+            return False
+        i += 1
+        j -= 1
+    return True
+
+
+# Helper function with updated signature: i is start index of the current substring
+# j is the end index of the current substring
+def min_cuts_helper(s, i, j):
+
+    # Base case
+    if i == j or is_palindrome(s, i, j):
+        return 0
+
+    # Variable to store the minimum number of cuts per iteration
+    result = j - i + 1
+
+    # Loop to place a cut after each index
+    for k in range(i, j):
+        total_cuts = 1 + min_cuts_helper(s, i, k) + min_cuts_helper(s, k + 1, j)
+        result = min(result, total_cuts)
+
+    # Return the minimum number of cuts
+    return result
+
+
+def min_cuts(s):
+    return min_cuts_helper(s, 0, len(s) - 1)
+# Optimized
+# -- Top down
+# Function to check if the current substring is a palindrome or not
+def is_palindrome(s, i, j, palindrome_table):
+    if palindrome_table[i][j] == -1:
+        palindrome_table[i][j] = 1
+
+        start, end = i, j
+
+        while start < end:
+            if s[start] != s[end]:
+                palindrome_table[i][j] = 0
+                return palindrome_table[i][j]
+
+            start += 1
+            end -= 1
+
+            if start < end and palindrome_table[start][end] != -1:
+                palindrome_table[i][j] = palindrome_table[start][end]
+                return palindrome_table[i][j]
+
+    return palindrome_table[i][j]
+
+
+# Helper function with updated signature: i is start index of the current substring
+# j is the end index of the current substring
+def min_cuts_helper(s, i, j, dp, palindrome_table):
+
+    # Base case
+    if i == j or is_palindrome(s, i, j, palindrome_table):
+        return 0
+
+    if dp[i][j] != -1:
+        return dp[i][j]
+
+    # Variable to store the minimum number of cuts per iteration
+    result = j - i + 1
+
+    # Loop to place a cut after each index
+    for k in range(i, j):
+        dp[i][j] = (
+            1
+            + min_cuts_helper(s, i, k, dp, palindrome_table)
+            + min_cuts_helper(s, k + 1, j, dp, palindrome_table)
+        )
+        result = min(result, dp[i][j])
+
+    # Return the minimum number of cuts
+    dp[i][j] = result
+    return dp[i][j]
+
+
+def min_cuts(s):
+    dp = [[-1 for x in range(len(s))] for y in range(len(s))]
+    palindrome_table = [[-1 for x in range(len(s))] for y in range(len(s))]
+    return min_cuts_helper(s, 0, len(s) - 1, dp, palindrome_table)
+    
+# -- Bottom up
+import math
+
+
+def min_cuts_helper(s, palindrome_table, dp):
+
+    n = len(s)
+
+    # Filling the palindrome table
+    for i in range(n - 1, -1, -1):
+        for j in range(i + 1, n):
+            if s[i] == s[j]:
+                # If the string consists of two characters or if the remaining string, str[i + 1 : j - 1]
+                # is a palindrome, str[i : j] must also be a palindrome
+                if j - i == 1 or palindrome_table[i + 1][j - 1]:
+                    palindrome_table[i][j] = 1
+
+    # Traversing the dp table in reverse order
+    for i in range(n - 1, -1, -1):
+
+        # If str[i : n - 1] is a palindrome, no cuts need to be performed,
+        # so dp[i] = 0
+        if palindrome_table[i][n - 1] == 1:
+            dp[i] = 0
+
+        # Otherwise, we traverse the remaining string to check if it contains
+        # a palindrome and perform the minimum number of cuts on it to update
+        # dp[i]
+        else:
+            for j in range(n - 2, i - 1, -1):
+                if palindrome_table[i][j] == 1:
+                    dp[i] = min(dp[i], 1 + dp[j + 1])
+
+    # We return dp[0], as it contains the minimum number of cuts over the
+    # entire string
+    return dp[0]
+
+
+def min_cuts(s):
+
+    n = len(s)
+
+    palindrome_table = [[1 if i == j else 0 for i in range(n)] for j in range(n)]
+    dp = [math.inf] * n
+
+    return min_cuts_helper(s, palindrome_table, dp)
