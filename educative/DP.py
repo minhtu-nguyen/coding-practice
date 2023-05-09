@@ -3990,3 +3990,106 @@ def longest_palindromic_subsequence(s):
 
     return lookup_table[0][len(s) - 1]
 
+## Minimum Deletions in a String to make it a Palindrome
+'''
+You are given a string s. The task is to count the minimum deletions from s such that the resultant string is a palindrome.
+Naive approach: the number of minimum deletions as Length(s)−LPS(s)
+So, to find the LPS of s, we start from the first and the end index of s, and at each recursive step, we follow the following steps:
+If the start and end indexes are the same, we are at a single character, a palindrome with length 1. So, we return 1.
+If the elements at the start and end index are the same, we increase the count by 2 and make a recursive call to the rest of the string.
+If the elements are not the same, skip the element from the start or the end, make a recursive call to both choices and choose the maximum count from both of the calls.
+After getting the length of the longest palindromic sequence, we have to subtract it from the length of the original string to get the minimum deletions.
+O(2^n) - O(n)
+---
+Optimized solution
+Top-down solution: steps to calculate LPS:
+If the start and end indexes are the same, we are at a single character, a palindrome with length 1. So, we return 1.
+If the elements at the start and end index are the same, we increase the count by 2 and make a recursive call to the rest of the string. The result will be stored at lookup_table[start][end].
+If they are not the same, skip the element from the start or the end, make a recursive call to both choices, choose the maximum count from both calls, and store it at lookup_table[start][end].
+After calculating the length of the longest palindromic sequence, subtract it from the size of the string, which will be the minimum deletions required to make the string a palindrome.
+O(n^2) - O(n^2)
+Bottom-up solution: we create a lookup table of size nxn and initialize the cells as 1 for the same start and end index because the same indexes mean a palindrome character with length 1. After initializing the lookup table, we’ll follow the following algorithm:
+Start looping by initializing the start index to the end of the string and another loop by initializing end to start + 1. This is because we want to build the solution from the bottom of the lookup table.
+In each iteration, if the element at start and end indexes are the same, we’ll fill that position in the lookup table by adding 2 and the value at lookup_table[start + 1][end - 1].
+We add 2 because two same characters contribute to the length of the palindrome.
+The value at lookup_table[start + 1][end - 1] (diagonal from the current cell) has the length of the longest palindromic sequence present after the character at s[start].
+If the element at start and end indexes are not the same, we’ll fill that cell in the lookup table by getting the maximum value between the cell at its left and below it.
+O(n^2) - O(n^2)
+'''
+# Naive
+def minimum_deletions(s):
+    length = len(s)
+    return length - longest_palindromic_subsequence(s, 0, length - 1)
+
+def longest_palindromic_subsequence(s, start, end):
+    if start > end:
+        return 0
+
+    # Every sequence with one element is a palindrome of length 1
+    if start == end:
+        return 1
+
+    # Case 1: elements at the beginning and the end are the same
+    if s[start] == s[end]:
+        return 2 + longest_palindromic_subsequence(s, start + 1, end - 1)
+
+    # Case 2: skip one element either from the beginning or the end
+    c1 = longest_palindromic_subsequence(s, start + 1, end)
+    c2 = longest_palindromic_subsequence(s, start, end - 1)
+    return max(c1, c2)
+
+# Optimzied
+# -- Top down
+def minimum_deletions(s):
+    length = len(s)
+    return length - longest_palindromic_subsequence(s)
+
+# Returns the LPS
+def longest_palindromic_subsequence(s):
+    # Initializing a lookup table of dimensions len(s) x len(s)
+    lookup_table = [[0 for x in range(len(s))] for x in range(len(s))]
+    return longest_palindromic_subsequence_recursive(lookup_table, s, 0, len(s) - 1)
+
+def longest_palindromic_subsequence_recursive(lookup_table, s, start, end):
+    if start > end:
+        return 0
+
+    # Every sequence with one element is a palindrome of length 1
+    if start == end:
+        return 1
+
+    if lookup_table[start][end] == 0:
+        # case 1: elements at the beginning and the end are the same
+        if s[start] == s[end]:
+            lookup_table[start][end] = 2 + longest_palindromic_subsequence_recursive(lookup_table, s, start + 1, end - 1)
+        else:
+            # case 2: skip one element either from the beginning or the end
+            c1 = longest_palindromic_subsequence_recursive(lookup_table, s, start + 1, end)
+            c2 = longest_palindromic_subsequence_recursive(lookup_table, s, start, end - 1)
+            lookup_table[start][end] = max(c1, c2)
+
+    return lookup_table[start][end]
+# -- Bottom up
+def minimum_deletions(s):
+    length = len(s)
+    return length - longest_palindromic_subsequence(s)
+
+# Returns the LPS
+def longest_palindromic_subsequence(s):
+    # Initializing a lookup table of dimensions len(s) x len(s)
+    lookup_table = [[0 for x in range(len(s))] for x in range(len(s))]
+
+    # Every sequence with one element is a palindrome of length 1
+    for i in range(len(s)):
+        lookup_table[i][i] = 1
+    
+    for start in reversed(range(len(s))):
+        for end in range(start + 1, len(s)):
+            if s[start] == s[end]:
+                lookup_table[start][end] = 2 + lookup_table[start + 1][end - 1]
+            else:
+                c1 = lookup_table[start][end - 1]
+                c2 = lookup_table[start + 1][end]
+                lookup_table[start][end] = max(c1, c2)
+
+    return lookup_table[0][len(s) - 1]
