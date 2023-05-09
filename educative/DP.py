@@ -4191,3 +4191,156 @@ def find_lps_length(s):
                 dp[start][end] = max(dp[start + 1][end], dp[start][end - 1])
 
     return dp[0][len(s) - 1]
+
+## Count of Palindromic Substrings
+'''
+Given a string str1, find the count of palindromic substrings in it.
+Naive approach: 
+Set two pointers i and j at the start and end index of the given string, respectively.
+If i > j, then we return 0 as no substring is possible.
+If i == j, it means that the string has a single character and we know every single character is a palindromic substring of itself.
+Check if the substring from i to j is a palindrome or not. If yes, then:
+- Increment the count of palindromic substrings by 1
+- Recursively check for the substrings from i+1 to j
+- Recursively check for the substrings from i to j-1
+- Subtract the count of common palindromic substring from i+1 to j-1
+If the substring from i to j is not a palindrome, then:
+- Recursively check for the substrings from i+1 to j
+- Recursively check for the substrings from i to j-1
+- Subtract the count of common palindromic substring from i+1 to j-1
+O(3^N) - O(n)
+---
+Optimized Solution
+Top-down solution: O(n^2) - O(n^2)
+Bottom-up solution: start by creating a 2-D table, called lookup_table, for tabulation and set all the elements of the lookup_table as FALSE. Next, we start filling in the lookup_table with the results of all the possible substrings. For each entry in the lookup_table, we simply check if it is TRUE and we increment the count of palindromic substrings by 1.
+O(n^2) - O(n^2)
+'''
+# Naive
+def count_palindromic_substring(str1):
+  # as every individual character can be a palindromic substring so add the length
+  # of the string to the evaluated count of the string
+  return len(str1) + count_palindromic_substring_recursive(str1, 0, len(str1)-1)
+
+def count_palindromic_substring_recursive(str1, i, j):
+  # if i>j then there can be no substring
+  # if i=j it means string has single letter so we will count the string itself as a palindromic substring
+  # in both the cases we will return the length of the string as count of substring  
+  if i >= j:
+    return 0 
+  
+  # defining a variable to count the palindromic substrings
+  ps_count = 0
+  
+  # checking if a substring of the string is a palindrome or not
+  if check_palindrome(str1, i, j):
+    # if it is a palindrome we will increment the count of the substrings, will check the other substring from i+1 to j 
+    ps_count = 1 + (count_palindromic_substring_recursive(str1, i+1, j) 
+    # checking substring from i to j-1
+    + count_palindromic_substring_recursive(str1, i, j-1)
+    # remove common palindromic substrings   
+    - count_palindromic_substring_recursive(str1, i+1, j-1))
+    return ps_count
+  
+  else:
+    # if it is not a palindrome then we will check the rest of the substrings
+    ps_count = count_palindromic_substring_recursive(str1, i+1, j) + count_palindromic_substring_recursive(str1, i, j-1)  - count_palindromic_substring_recursive(str1, i+1, j-1)
+    return ps_count
+
+def check_palindrome(str1, i, j):
+  # checking if the string is a palindrome or not
+  if i>j:
+    return True
+  if str1[i] != str1[j]:
+    return False
+  
+  return check_palindrome(str1, i+1, j-1)
+# Optimized 
+# -- Top down
+def count_palindromic_substring(str1):
+  # Declare a memo table that stores
+  # the answer to recursive calls  
+  memo = [[-1 for _ in range(len(str1))] for _ in range(len(str1))]
+  # as every individual character can be a palindromic substring so add the length
+  # of the string to the evaluated count of the string
+  return len(str1) + count_palindromic_substring_memo(str1, 0, len(str1)-1, memo)
+
+def count_palindromic_substring_memo(str1, i, j, memo):
+  # if i>j then there can be no substring
+  # if i=j it means string has single letter so we will count the string itself as a palindromic substring
+  # in both the cases we will return the length of the string as count of substring
+
+  if i >= j:
+    return 0 
+
+  # Declare a bool_memo array which stores
+  # the answer to recursive calls of palindromes
+  bool_memo = [[False for _ in range(len(str1))] for _ in range(len(str1))]
+
+  # if the recursive call has been called previously, 
+  # then return the stored value that was calculated previously
+  if(memo[i][j] != -1):
+    return memo[i][j]  
+
+  # checking if a substring of the string is a palindrome or not
+  if check_palindrome(str1, i, j, bool_memo):
+    # if it is a palindrome we will increment the count of the substrings 
+    # we will check the other substring from i+1 to j 
+    memo[i][j] = 1 + (count_palindromic_substring_memo(str1, i+1, j, memo)
+    # checking substring from i to j-1
+    + count_palindromic_substring_memo(str1, i, j-1, memo)
+    # remove common palindromic substrings and store the result in memo
+    - count_palindromic_substring_memo(str1, i+1, j-1, memo))
+    return memo[i][j]
+  
+  else:
+    # if it is not a palindrome then we will check the rest of the substrings
+    # and store its result in memo 
+    memo[i][j] = count_palindromic_substring_memo(str1, i+1, j, memo) + count_palindromic_substring_memo(str1, i, j-1, memo)  - count_palindromic_substring_memo(str1, i+1, j-1, memo)
+    return memo[i][j]
+
+def check_palindrome(str1, i, j, bool_memo):
+  # checking if the string is a palindrome or not
+
+  if i > j:
+    return True
+  
+  # if the recursive call has been called previously, then return
+  # the value that was stored previously
+  if bool_memo[i][j]!= False:
+    return bool_memo[i][j]
+
+  if str1[i] != str1[j]:
+    bool_memo[i][j] = False
+    return bool_memo[i][j]
+
+  bool_memo[i][j] = check_palindrome(str1, i+1, j-1,bool_memo)
+  return bool_memo[i][j] 
+
+# -- Bottom up
+def count_palindromic_substring(str1):
+  n = len(str1)
+  # Declare a lookup table 2-D table which that
+  # the answers of the tabulation
+  lookup_table = [[False for _ in range(n)] for _ in range(n)]
+  ps_count=0
+
+  # start filling the lookup table with the results of the 
+  # palindromic substrings
+  for i in range(n - 1, -1, -1):
+    for j in range(i, n):
+      # start checking substrings from i to j
+      # if they are palindrome or not
+      if str1[i] == str1[j]:
+        # if the substring is palindrome set the 
+        # value in table as True if we have not checked it before
+        if i+1 >= j:
+          lookup_table[i][j] = True
+        # otherwise fill it with the previously stored value  
+        else:
+          lookup_table[i][j] = lookup_table[i+1][j-1]
+      # if the substring is a palindrome increment the count of
+      # the palindromic substrings by 1                  
+      if lookup_table[i][j]:
+        ps_count += 1
+
+  return ps_count
