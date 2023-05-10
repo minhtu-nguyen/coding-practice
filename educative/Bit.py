@@ -209,3 +209,24 @@ swap_nums(a,b)
 ---
 O(1) - O(1)
 '''
+
+## Find Odd Occurring Element
+'''
+In this question, every element appears an even number of times except for one element, which appears an odd number of times. The element that appears an odd number of times is our answer.
+---
+If we take XOR of zero and a bit, it will return that bit. a ^ 0 = a
+If we take XOR of duplicate bits, it will return 0. a ^ a = 0
+For n numbers, the same below math can be applied.
+a ^ b ^ a = (a ^ a) ^ b = 0 ^ b = b;
+---
+def OddOccurence(array):
+    res=0
+    for value in array:
+        res=res^value
+    return res
+
+array=[4,3,3,4,4,4,5,3,5]
+print("Odd occuring element is : ",str(OddOccurence(array)))
+---
+O(n) - O(1)
+'''
