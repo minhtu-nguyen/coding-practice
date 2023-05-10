@@ -80,3 +80,28 @@ def CountSetBits(n):
 
     return res
 '''
+
+## Counting Bits II
+'''
+Write a program to return an array of number of 1’s in the binary representation of every number in the range [0, n].
+---
+def count_bits(n):
+    count = 0
+    while n > 0:
+        n &= (n - 1)
+        count += 1
+    return count
+
+def counting_bits(n):
+    ans = [0] * (n + 1)
+    for i in range(n + 1):
+        ans[i] = count_bits(i)
+    return ans
+
+n=6
+print(counting_bits(n))
+
+# output: Result [0, 1, 1, 2, 1, 2, 2]
+---
+O(n) - O(1)
+'''
