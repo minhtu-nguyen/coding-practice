@@ -52,7 +52,7 @@ Optimized
 In this approach, we count only the set bits. So,
 - If a number has 2 set bits, then the while loop runs two times.
 - If a number has 4 set bits, then the while loop runs four times.
-Leave the left most bit as is:
+
   n  = 40           => 00000000 00000000 00000000 00101000
   n - 1 = 39        => 00000000 00000000 00000000 00100111
 -----------------------------------------------------------
@@ -125,4 +125,28 @@ def IsEven(array):
 print(IsEven([1, 2, 3, 4, 5, 6, 7, 8, 9]))
 
 O(n) - O(n)
+'''
+
+## Power of 2
+'''
+# Brute-force
+def IsPowerOf2(n):
+    if n == 0:
+        return False
+    while n != 1:
+        if n %2 !=0:
+            return False
+        n >>= 1
+    return True
+O(logn) - O(1)
+# Brian Kernighan’s algorithm
+If a number is the power of 2, we know that only one set bit is present in its Binary representation ~ n & (n - 1)==0
+def helper(n):
+    if n == 0:
+        return False
+    return (n & (n - 1) == 0)
+# One line
+def IsPowerOf2(n):
+    return n != 0 and (n & (n - 1)==0)
+O(1) - O(1)
 '''
