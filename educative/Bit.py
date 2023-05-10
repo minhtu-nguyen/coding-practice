@@ -230,3 +230,25 @@ print("Odd occuring element is : ",str(OddOccurence(array)))
 ---
 O(n) - O(1)
 '''
+
+## Detect If Two Integers Have Opposite Signs
+'''
+The XOR rule says the output will be 1 only when two input values are opposite (0 and 1, or 1 and 0).
+The above concept clearly says if the leading left-MSB (left-most significant bit) is 1, then it’s negative.
+The following four examples will clearly explain these concepts.
+Consider two numbers whose left MSBs are both 1, and the XOR of them is 0.
+If two numbers both have left MSBs of 0, then the XOR of them is 0.
+Now, when the left MSB of two inputs is different, then the XOR yields to 1, which is a negative number.
+So, when we perform (x ^ y) < 0, we get the right answer.
+---
+def oppositeSigns(x,y):
+  return "signs are opposite" if (x ^ y)< 0 else "signs are not opposite"
+
+x=100
+y=-1
+print("For inputs ",x,"," ,y ,":" ,oppositeSigns(x,y))
+---
+O(1) - O(1)
+'''
+
+##
