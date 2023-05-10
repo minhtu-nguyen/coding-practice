@@ -105,3 +105,24 @@ print(counting_bits(n))
 ---
 O(n) - O(1)
 '''
+## Check If Number Is Even/Odd
+'''
+It would be best if you saw the pattern of bits present in odd numbers. If you take a closer look at each of them, you can see the right-most significant bit is set to 1 (for 2^0 place).
+So, we do an AND bitwise operation with 1 decimal number to see if the resultant output is 1. If not, it is an even number else odd.
+---
+def IsEven(array):
+    result = []
+
+    def helper(array):
+        k = 0
+        for n in array:
+            result.append("Odd" if (n & 1) == 1 else "Even")
+            k += 1
+        return result
+
+    return helper(array)
+
+print(IsEven([1, 2, 3, 4, 5, 6, 7, 8, 9]))
+
+O(n) - O(n)
+'''
