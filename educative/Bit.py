@@ -179,3 +179,17 @@ print("Min Flips required to make two numbers equal to third is : ",MinFlips(a,b
 ---
 O(logn) - O(1)
 '''
+
+### *** NOT
+## Switch Sign of a Number
+'''
+  number   = 8
+  ~number  = -9
+----------------------------
+~number + 1 = (-9 + 1) = -8
+----------------------------
+def switchSign(number):
+      return ~number + 1
+---
+O(1) - O(1)
+'''
