@@ -193,3 +193,19 @@ def switchSign(number):
 ---
 O(1) - O(1)
 '''
+
+### *** XOR
+## Swap Two Numbers
+'''
+def swap_nums(a,b):
+    a=a^b
+    b=b^a
+    a=a^b
+    print("Finally, after swapping a =", a, ",b =", b)
+
+a=10
+b=121
+swap_nums(a,b)
+---
+O(1) - O(1)
+'''
