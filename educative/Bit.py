@@ -183,7 +183,7 @@ O(logn) - O(1)
 ### *** NOT
 ## Switch Sign of a Number
 '''
-  number   = 8
+  number   =  8
   ~number  = -9
 ----------------------------
 ~number + 1 = (-9 + 1) = -8
@@ -251,4 +251,35 @@ print("For inputs ",x,"," ,y ,":" ,oppositeSigns(x,y))
 O(1) - O(1)
 '''
 
-##
+## Hamming Distance
+'''
+Given integers x, y finds the positions where the corresponding bits are different.
+# Bit Shifting
+We use the right shift operation, where each bit would have its turn to be shifted to the rightmost position.
+
+def HammingDistance(a, b):
+   xor = a ^ b
+   distance = 0
+
+   while (xor ^ 0) :
+    if (xor % 2 == 1) :
+        distance += 1
+    
+    xor >>= 1
+    
+   return distance
+
+# Brian Kernighan’s Algorithm
+
+def HammingDistance(a, b):
+   xor = a ^ b
+   distance = 0
+
+   while (xor != 0) :
+     distance += 1
+     xor &= ( xor - 1)
+  
+   return distance
+---
+O(1) - O(1)
+'''
