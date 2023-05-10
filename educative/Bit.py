@@ -150,3 +150,32 @@ def IsPowerOf2(n):
     return n != 0 and (n & (n - 1)==0)
 O(1) - O(1)
 '''
+### *** OR
+## Number Of Flips Required To Make a|b Equal to c
+'''
+The flip operation consists of changing any single bit 1 to 0 or changing the bit 0 to 1 in their binary representation.
+---
+def MinFlips(a,b,c):
+    ans=0
+    for i in range(0,32):
+        bitC = ((c >> i) & 1)
+        bitA = ((a >> i) & 1)
+        bitB = ((b >> i) & 1)
+
+        if((bitA | bitB) != bitC):
+            if(bitC == 0):
+                if(bitA == 1 and bitB == 1):
+                     ans=ans+2
+                else:
+                    ans=ans+1 # bitA or bitB == 0
+            else: # bitC == 1
+                        ans=ans+1 # bitA and bitB == 0
+    return ans
+
+a=2
+b=6
+c=5
+print("Min Flips required to make two numbers equal to third is : ",MinFlips(a,b,c))
+---
+O(logn) - O(1)
+'''
