@@ -2646,3 +2646,830 @@ https://labuladong.gitbook.io/algo-en/iii.-algorithmic-thinking/shuffle_algorith
 '''
 https://labuladong.gitbook.io/algo-en/iii.-algorithmic-thinking/several_counter_intuitive_probability_problems
 '''
+
+### *** High Frequency Interview Problem
+## How to Find Prime Number Efficiently
+'''
+# Inefficient
+int countPrimes(int n) {
+    int count = 0;
+    for (int i = 2; i < n; i++)
+        if (isPrim(i)) count++;
+    return count;
+}
+
+// Determines whether integer n is prime
+boolean isPrime(int n) {
+    for (int i = 2; i < n; i++)
+        if (n % i == 0)
+            // There are other divisibility factors
+            return false;
+    return true;
+}
+
+# Efficient implementation countPrimes
+int countPrimes(int n) {
+    boolean[] isPrim = new boolean[n];
+    Arrays.fill(isPrim, true);
+    for (int i = 2; i * i < n; i++) 
+        if (isPrim[i]) 
+            for (int j = i * i; j < n; j += i) 
+                isPrim[j] = false;
+
+    int count = 0;
+    for (int i = 2; i < n; i++)
+        if (isPrim[i]) count++;
+
+    return count;
+}
+'''
+
+## How to Solve Drop Water Problem
+'''
+# Brute force
+int trap(vector<int>& height) {
+    int n = height.size();
+    int ans = 0;
+    for (int i = 1; i < n - 1; i++) {
+        int l_max = 0, r_max = 0;
+        // find the highest column on the right
+        for (int j = i; j < n; j++)
+            r_max = max(r_max, height[j]);
+        // find the highest column on the right
+        for (int j = i; j >= 0; j--)
+            l_max = max(l_max, height[j]);
+        // if the position i itself is the highest column
+        // l_max == r_max == height[i]
+        ans += min(l_max, r_max) - height[i];
+    }
+    return ans;
+}
+
+# Memorized 
+int trap(vector<int>& height) {
+    if (height.empty()) return 0;
+    int n = height.size();
+    int ans = 0;
+    // arrays act the memo
+    vector<int> l_max(n), r_max(n);
+    // initialize base case
+    l_max[0] = height[0];
+    r_max[n - 1] = height[n - 1];
+    // calculate l_max from left to right
+    for (int i = 1; i < n; i++)
+        l_max[i] = max(height[i], l_max[i - 1]);
+    // calculate r_max from right to left
+    for (int i = n - 2; i >= 0; i--) 
+        r_max[i] = max(height[i], r_max[i + 1]);
+    // calculate the final result
+    for (int i = 1; i < n - 1; i++) 
+        ans += min(l_max[i], r_max[i]) - height[i];
+    return ans;
+}
+
+# Two pointers
+int trap(vector<int>& height) {
+    if (height.empty()) return 0;
+    int n = height.size();
+    int left = 0, right = n - 1;
+    int ans = 0;
+
+    int l_max = height[0];
+    int r_max = height[n - 1];
+
+    while (left <= right) {
+        l_max = max(l_max, height[left]);
+        r_max = max(r_max, height[right]);
+
+        // ans += min(l_max, r_max) - height[i]
+        if (l_max < r_max) {
+            ans += l_max - height[left];
+            left++; 
+        } else {
+            ans += r_max - height[right];
+            right--;
+        }
+    }
+    return ans;
+}
+'''
+
+## How to Remove Duplicate From Sorted Sequence
+'''
+For the array related algorithm problem,there is a general technique: try to avoid deleting the element in the middle, then I want to find a way to swap the element to the last.
+---
+int removeDuplicates(int[] nums) {
+    int n = nums.length;
+    if (n == 0) return 0;
+    int slow = 0, fast = 1;
+    while (fast < n) {
+        if (nums[fast] != nums[slow]) {
+            slow++;
+            // Maintain no repetition of nums[0..slow] 
+            nums[slow] = nums[fast];
+        }
+        fast++;
+    }
+    //The length is index + 1 
+    return slow + 1;
+}
+---
+# Remove Duplicates from Sorted List
+ListNode deleteDuplicates(ListNode head) {
+    if (head == null) return null;
+    ListNode slow = head, fast = head.next;
+    while (fast != null) {
+        if (fast.val != slow.val) {
+            // nums[slow] = nums[fast];
+            slow.next = fast;
+            // slow++;
+            slow = slow.next;
+        }
+        // fast++
+        fast = fast.next;
+    }
+    // The list disconnects from the following repeating elements
+    slow.next = null;
+    return head;
+}
+'''
+
+## How to Find Longest Palindromic Substring
+'''
+Palindrome string could be in either odd length or even length, a good solution would be double pointers. 
+Core idea: start a scanner from the mid point of the string. 
+Pseudo code:
+for 0 <= i < len(s):
+    find a palindrome that set s[i] as its mid point
+    find a palindrome that set s[i] and s[i + 1] as its mid point
+    update the answer
+
+---
+string longestPalindrome(string s) {
+    string res;
+    for (int i = 0; i < s.size(); i++) {
+        // find a palindrome that set s[i] as its mid 
+        string s1 = palindrome(s, i, i);
+        // find a palindrome that set s[i] and s[i + 1] as its mid  
+        string s2 = palindrome(s, i, i + 1);
+        // res = longest(res, s1, s2)
+        res = res.size() > s1.size() ? res : s1;
+        res = res.size() > s2.size() ? res : s2;
+    }
+    return res;
+}
+---
+Time complexity: O(N^2)
+Space complexity: O(1)
+By the way, a dynamic programming approach can also work in this problem in a same time complexity. However, we need at least O(N^2) spaces to store DP table. Therefore, in this problem, dp approach is not the best solution.
+In addition, Manacher's Algorithm requires only O(N) time complexity. 
+'''
+
+## Reverse Linked List in K Group
+'''
+Given a linked list, reverse the nodes of a linked list k at a time and return its modified list.
+Given this linked list: 1->2->3->4->5 For k = 2, you should return: 2->1->4->3->5 For k = 3, you should return: 3->2->1->4->5
+---
+Linked list is a kind of data structure with recursion and iteration. On second thought, we can find that this problem can be solved by recursion.
+
+ListNode reverseKGroup(ListNode head, int k) {
+    if (head == null) return null;
+    // interval [a, b) includes k nodes to be reversed
+    ListNode a, b;
+    a = b = head;
+    for (int i = 0; i < k; i++) {
+        // base case
+        if (b == null) return head;
+        b = b.next;
+    }
+    // reverse first k nodes
+    ListNode newHead = reverse(a, b);
+    // merge all reversed internals
+    a.next = reverseKGroup(b, k);
+    return newHead;
+}
+'''
+
+## Validation of Parenthesis
+'''
+Having left parenthesis into stack, as for right parenthesis, find the recent left parenthesis in the stack, and then check if matched.
+---
+bool isValid(string str) {
+    stack<char> left;
+    for (char c : str) {
+        if (c == '(' || c == '{' || c == '[')
+            left.push(c);
+        else // character c is right parenthesis
+            if (!left.empty() && leftOf(c) == left.top())
+                left.pop();
+            else
+                // not match with recent left parenthesis
+                return false;
+    }
+    // whether all left parenthesis are matched
+    return left.empty();
+}
+
+char leftOf(char c) {
+    if (c == '}') return '{';
+    if (c == ')') return '(';
+    return '[';
+}
+'''
+
+## Find Missing Element
+'''
+This question is not hard. It's easy to think aabout traversing after sorting. Alternatively, using a HashSet to store all the existing elements, and then go through elements in [0, n] and loop up in the HashSet. Both ways can find the correct answer.
+However, the time complexity for the sorting solution is O(NlogN). The HashSet solution has O(N) for time complexity, but requires O(N) space complexity to store the data.
+---
+Bit Manipulation
+The XOR operation (^) has a special property: the result of a number XOR itself is 0, and the result of a number with 0 is itself.
+How to find out the missing number? Perform XOR operations to all elements and their indices respectively. A pair of an element and its index will become 0. Only the missing element will be left.
+
+int missingNumber(int[] nums) {
+    int n = nums.length;
+    int res = 0;
+    // XOR with the new index first
+    res ^= n;
+    // XOR with the all elements and the other indices
+    for (int i = 0; i < n; i++)
+        res ^= i ^ nums[i];
+    return res;
+}
+---
+There is actually an even easier solution: Summation of Arithmetic Progression (AP).
+int missingNumber(int[] nums) {
+    int n = nums.length;
+    // Formula: (head + tail) * n / 2
+    int expect = (0 + n) * (n + 1) / 2;
+
+    int sum = 0;
+    for (int x : nums) 
+        sum += x;
+    return expect - sum;
+---
+To avoid overflow, why not perform subtraction while summing up? Similar to our bit operation solution just now, assume nums = [0,3,1,4], add an index such that elements will be paired up with indices respectively.
+public int missingNumber(int[] nums) {
+    int n = nums.length;
+    int res = 0;
+    // Added index
+    res += n - 0;
+    // Summing up the differences between the remaining indices and elements
+    for (int i = 0; i < n; i++) 
+        res += i - nums[i];
+    return res;
+}
+'''
+
+## Pick Elements From a Arbitrary Sequence
+'''
+Given a linked which length is unknown, and you need design an algorithm to return one node from the linked list with traversaling the linked list only once.
+The simple idea is to firstly traversal the whole linked list and then get the total length n. After that, generate an index from the random number in range [1, n]. Finding the corresponding node of the index means we have found the randomly selected node.
+However, the requirement is, traversaling the linked list only once, but such kind of ideas would not fulfill it.
+If you want to solve such kind of questions, then you need to learn the Reservoir Sampling algorithm.
+---
+/* return the value of a random node from the linked list */
+int getRandom(ListNode head) {
+    Random r = new Random();
+    int i = 0, res = 0;
+    ListNode p = head;
+    // while iterate through the linked list
+    while (p != null) {
+        // generate an integer in range [0, i) 
+        // the possibility of the integer equals to 0 is 1/i
+        if (r.nextInt(++i) == 0) {
+            res = p.val;
+        }
+        p = p.next;
+    }
+    return res;
+}
+---
+/* return the values of k random nodes from the linked list */
+int[] getRandom(ListNode head, int k) {
+    Random r = new Random();
+    int[] res = new int[k];
+    ListNode p = head;
+
+    // select first k elements by default
+    for (int j = 0; j < k && p != null; j++) {
+        res[j] = p.val;
+        p = p.next;
+    }
+
+    int i = k;
+    // while iterate the linked list
+    while (p != null) {
+        // generate an integer in range [0, i) 
+        int j = r.nextInt(++i);
+        // the possibility of the integer less than k is k/i
+        if (j < k) {
+            res[j] = p.val;
+        }
+        p = p.next;
+    }
+    return res;
+}
+---
+The time complexity of above sampling algorithm is O(n), but it's not the most optimized method. The better algorithm is based on geometric distribution. The time complexity is O(k + klog(n/k)). 
+'''
+
+## Binary Search
+'''
+KoKo Banana
+Koko loves to eat bananas. There are N piles of bananas, the i-th pile has piles[i] bananas. The guards have gone and will come back in H hours.
+Koko can decide her bananas-per-hour eating speed of K. Each hour, she chooses some pile of bananas, and eats K bananas from that pile. If the pile has less than K bananas, she eats all of them instead, and won't eat any more bananas during this hour.
+Koko likes to eat slowly, but still wants to finish eating all the bananas before the guards come back.
+Return the minimum integer K such that she can eat all the bananas within H hours.
+int minEatingSpeed(int[] piles, int H) {
+    // apply the algorithms framework for searching the left boundary
+    int left = 1, right = getMax(piles) + 1;
+    while (left < right) {
+        // prevent overflow
+        int mid = left + (right - left) / 2;
+        if (canFinish(piles, mid, H)) {
+            right = mid;
+        } else {
+            left = mid + 1;
+        }
+    }
+    return left;
+}
+
+// Time complexity O(N)
+boolean canFinish(int[] piles, int speed, int H) {
+    int time = 0;
+    for (int n : piles) {
+        time += timeOf(n, speed);
+    }
+    return time <= H;
+}
+
+int timeOf(int n, int speed) {
+    return (n / speed) + ((n % speed > 0) ? 1 : 0);
+}
+
+int getMax(int[] piles) {
+    int max = 0;
+    for (int n : piles)
+        max = Math.max(n, max);
+    return max;
+}
+---
+Transport problem
+The i-th package on the conveyor belt has a weight of weights[i]. Each day, we load the ship with packages on the conveyor belt (in the order given by weights). We may not load more weight than the maximum weight capacity of the ship.
+Return the least weight capacity of the ship that will result in all the packages on the conveyor belt being shipped within D days.
+// find the left boundary using binary search
+int shipWithinDays(int[] weights, int D) {
+    // minimum possible load
+    int left = getMax(weights);
+    // maximum possible load + 1
+    int right = getSum(weights) + 1;
+    while (left < right) {
+        int mid = left + (right - left) / 2;
+        if (canFinish(weights, D, mid)) {
+            right = mid;
+        } else {
+            left = mid + 1;
+        }
+    }
+    return left;
+}
+
+// If the load is cap, can I ship the goods within D days？
+boolean canFinish(int[] w, int D, int cap) {
+    int i = 0;
+    for (int day = 0; day < D; day++) {
+        int maxCap = cap;
+        while ((maxCap -= w[i]) >= 0) {
+            i++;
+            if (i == w.length)
+                return true;
+        }
+    }
+    return false;
+}
+'''
+## Scheduling Seats
+'''
+https://labuladong.gitbook.io/algo-en/iv.-high-frequency-interview-problem/seatscheduling
+---
+// Map endpoint p to the segment with P as the left endpoint
+private Map<Integer, int[]> startMap;
+// Map endpoint p to the segment with P as the right endpoint
+private Map<Integer, int[]> endMap;
+// According to their length, store all line segments from small to large 
+private TreeSet<int[]> pq;
+private int N;
+
+public ExamRoom(int N) {
+    this.N = N;
+    startMap = new HashMap<>();
+    endMap = new HashMap<>();
+    pq = new TreeSet<>((a, b) -> {
+        // Calculate the length of two line segments
+        int distA = distance(a);
+        int distB = distance(b);
+        // Longer means it is bigger, and put it back
+        return distA - distB;
+    });
+    // Firstly, put a virtual segment in the ordered set
+    addInterval(new int[] {-1, N});
+}
+
+/* Remove a line segment */
+private void removeInterval(int[] intv) {
+    pq.remove(intv);
+    startMap.remove(intv[0]);
+    endMap.remove(intv[1]);
+}
+
+/* Add a line segment */
+private void addInterval(int[] intv) {
+    pq.add(intv);
+    startMap.put(intv[0], intv);
+    endMap.put(intv[1], intv);
+}
+
+/* Calculate the length of a line segment */
+private int distance(int[] intv) {
+    return intv[1] - intv[0] - 1;
+}
+
+public int seat() {
+    // Take the longest line from the ordered set
+    int[] longest = pq.last();
+    int x = longest[0];
+    int y = longest[1];
+    int seat;
+    if (x == -1) { // case 1
+        seat = 0;
+    } else if (y == N) { // case 2
+        seat = N - 1;
+    } else { // case 3
+        seat = (y - x) / 2 + x;
+    }
+    // Divide the longest line segment into two segments
+    int[] left = new int[] {x, seat};
+    int[] right = new int[] {seat, y};
+    removeInterval(longest);
+    addInterval(left);
+    addInterval(right);
+    return seat;
+}
+
+public void leave(int p) {
+    // Find out the lines around p
+    int[] right = startMap.get(p);
+    int[] left = endMap.get(p);
+    // Merge two segments into one
+    int[] merged = new int[] {left[0], right[1]};
+    removeInterval(left);
+    removeInterval(right);
+    addInterval(merged);
+}
+'''
+
+## Union Find
+'''
+https://labuladong.gitbook.io/algo-en/iv.-high-frequency-interview-problem/union-find-explanation
+
+The algorithm has three key points:
+Use the parent array to record the parent node of each node, which is equivalent to a pointer to the parent node, so theparent array actually stores a forest (several multi-trees).
+Use the size array to record the weight of each tree. The purpose is to keep theunion tree still balanced without degrading it into a linked list, which affects the operation efficiency.
+Path compression is performed in the find function to ensure that the height of any tree is kept constant, so that the time complexity of theunion and connected API is O (1).
+Some readers may ask, Since the path compression, does the weight balance of the size array still need? This problem is very interesting, because path compression guarantees that the tree height is constant (not more than 3), even if the tree is unbalanced, the height is also constant, which basically has little effect.
+---
+class UF {
+    // Number of connected components
+    private int count;
+    // Store a tree
+    private int[] parent;
+    // Record the "weight" of the tree
+    private int[] size;
+
+    public UF(int n) {
+        this.count = n;
+        parent = new int[n];
+        size = new int[n];
+        for (int i = 0; i < n; i++) {
+            parent[i] = i;
+            size[i] = 1;
+        }
+    }
+
+    public void union(int p, int q) {
+        int rootP = find(p);
+        int rootQ = find(q);
+        if (rootP == rootQ)
+            return;
+
+        // The small tree is more balanced under the big tree
+        if (size[rootP] > size[rootQ]) {
+            parent[rootQ] = rootP;
+            size[rootP] += size[rootQ];
+        } else {
+            parent[rootP] = rootQ;
+            size[rootQ] += size[rootP];
+        }
+        count--;
+    }
+
+    public boolean connected(int p, int q) {
+        int rootP = find(p);
+        int rootQ = find(q);
+        return rootP == rootQ;
+    }
+
+    private int find(int x) {
+        while (parent[x] != x) {
+            // Path compression
+            parent[x] = parent[parent[x]];
+            x = parent[x];
+        }
+        return x;
+    }
+
+    public int count() {
+        return count;
+    }
+}
+'''
+
+## Union-Find Application
+'''
+# DFS Alternatives
+Many problems solved by the DFS depth-first algorithm can also be solved by the Union-Find algorithm.
+For instance, Surrounded Regions of question 130: Given a 2D board containing X and O (the letter O), capture all regions surrounded by X.
+void solve(char[][] board) {
+    if (board.length == 0) return;
+
+    int m = board.length;
+    int n = board[0].length;
+    // Leave an extra room for dummy
+    UF uf = new UF(m * n + 1);
+    int dummy = m * n;
+    // Connect the first and last columns of O and dummy
+    for (int i = 0; i < m; i++) {
+        if (board[i][0] == 'O')
+            uf.union(i * n, dummy);
+        if (board[i][n - 1] == 'O')
+            uf.union(i * n + n - 1, dummy);
+    }
+    // Connect O and dummy in the first and last rows
+    for (int j = 0; j < n; j++) {
+        if (board[0][j] == 'O')
+            uf.union(j, dummy);
+        if (board[m - 1][j] == 'O')
+            uf.union(n * (m - 1) + j, dummy);
+    }
+    // Direction array d is a common method for searching up, down, left and right
+    int[][] d = new int[][]{{1,0}, {0,1}, {0,-1}, {-1,0}};
+    for (int i = 1; i < m - 1; i++) 
+        for (int j = 1; j < n - 1; j++) 
+            if (board[i][j] == 'O')
+                // Connect this O with up, down, left and right O
+                for (int k = 0; k < 4; k++) {
+                    int x = i + d[k][0];
+                    int y = j + d[k][1];
+                    if (board[x][y] == 'O')
+                        uf.union(x * n + y, i * n + j);
+                }
+    // All O not connected to dummy shall be replaced
+    for (int i = 1; i < m - 1; i++) 
+        for (int j = 1; j < n - 1; j++) 
+            if (!uf.connected(dummy, i * n + j))
+                board[i][j] = 'X';
+}
+---
+Satisfiability of Equality Equations
+Given an array equations of strings that represent relationships between variables, each string equations[i] has length 4 and takes one of two different forms: "a==b" or "a!=b". Here, a and b are lowercase letters (not necessarily different) that represent one-letter variable names.
+Return true if and only if it is possible to assign integers to variable names so as to satisfy all the given equations.
+The core idea of solving the problem is that divide the expressions in equations into two parts according to == and !=, First process the expressions of ==, so that they are connected. != Expression to check if the inequality relationship breaks the connectivity of the equality relationship.
+
+boolean equationsPossible(String[] equations) {
+    // 26 letters
+    UF uf = new UF(26);
+    // Let equal letters form connected components first
+    for (String eq : equations) {
+        if (eq.charAt(1) == '=') {
+            char x = eq.charAt(0);
+            char y = eq.charAt(3);
+            uf.union(x - 'a', y - 'a');
+        }
+    }
+    // Check if inequality relationship breaks connectivity of equal relationship
+    for (String eq : equations) {
+        if (eq.charAt(1) == '!') {
+            char x = eq.charAt(0);
+            char y = eq.charAt(3);
+            // If the equality relationship holds, it is a logical conflict
+            if (uf.connected(x - 'a', y - 'a'))
+                return false;
+        }
+    }
+    return true;
+}
+'''
+## Find Subsequence With Binary Search
+'''
+how to determine if a given string s is subsequence of another string t (assume s is much shorter as compared to t)?
+int m = s.length(), n = t.length();
+ArrayList<Integer>[] index = new ArrayList[256];
+// record down the indices of each character in t
+for (int i = 0; i < n; i++) {
+    char c = t.charAt(i);
+    if (index[c] == null) 
+        index[c] = new ArrayList<>();
+    index[c].add(i);
+}
+---
+boolean isSubsequence(String s, String t) {
+    int m = s.length(), n = t.length();
+    // pre-process t
+    ArrayList<Integer>[] index = new ArrayList[256];
+    for (int i = 0; i < n; i++) {
+        char c = t.charAt(i);
+        if (index[c] == null) 
+            index[c] = new ArrayList<>();
+        index[c].add(i);
+    }
+
+    // the pointer in t
+    int j = 0;
+    // find s[i] using index
+    for (int i = 0; i < m; i++) {
+        char c = s.charAt(i);
+        // character c does not exist in t
+        if (index[c] == null) return false;
+        int pos = left_bound(index[c], j);
+        // c is not found in the binary search interval
+        if (pos == index[c].size()) return false;
+        // increment pointer j
+        j = index[c].get(pos) + 1;
+    }
+    return true;
+}
+'''
+## Problems can be solved by one line
+'''
+# Nim Game
+The game rule is that there is a heap of stones on the table for you and friends to remove. Each of you takes turns to remove the stones and can take at least one and at most three each time. The one who takes the last stone will win the game. S
+
+We usually use contrarian thinking to find a solution of this kind of problems：
+If I win the game, I need to take the remaining stones (1\~3 stones) at once.
+How to make this situation come into being? If there are 4 stones remaining when your opponent takes the chance to pick the stones, no matter how he takes the stones, you can always win the game because there will always be 1~3 stones remaining.
+And how to force your opponent to face the situation when there are 4 stones left? If there are 5~7 stones remaining by the time you take your turn, you can let your opponent face 4-stone situation.
+Then how to get into a 5~7 stones situation when you are picking? Let your opponent face 8 stones. No matter how he plans to take the stones, we can win the game because of the remaining 5~7 stones.
+And so on, we can find out that if n is a multiple of 4, you will fall into the trap and can never win the game.
+
+bool canWinNim(int n) {
+    // If n is a multiple of 4, then return false
+    // Otherwise, return true
+    return n % 4 != 0;
+}
+---
+# Stone Game
+The game rule is that you and your friend play a game with piles of stones. The piles of stone are represented by an array, piles. pile[i] refers to the number of stones in the ith pile. Each turn, a player takes the entire pile of stones from either the beginning or the end of the row. And the winner is the one who gets more stones in the end. 
+
+????
+---
+# Bulb Switcher
+there are n bulbs in a room and they are initially turned off. Now we need to do n operations:
+- Flip all the lights.
+- Flip lights with even numbers.
+- Flip the bulb whose number is a multiple of 3 (e.g. 3, 6, 9, ... and 3 is off while 6 is on).
+For the i-th round, you toggle every i bulb. For the n-th round, you only toggle the last bulb.
+You need to find how many bulbs are on after n rounds.
+
+Suppose we have 16 lights, and we take the square root of 16, which is equal to 4, and that means we're going to end up with 4 lights on. The lights are 1*1=1, 2*2=4, 3*3=9, and 4*4=16.
+Some square root of n turns out to be a decimal. However, converting them to integers is the same thing as getting all the integers smaller than a certain integer upper bound, and the square roots of these numbers are the index of the lights on at last. so just turn the square root into an integer, that's the answer to the question.
+
+int bulbSwitch(int n) {
+    return (int)Math.sqrt(n);
+}
+'''
+
+## How to Find Duplicate and Missing Element
+'''
+The set Soriginally contains numbers from 1 to n. But unfortunately, due to the data error, one of the numbers in the set got duplicate to another number in the set, which results in repetition of one number and loss of another number.
+Given an array nums representing the data status of this set after the error. Your task is to firstly find the number occurs twice and then find the number that is missing. Return them in the form of an array.
+
+Firstly, traverse over the whole nums array and use HashMap to store the number of times each element of the array. After this, we can consider every number from 1 to n, and check for its presence in map.
+But here's a problem. This solution requires a HashMap that means the space complexity is O(n). We check the condition again. Consider the numbers from 1 to n, which happens to be one duplicate element and one missing element. There must be something strange about things going wrong.
+We must traverse over the whole nums array of size n for each of the numbers from 1 to n. That means the time complexity is O(n). So we can think how to save the space used to reduce the space complexity to O(1).
+
+The key point is that elements and indexes appear in pairs for this kind of problems. Common methods include Sorting, XOR, and Map
+The idea of Map is the above analysis. Mapping each index and element, and recording whether an element is mapped with a sign.
+The Sorting method is also easy to understand. For this problem, we can assume that if all elements are sorted from smallest to largest. If we find that the corresponding elements of the index didn't match, so we find duplicate and missing elements.
+XOR operation is also commonly used. The XOR operation (^) has a special property: the result of a number XOR itself is 0, and the result of a number with 0 is itself. For instance: a ^ a = 0, a ^ 0 = a. If we take XOR of the index and element at the same time, the paired index and element can be eliminated, and the remaining are duplicate or missing elements. 
+
+vector<int> findErrorNums(vector<int>& nums) {
+    int n = nums.size();
+    int dup = -1;
+    for (int i = 0; i < n; i++) {
+        // Now, elements  start at 1
+        int index = abs(nums[i]) - 1;
+        // nums[index] < 0  means find the duplicate element
+        if (nums[index] < 0)
+            dup = abs(nums[i]);
+        else
+            nums[index] *= -1;
+    }
+
+    int missing = -1;
+    for (int i = 0; i < n; i++)
+        // nums[i] > 0 means find the missing element
+        if (nums[i] > 0)
+            // Convert index to element
+            missing = i + 1;
+
+    return {dup, missing};
+}
+'''
+## How to Check Palindromic LinkedList
+'''
+The core concept to FIND the palindromic strings is expanding from the middle to the edges.
+string palindrome(string& s, int l, int r) {
+    // to prevent the indexes from getting out of range
+    while (l >= 0 && r < s.size()
+            && s[l] == s[r]) {
+        // expand to two edges
+        l--; r++;
+    }
+    // return the longest palindromic in which the middle
+    // are both s[l] and s[r]
+    return s.substr(l + 1, r - l - 1);
+}
+
+But to CHECK a palindromic string is much easier. Regardless of its length, we only need to do the double pointers trick, and move from two edges to the middle.
+bool isPalindrome(string s) {
+    int left = 0, right = s.length - 1;
+    while (left < right) {
+        if (s[left] != s[right])
+            return false;
+        left++; right--;
+    }
+    return true;
+}
+---
+Check A Palindromic Singly Linked List
+What is the essence of this way? It is all about pushing the nodes in the linked list into a stack and then popping them out. At this time the elements are in reverse. What we make in use is the queues and stacks in recursion.
+
+// The left pointer
+ListNode left;
+
+boolean isPalindrome(ListNode head) {
+    left = head;
+    return traverse(head);
+}
+
+boolean traverse(ListNode right) {
+    if (right == null) return true;
+    boolean res = traverse(right.next);
+    // code to traverse in postorder
+    res = res && (right.val == left.val);
+    left = left.next;
+    return res;
+}
+
+---
+Optimizing the Space Complexity
+Find the node in the middle by the fast and slow pointers:
+ListNode slow, fast;
+slow = fast = head;
+while (fast != null && fast.next != null) {
+    slow = slow.next;
+    fast = fast.next.next;
+}
+// the slow pointer now points to the middle point
+
+If the fast pointer doesn't point to null, the length of this linked list is odd, which means the slow pointer needs to forward one more step:
+if (fast != null)
+    slow = slow.next;
+
+Reverse the right half of the linked list and compare palindromes:
+ListNode left = head;
+ListNode right = reverse(slow);
+
+while (right != null) {
+    if (left.val != right.val)
+        return false;
+    left = left.next;
+    right = right.next;
+}
+return true;
+
+ListNode reverse(ListNode head) {
+    ListNode pre = null, cur = head;
+    while (cur != null) {
+        ListNode next = cur.next;
+        cur.next = pre;
+        pre = cur;
+        cur = next;
+    }
+    return pre;
+}
+
+p.next = reverse(q);
+'''
