@@ -413,7 +413,7 @@ print(bitsLength(7))
 O(n) - O(1)
 '''
 
-## Check If Kth Bit Is Set/Unset
+## Check If Kth Bit Is Set/Unset - LEFT
 '''
 def helper(n):
     if(n == 0):
@@ -443,6 +443,34 @@ print("n=10,k=2 : ",checkKthBitSet(10,2))
 print("--------------------")
 print("n=10,k=1 : ",checkKthBitSet(10,1))
 '''
+
+## Check If Kth Bit Is Set/Unset - RIGHT
+'''
+def helper(n):
+    if(n == 0):
+        return 0
+    k=1
+    while True:
+        if(((n >> (k - 1))& 1) == 0):
+            k+=1
+        else:
+            return k
+  
+print("First setbit position for number : 18 is -> ",helper(18))
+print("First setbit position for number : 5 is -> ",helper(5))
+print("First setbit position for number : 32 is -> ",helper(32))
+---
+def checkKthBitSet(n,k):
+    return ((n >> (k - 1)) & 1) == 1
+    
+print("n=5,k=3  : ",checkKthBitSet(5,3))
+print("--------------------")
+print("n=10,k=2 : ",checkKthBitSet(10,2))
+print("--------------------")
+print("n=10,k=1 : ",checkKthBitSet(10,1))
+'''
+
+
 ## Subsets / Powerset -- CHECK AGAIN
 '''
 In general, if we have n elements then the subsets are 2^n subsets.
