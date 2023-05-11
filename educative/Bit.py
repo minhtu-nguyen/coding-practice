@@ -283,3 +283,61 @@ def HammingDistance(a, b):
 ---
 O(1) - O(1)
 '''
+
+## Single Number
+'''
+In this question, every element appears twice except one element, which is our answer.
+---
+# Brute force
+Iterate the elements using two for loops and find the one that is not repeating. O(n^2) - O(1)
+# Hashtable - O(n) - O(1)
+from collections import defaultdict
+
+def singleNumber(nums):
+    lookup = defaultdict(int)
+
+    for i in nums:
+        lookup[i] += 1
+
+    for i in nums:
+        if lookup[i] == 1:
+            return i
+
+    return -1
+
+nums = [4, 1, 2, 9, 1, 4, 2]
+print("Element appearing one time is", singleNumber(nums))
+
+# Math
+2 * (a + b) − (a + a + b) = b
+
+def singleNumber(nums):
+    sum_of_unique_elements = 0
+    total_sum = 0
+    num_set = set()
+
+    for num in nums:
+        if num not in num_set:
+            num_set.add(num)
+            sum_of_unique_elements += num
+        total_sum += num
+
+    return 2 * sum_of_unique_elements - total_sum
+
+nums = [4, 1, 2, 9, 1, 4, 2]
+print("Element appearing one time is", singleNumber(nums))
+---
+Optimized
+a ^ b ^ a = (a ^ a) ^ b = 0 ^ b = b;
+
+def singleNumber(nums):
+    xor = 0
+    for num in nums:
+        xor ^= num
+    return xor
+
+nums = [4, 1, 2, 9, 1, 4, 2]
+print("Element appearing one time is", singleNumber(nums))
+
+O(n) - O(1)
+'''
