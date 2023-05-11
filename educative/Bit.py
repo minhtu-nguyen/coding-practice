@@ -443,7 +443,7 @@ print("n=10,k=2 : ",checkKthBitSet(10,2))
 print("--------------------")
 print("n=10,k=1 : ",checkKthBitSet(10,1))
 '''
-## Subsets / Powerset
+## Subsets / Powerset -- CHECK AGAIN
 '''
 In general, if we have n elements then the subsets are 2^n subsets.
 So for every possible case of having at least two elements, we can see that an element is present and not present in the subsets.
@@ -471,4 +471,23 @@ def subsets(nums):
 print('Result:', subsets([1, 2, 3]))
 ---
 O(n2^n) - O(2^n)
+'''
+
+## Get First Set Bit Position
+'''
+def helper(n):
+    if (n == 0):
+        return 0
+    
+    k = 1
+    while (True) :
+        if ((n & (1 << (k - 1))) == 0) :
+            k+=1
+        else:
+            return k
+
+print("First setbit position for number: 18 is -> ", helper(18))
+print("First setbit position for number: 18 is -> ", helper(5))
+print("First setbit position for number: 18 is -> ", helper(32))
+ 
 '''
