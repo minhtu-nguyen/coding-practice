@@ -443,3 +443,32 @@ print("n=10,k=2 : ",checkKthBitSet(10,2))
 print("--------------------")
 print("n=10,k=1 : ",checkKthBitSet(10,1))
 '''
+## Subsets / Powerset
+'''
+In general, if we have n elements then the subsets are 2^n subsets.
+So for every possible case of having at least two elements, we can see that an element is present and not present in the subsets.
+
+For every value, we are considering the binary representation and here we use the set bits in the binary representation to generate corresponding subsets.
+
+If all set bits are 0, then the corresponding subset is empty [].
+If the last bit is 1, then we put 1 in the subset as [1].
+---
+def subsets(nums):
+    result = []
+
+    n = len(nums)
+    pow_size = 2 ** n
+
+    for i in range(pow_size):
+        val = []
+        for j in range(n):
+            if (i & (1 << j)) != 0:
+                val.append(nums[j])
+        result.append(val)
+
+    return result
+
+print('Result:', subsets([1, 2, 3]))
+---
+O(n2^n) - O(2^n)
+'''
