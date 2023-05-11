@@ -394,3 +394,52 @@ print("Missing element in the array is: ",MissingNumber(nums))
 
 O(n) - O(1)
 '''
+
+### ** LEFT SHIFT
+## Find Bit Length of a Number
+'''
+def bitsLength(n):
+  bitsCounter = 0
+
+  while((1 << bitsCounter) <= n):
+    bitsCounter += 1
+  
+  return bitsCounter
+
+print(bitsLength(8))
+print(bitsLength(2))
+print(bitsLength(7))
+---
+O(n) - O(1)
+'''
+
+## Check If Kth Bit Is Set/Unset
+'''
+def helper(n):
+    if(n == 0):
+        return 0
+    k=1
+    while True:
+        if((n & (1 << (k -1))) == 0):
+            k+=1
+        else:
+            return k
+  
+print("First setbit position for number : 18 is -> ",helper(18))
+print("First setbit position for number : 5 is -> ",helper(5))
+print("First setbit position for number : 32 is -> ",helper(32))
+---
+   n         = 5 = 00000000 00000000 00000000 00000101
+  (1 << (k - 1))   = 4 = 00000000 00000000 00000000 00000100
+-------------------------------------------------------------
+n & (1 << (k - 1)) = 4 = 00000000 00000000 00000000 00000100
+-------------------------------------------------------------
+---
+def checkKthBitSet(n,k):
+    return (n & (1 << (k- 1))) !=0
+print("n=5,k=3  : ",checkKthBitSet(5,3))
+print("--------------------")
+print("n=10,k=2 : ",checkKthBitSet(10,2))
+print("--------------------")
+print("n=10,k=1 : ",checkKthBitSet(10,1))
+'''
