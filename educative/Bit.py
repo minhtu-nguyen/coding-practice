@@ -501,7 +501,7 @@ print('Result:', subsets([1, 2, 3]))
 O(n2^n) - O(2^n)
 '''
 
-## Get First Set Bit Position
+## Get First Set Bit Position - LEFT
 '''
 def helper(n):
     if (n == 0):
@@ -518,4 +518,21 @@ print("First setbit position for number: 18 is -> ", helper(18))
 print("First setbit position for number: 18 is -> ", helper(5))
 print("First setbit position for number: 18 is -> ", helper(32))
  
+'''
+
+## Get First Set Bit Position - RIGHT
+'''
+def helper(n):
+    if(n == 0):
+        return 0
+    k=1
+    while True:
+        if(((n >> (k - 1))& 1) == 0):
+            k+=1
+        else:
+            return k
+  
+print("First setbit position for number : 18 is -> ",helper(18))
+print("First setbit position for number : 5 is -> ",helper(5))
+print("First setbit position for number : 32 is -> ",helper(32))
 '''
