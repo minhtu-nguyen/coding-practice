@@ -341,3 +341,56 @@ print("Element appearing one time is", singleNumber(nums))
 
 O(n) - O(1)
 '''
+
+## Missing Number
+'''
+Given an array nums containing n distinct numbers in the range [0, n], return the only number in the range that is missing from the array.
+---
+# Hashtable
+def missing_number(array):
+    num_set = set()
+
+    for num in array:
+        num_set.add(num)
+
+    n = len(array) + 1
+
+    for i in range(n):
+        if i not in num_set:
+            return i
+
+    return -1
+
+array = [9, 6, 4, 2, 3, 5, 7, 0, 1]
+print("Missing element in the array is", missing_number(array))
+
+# Math/Summation
+We know the sum of n natural numbers = n(n+1)/2
+
+def helper(nums):
+    n = len(nums)
+    expected_sum = n * (n + 1) // 2
+
+    actual_sum = 0
+    
+    for num in nums:
+        actual_sum += num
+
+    return expected_sum - actual_sum
+
+
+nums = [9, 6, 4, 2, 3, 5, 7, 0, 1]
+print("Missing element in the array is", helper(nums))
+---
+We can XOR all bits together to find the unique number.
+
+def MissingNumber(nums):
+    missing=len(nums)
+    for i in range(0,len(nums)):
+        missing ^= i ^ nums[i]
+    return missing
+nums=[9,6,4,2,3,5,7,0,1]
+print("Missing element in the array is: ",MissingNumber(nums))
+
+O(n) - O(1)
+'''
