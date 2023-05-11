@@ -298,7 +298,7 @@ if __name__ == "__main__":
 """
 Jacobi Iteration Method - https://en.wikipedia.org/wiki/Jacobi_method
 """
-from __future__ import annotations
+#from __future__ import annotations
 
 import numpy as np
 from numpy import float64
@@ -472,7 +472,7 @@ if __name__ == "__main__":
         numbers out of 1 ... n. We use backtracking to solve this problem.
         Time complexity: O(C(n,k)) which is O(n choose k) = O((n!/(k! * (n - k)!)))
 """
-from __future__ import annotations
+#from __future__ import annotations
 
 
 def generate_all_combinations(n: int, k: int) -> list[list[int]]:
@@ -522,7 +522,7 @@ if __name__ == "__main__":
         Time complexity: O(n! * n),
         where n denotes the length of the given sequence.
 """
-from __future__ import annotations
+#from __future__ import annotations
 
 
 def generate_all_permutations(sequence: list[int | str]) -> None:
@@ -575,7 +575,7 @@ of the given sequence. We use backtracking to solve this problem.
 Time complexity: O(2^n),
 where n denotes the length of the given sequence.
 """
-from __future__ import annotations
+#from __future__ import annotations
 
 from typing import Any
 
@@ -1135,7 +1135,7 @@ python3 -m doctest -v binary_search.py
 For manual testing run:
 python3 binary_search.py
 """
-from __future__ import annotations
+#from __future__ import annotations
 
 import bisect
 
@@ -1437,7 +1437,7 @@ if __name__ == "__main__":
 """
 This is pure Python implementation of tree traversal algorithms
 """
-from __future__ import annotations
+#from __future__ import annotations
 
 import queue
 
@@ -1742,7 +1742,7 @@ if __name__ == "__main__":
     print(prompt())
 
 ## Double Linear Search
-from __future__ import annotations
+#from __future__ import annotations
 
 
 def double_linear_search(array: list[int], search_item: int) -> int:
@@ -2558,7 +2558,7 @@ python3 -m doctest -v simple_binary_search.py
 For manual testing run:
 python3 simple_binary_search.py
 """
-from __future__ import annotations
+#from __future__ import annotations
 
 
 def binary_search(a_list: list[int], item: int) -> bool:
@@ -2615,7 +2615,7 @@ import math
 import random
 from typing import Any
 
-from .hill_climbing import SearchProblem
+#from .hill_climbing import SearchProblem
 
 
 def simulated_annealing(
@@ -3050,7 +3050,7 @@ This is a type of divide and conquer algorithm which divides the search space in
 Time Complexity  : O(log3 N)
 Space Complexity : O(1)
 """
-from __future__ import annotations
+#from __future__ import annotations
 
 # This is the precision for this function which can be altered.
 # It is recommended for users to keep this number greater than or equal to 10.
@@ -3268,7 +3268,7 @@ Python program for Bitonic Sort.
 
 Note that this program works only when size of input is a power of 2.
 """
-from __future__ import annotations
+#from __future__ import annotations
 
 
 def comp_and_swap(array: list[int], index1: int, index2: int, direction: int) -> None:
@@ -3493,7 +3493,7 @@ If k = O(n), time complexity is O(n)
 
 Source: https://en.wikipedia.org/wiki/Bucket_sort
 """
-from __future__ import annotations
+#from __future__ import annotations
 
 
 def bucket_sort(my_list: list) -> list:
@@ -4565,7 +4565,7 @@ For manual testing run:
 python3 iterative_merge_sort.py
 """
 
-from __future__ import annotations
+#from __future__ import annotations
 
 
 def merge(input_list: list, low: int, mid: int, high: int) -> list:
@@ -4662,7 +4662,7 @@ For manual testing run:
 python3 merge_insertion_sort.py
 """
 
-from __future__ import annotations
+#from __future__ import annotations
 
 
 def binary_search_insertion(sorted_list, item):
@@ -4915,7 +4915,7 @@ It used the binary representation of the integers to sort
 them.
 https://en.wikipedia.org/wiki/Radix_sort
 """
-from __future__ import annotations
+#from __future__ import annotations
 
 
 def msd_radix_sort(list_of_ints: list[int]) -> list[int]:
@@ -5071,7 +5071,7 @@ if __name__ == "__main__":
     doctest.testmod()
 
 ## Natural Sort
-from __future__ import annotations
+#from __future__ import annotations
 
 import re
 
@@ -5383,7 +5383,7 @@ if __name__ == "__main__":
     print(pancake_sort(unsorted))
 
 ## Patience Sort
-from __future__ import annotations
+#from __future__ import annotations
 
 from bisect import bisect_left
 from functools import total_ordering
@@ -5462,7 +5462,7 @@ if __name__ == "__main__":
     For manual testing run:
     python pigeon_sort.py
 """
-from __future__ import annotations
+#from __future__ import annotations
 
 
 def pigeon_sort(array: list[int]) -> list[int]:
@@ -5569,7 +5569,7 @@ python3 -m doctest -v quick_sort.py
 For manual testing run:
 python3 quick_sort.py
 """
-from __future__ import annotations
+#from __future__ import annotations
 
 from random import randrange
 
@@ -5718,7 +5718,7 @@ This is a pure Python implementation of the radix sort algorithm
 
 Source: https://en.wikipedia.org/wiki/Radix_sort
 """
-from __future__ import annotations
+#from __future__ import annotations
 
 RADIX = 10
 
@@ -5919,7 +5919,7 @@ if __name__ == "__main__":
 """
 A recursive implementation of the insertion sort algorithm
 """
-from __future__ import annotations
+#from __future__ import annotations
 
 
 def rec_insertion_sort(collection: list, n: int):
@@ -6249,7 +6249,7 @@ in their paper Pessimal Algorithms and Simplexity Analysis
 
 Source: https://en.wikipedia.org/wiki/Slowsort
 """
-from __future__ import annotations
+#from __future__ import annotations
 
 
 def slowsort(sequence: list, start: int | None = None, end: int | None = None) -> None:
