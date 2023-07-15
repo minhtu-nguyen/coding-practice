@@ -542,7 +542,7 @@ def min_refuel_stops(target, start_fuel, stations):
     max_d = [-1 for i in range(n+1)]
     # Find the maximum distance that can be travelled for each number of refuelling stops.
     while i <= n:
-        max_d[i] = min_refuel_stops_helper(n, i, start_fuel, stations);
+        max_d[i] = min_refuel_stops_helper(n, i, start_fuel, stations)
         i += 1
     result = -1
     i = 0

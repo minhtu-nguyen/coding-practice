@@ -17,7 +17,7 @@ class Solution:
     def twoSum(self, nums: List[int], target: int) -> List[int]:
         prevMap = {}  # val -> index
 
-        for i, n in enumerate(nums):
+        for i, n in enumerate(nums): 
             diff = target - n
             if diff in prevMap:
                 return [prevMap[diff], i]
@@ -1004,7 +1004,7 @@ class Solution:
 
             visited[char] = True
 
-            for neighChar in adj[char]:
+            for neighChar in adj[char]: #???
                 if dfs(neighChar):
                     return True
 
@@ -1349,7 +1349,7 @@ class Solution:
         elif list2:
             tail.next = list2
 
-        return dummy.next
+        return dummy.next #Check this
 
 #Merge K Sorted Lists
 '''
@@ -1563,7 +1563,7 @@ class Solution:
         """
         l, r = 0, len(matrix) - 1
         while l < r:
-            for i in range(r - l):
+            for i in range(r - l)
                 top, bottom = l, r
 
                 # save the topleft
