@@ -118,7 +118,7 @@ def reverse_words(sentence):
         end += 1
      # Let's call our helper function to reverse the word in-place.
     str_rev(sentence, start, end - 1)
-    start = end + 1;
+    start = end + 1
     end += 1
   
    return ''.join(sentence)
