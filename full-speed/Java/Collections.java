@@ -1,4 +1,7 @@
 import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.Month;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -13,8 +16,14 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.StampedLock;
 import java.util.function.BiFunction;
 import java.util.function.BinaryOperator;
 import java.util.function.Function;
@@ -781,7 +790,258 @@ public class CollectorsDemo {
         String joinedString = Stream.of("hello", "how", "are", "you")
         .collect(Collectors.joining(" ", "prefix", "suffix"));
 
+        Map<String,List<Employee2>> empMap1 = employeeList.stream()
+        .collect(Collectors.groupingBy(Employee2::getCountry));
         
+        Map<String, Optional<Employee2>> empMap2 = employeeList.stream()
+        .collect(Collectors.groupingBy(Employee2::getCountry, Collectors.maxBy(Comparator.comparingInt(Employee2::getSalary))));
+
+        Map<String, Set<Employee2>> empMap3 = employeeList.stream()
+        .collect(Collectors.groupingBy(Employee2::getCountry, HashMap::new, Collectors.toSet()));
+
+        ConcurrentMap<String, List<Employee2>> empMap4 = employeeList.parallelStream()
+        .collect(Collectors.groupingBy(Employee2::getCountry));
+
+        Map<Boolean, List<Employee2>> empMap5 = employeeList.stream()
+        .collect(Collectors.partitioningBy(emp -> emp.getAge() > 30));
     }
 }
 
+public class ParallelStreamDemo {
+    public static void main(String args[]) {
+        Stream.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+            .parallel()
+            .forEach(num -> System.out.println(num + " " + Thread.currentThread().getName()));
+    }
+}
+
+public class LazyEvaluationDemo {
+    public static void main(String args[]) {
+        List<Integer> data = Array.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
+
+        Optional<Integer> number = data.stream()
+            .filter(num -> {
+                System.out.println("Processing first filter for number " + num);
+                return num > 5;
+            })
+            .filter(num -> {
+                System.out.println("Processing second filter for number " + num);
+                return num % 3 == 0;
+            })
+            .findFirst();
+
+        System.out.println(number.get());
+    }
+}
+
+public class CompletableFutureDemo {
+    public static void main(String args[]) {
+        CompletableFuture<String> completedFutute = CompletableFuture.completedFuture("Hello World");
+
+        try {
+            System.out.println(completedFutute.get());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        
+        CompletableFuture<Void> future = CompletableFuture.runAsync(() -> {
+            try {
+                TimeUnit.SECONDS.sleep(5);
+            } catch (InterruptedException e) {
+                throw new IllegalStateException(e);
+            }
+            System.out.println("This will print immediately " + Thread.currentThread().getName());
+        });
+
+        System.out.print("This will print immedidately " + Thread.currentThread().getName());
+
+        try {
+            future.get();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
+
+        System.out.println("This will print after 5 seconds " + Thread.currentThread().getName());
+    }
+
+    public CompletableFuture<Integer> getSquareAsynchronously(int num) throws InterruptedException {
+        CompletableFuture<Integer> completableFuture = new CompletableFuture<>();
+
+        Executors.newCachedThreadPool().submit(() -> {
+            Thread.sleep(500);
+
+            completableFuture.complete(num * num);
+            return null;
+        });
+
+        return completableFuture;
+    }
+
+    public void supplyA() {
+        CompletableFuture<String> future = CompletableFuture.supplyAsync(() -> {
+            try {
+                TimeUnit.SECONDS.sleep(5);
+            } catch (InterruptedException e) {
+                throw new IllegalStateException(e);
+            }
+            return "Hello World";
+        });
+
+        System.out.println("THis will print immediately");
+
+        try {
+            System.out.println(future.get());
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
+
+        System.out.println("This will print after 5 seconds");
+    }
+
+    public void thenApply() {
+        CompletableFuture<Integer> future = CompletableFuture.supplyAsync(() -> {
+            try {
+                TimeUnit.SECONDS.sleep(1);
+                System.out.println(Thread.currentThread().getName());
+            } catch (InterruptedException e) {
+                throw new IllegalStateException(e);
+            }
+            return 50;
+        });
+
+        CompletableFuture<Integer> resultFuture = future.thenApply(num -> {
+            System.out.println(Thread.currentThread().getName());
+            return num * 2;
+        });
+
+        future.thenAccept(num -> {
+            System.out.println(Thread.currentThread().getName());
+            System.out.println("The value is " + num);
+        });
+
+        future.thenRun(() -> {
+            System.out.println(Thread.currentThread().getName());
+            System.out.println("Hello");
+        });
+
+        try {
+            System.out.println(resultFuture.get());
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void thenApplySync() {
+        CompletableFuture<Integer> resultFuture = future.thenApplySync(num -> {
+            System.out.println(Thread.currentThread().getName());
+            return num * 2;
+        });
+
+        ExecutorService executor = Executors.newFixedThreadPool(5);
+
+        CompletableFuture<Integer> resultFuture = future.thenApplySync(num -> {
+            System.out.println(Thread.currentThread().getName());
+            return num * 2;
+        }, executor);
+    }
+
+    public void Chaining() {
+        CompletableFuture<Integer> future = CompletableFuture.supplyAsync(() -> {
+            try {
+                TimeUnit.SECONDS.sleep(1);
+                System.out.println(Thread.currentThread().getName());
+            } catch (InterruptedException e) {
+                throw new IllegalStateException(e);
+            }
+            return 50;
+        });
+
+        CompletableFuture<Integer> resultFuture = future.thenCompose(num -> CompletableFuture.supplyAsync(() -> num * 2));
+
+        CompletableFuture<Integer> resultCombine = future.thenCombine(CompletableFuture.supplyAsync(() -> 20), (num1, num2) -> num1 + num2);
+    }
+
+    public void Combining() {
+        CompletableFuture<Integer> future1 = CompletableFuture.supplyAsync(() -> 50);
+        CompletableFuture<Integer> future2 = CompletableFuture.supplyAsync(() -> 40);
+        CompletableFuture<Integer> future3 = CompletableFuture.supplyAsync(() -> 30);
+
+        CompletableFuture<Void> finalFuture = CompletableFuture.allOf(future1, future2, future3);
+
+        try {
+            finalFuture.get();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        Optional<Integer> maxElement = Stream.of(future1, future2, future3)
+        .map(CompletableFuture::join)
+        .max(Integer::compareTo);
+
+        CompletableFuture<Object> firstCompletedFuture = CompletableFuture.anyOf(future1, futu2, futur2);
+    }
+}
+
+public class StampedLockDemo1 {
+
+    static Map<String, Integer> data = new HashMap<>();
+    static StampedLock lock = new StampedLock();
+
+    public static Integer readDataFromMap(String key) {
+        long stamp = lock.tryReadLock();
+        int result = 0;
+        if(stamp != 0L) {
+            try {
+                result = data.get(key);
+            } finally {
+                lock.unlockRead(stamp);
+            }
+        }
+        return result;
+    }
+
+    public static void writeDataToMap(String key, Integer value) {
+        long stamp = lock.tryWriteLock();
+        if (stamp != 0L) {
+            try {
+                data.put(key, value);
+            } finally {
+                lock.unlockWrite(stamp);
+            }
+        }
+    }
+
+    public static void main(String args[]) {
+        writeDataToMap("ray", 123);
+        Integer val = readDataFromMap("ray");
+        System.out.println(val);
+    }
+}
+
+public class DateTimeDemo {
+    public static void main(String args[]) {
+        LocalDate date = LocalDate.now();
+
+        LocalDate date1 = LocalDate.of(2019, 05, 03);
+
+        LocalDate date2 = LocalDate.of(2019, Month.AUGUST, 03);
+
+        LocalDate date3 = LocalDate.parse("2015-02-12");
+
+        LocalDate date4 = LocalDate.parse("12/02/2012", DateTimeFormatter.ofPattern("MM/dd/yyyy"));
+
+        LocalDate date5 = LocalDate.parse("2015-02-12").plusDays(4);
+
+        DayOfWeek dayOfWeek = LocalDate.parse("2017-04-06").getDayOfWeek();
+
+        boolean isBefore = LocalDate.parse("2020-03-12")
+        .isBefore(LocalDate.parse("2018-06-14"));
+    }
+
+}
