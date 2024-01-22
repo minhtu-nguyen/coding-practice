@@ -1,7 +1,9 @@
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.Month;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -1042,6 +1044,19 @@ public class DateTimeDemo {
 
         boolean isBefore = LocalDate.parse("2020-03-12")
         .isBefore(LocalDate.parse("2018-06-14"));
-    }
+    
+        LocalTime time = LocalTime.now();
 
+        LocalTime time2 = LocalTime.of(11, 25, 03);
+
+        LocalTime time3 = LocalTime.parse("08:27");
+
+        LocalTime time4 = LocalTime.parse("08:27", DateTimeFormatter.ofPattern("HH:mm"));
+
+        time = LocalTime.parse("12:54:53").plus(4, ChronoUnit.MINUTES);
+
+        int minute = LocalTime.parse("07:45").getMinute();
+
+        boolean isBeforeTime = LocalTime.parse("06:23").isBefore(LocalTime.parse("07:50"));
+    }
 }
