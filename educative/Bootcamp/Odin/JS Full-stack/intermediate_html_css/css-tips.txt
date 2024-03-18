@@ -1,0 +1,24 @@
+use rem for font-size and px for everything else
+websites that use Google Fonts violate the GDPR --> download them
+Imported font performance considerations: https://web.dev/articles/font-best-practices
+A good rule of thumb to follow is that if you just want text to be italic (or bold, underlined, highlighted, etc.), use a CSS property. Otherwise, if text should have some sort of semantic emphasis, use the correct HTML element.
+With the text-overflow property, you can truncate overflowing text with an ellipsis: https://css-tricks.com/snippets/css/truncate-string-with-ellipsis/
+.overflowing {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+Legibility: https://www.smashingmagazine.com/2020/07/css-techniques-legibility/
+Font stack: https://modernfontstacks.com/
+Practice CSS: https://flukeout.github.io -- CSS Diner
+Disclaimer: absolute positioning has very specific use cases and if possible, using flexbox or grid should be prioritized. Absolute positioning shouldn’t be used to do entire page layouts.
+:root {
+--header: 3rem;
+--footer: 40px;
+--main: calc(100vh - calc(var(--header) + var(--footer)));
+}
+Client-side validations are not a silver bullet for ensuring users enter the correct data. To ensure the integrity of any user data coming into our systems, we should also have server-side validations in place.
+Grid game: https://cssgridgarden.com/
+CSS exercises: https://github.com/TheOdinProject/css-exercises
+Visual Flexbox: https://www.samanthaming.com/flexbox30/ 
+Grid and Flexbox: In Content First Design, you begin with clarity of how the content should be, and the layout follows. This is a great opportunity to use Flexbox. In Layout First Design, you decide how you want the pieces arranged, then fill in the content. That is when Grid shines.
