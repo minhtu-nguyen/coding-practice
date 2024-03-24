@@ -1,0 +1,6 @@
+Object.getPrototypeOf() vs. .__proto__ vs. [[Prototype]]
+.__proto__ property of the object. However, this is a non-standard way of doing so, and deprecated.
+[[Prototype]], which is just another way of talking about the .__proto__ property of an object
+Though it seems to be an easy way to set up Prototypal Inheritance using Object.setPrototypeOf(), the prototype chain has to be set up using this function before creating any objects. Using setPrototypeOf() after objects have already been created can result in performance issues.
+Instead of using the new keyword to create an object, factory functions set up and return the new object when you call the function. They do not use the prototype, which incurs a performance penalty - but as a general rule, this penalty isn’t significant unless you’re creating thousands of objects.
+Encapsulation - bundling data, code, or something into a single unit, with selective access to the things inside that unit itself. While it sounds general, this is what happens when we wrap, or encapsulate our code into modules - we don’t expose everything to the body of our program itself. This encapsulation leads to an effect called namespacing. Namespacing is a technique that is used to avoid naming collisions in our programs.
